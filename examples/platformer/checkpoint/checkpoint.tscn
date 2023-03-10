@@ -1,0 +1,340 @@
+[gd_scene load_steps=19 format=3 uid="uid://pu453ge5wosa"]
+
+[ext_resource type="Texture2D" uid="uid://4nlen5j7etvq" path="res://examples/platformer/checkpoint/checkpoint_no_flag.png" id="1_7vf2w"]
+[ext_resource type="Script" path="res://examples/platformer/checkpoint/checkpoint.gd" id="1_jot5v"]
+[ext_resource type="Texture2D" uid="uid://dfju87f6rw0nm" path="res://examples/platformer/checkpoint/checkpoint_idle.png" id="2_ns71f"]
+[ext_resource type="Texture2D" uid="uid://beoe1hh5aggor" path="res://examples/platformer/checkpoint/checkpoint_flag_out.png" id="3_fbg27"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="5_a58ma"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="6_53g38"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="6_qkwqk"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="7_a74k1"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="8_7tjvh"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_is_active_guard.gd" id="10_fk2fi"]
+
+[sub_resource type="Animation" id="Animation_xvggk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_7vf2w")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_p66ga"]
+resource_name = "close_flag"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("3_fbg27")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [26]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [25, 0]
+}
+
+[sub_resource type="Animation" id="Animation_w48c8"]
+resource_name = "idle_no_flag"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_7vf2w")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_judeo"]
+resource_name = "idle_with_flag"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_ns71f")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [10]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0, 9]
+}
+
+[sub_resource type="Animation" id="Animation_gr2w7"]
+resource_name = "open_flag"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("3_fbg27")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [26]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0, 25]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5pqa5"]
+_data = {
+"RESET": SubResource("Animation_xvggk"),
+"close_flag": SubResource("Animation_p66ga"),
+"idle_no_flag": SubResource("Animation_w48c8"),
+"idle_with_flag": SubResource("Animation_judeo"),
+"open_flag": SubResource("Animation_gr2w7")
+}
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_06im6"]
+radius = 18.445
+height = 59.4
+
+[sub_resource type="Resource" id="Resource_22wfi"]
+script = ExtResource("10_fk2fi")
+state = NodePath("../../../../Player Presence/Absent")
+metadata/_editor_prop_ptr_state = NodePath("../../../Player Presence/Absent")
+
+[node name="Checkpoint" type="Node2D"]
+script = ExtResource("1_jot5v")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_7vf2w")
+offset = Vector2(0, -32)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_5pqa5")
+}
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(-2, -26)
+shape = SubResource("CapsuleShape2D_06im6")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("5_a58ma")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("6_53g38")
+
+[node name="Player Presence" type="Node" parent="StateChart/Root"]
+script = ExtResource("6_qkwqk")
+initial_state = NodePath("Absent")
+
+[node name="Absent" type="Node" parent="StateChart/Root/Player Presence"]
+script = ExtResource("7_a74k1")
+
+[node name="On Player Enter" type="Node" parent="StateChart/Root/Player Presence/Absent"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Present")
+event = &"player_entered"
+
+[node name="Present" type="Node" parent="StateChart/Root/Player Presence"]
+script = ExtResource("7_a74k1")
+
+[node name="On Player Exit" type="Node" parent="StateChart/Root/Player Presence/Present"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Absent")
+event = &"player_exited"
+
+[node name="Animation Control" type="Node" parent="StateChart/Root"]
+script = ExtResource("6_qkwqk")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root/Animation Control"]
+script = ExtResource("7_a74k1")
+
+[node name="On Player Enter" type="Node" parent="StateChart/Root/Animation Control/Idle"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Expanding")
+event = &"player_entered"
+
+[node name="Expanding" type="Node" parent="StateChart/Root/Animation Control"]
+script = ExtResource("7_a74k1")
+
+[node name="After 1 s" type="Node" parent="StateChart/Root/Animation Control/Expanding"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Activated/Expanded")
+delay_seconds = 0.9
+
+[node name="Activated" type="Node" parent="StateChart/Root/Animation Control"]
+script = ExtResource("6_qkwqk")
+initial_state = NodePath("Expanded")
+
+[node name="Expanded" type="Node" parent="StateChart/Root/Animation Control/Activated"]
+script = ExtResource("7_a74k1")
+
+[node name="Immediately" type="Node" parent="StateChart/Root/Animation Control/Activated/Expanded"]
+editor_description = "Immediately go to the retracting state when the player is no longer present when entering this state."
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Waiting To Retract")
+guard = SubResource("Resource_22wfi")
+
+[node name="On Player Leave" type="Node" parent="StateChart/Root/Animation Control/Activated/Expanded"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Waiting To Retract")
+event = &"player_exited"
+
+[node name="Waiting To Retract" type="Node" parent="StateChart/Root/Animation Control/Activated"]
+script = ExtResource("7_a74k1")
+
+[node name="After  5 s" type="Node" parent="StateChart/Root/Animation Control/Activated/Waiting To Retract"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../../Retracting")
+delay_seconds = 5.0
+
+[node name="On Player Enter" type="Node" parent="StateChart/Root/Animation Control/Activated/Waiting To Retract"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Expanded")
+event = &"player_entered"
+
+[node name="Retracting" type="Node" parent="StateChart/Root/Animation Control"]
+script = ExtResource("7_a74k1")
+
+[node name="After 1 s" type="Node" parent="StateChart/Root/Animation Control/Retracting"]
+script = ExtResource("8_7tjvh")
+to = NodePath("../../Idle")
+delay_seconds = 0.9
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]
+[connection signal="input_event" from="Area2D" to="." method="_on_area_2d_input_event"]
+[connection signal="state_entered" from="StateChart/Root/Animation Control/Idle" to="AnimationPlayer" method="play" binds= ["idle_no_flag"]]
+[connection signal="state_entered" from="StateChart/Root/Animation Control/Expanding" to="AnimationPlayer" method="play" binds= ["open_flag"]]
+[connection signal="state_entered" from="StateChart/Root/Animation Control/Activated" to="." method="emit_activated"]
+[connection signal="state_exited" from="StateChart/Root/Animation Control/Activated" to="." method="emit_deactivated"]
+[connection signal="state_entered" from="StateChart/Root/Animation Control/Activated/Expanded" to="AnimationPlayer" method="play" binds= ["idle_with_flag"]]
+[connection signal="state_entered" from="StateChart/Root/Animation Control/Retracting" to="AnimationPlayer" method="play" binds= ["close_flag"]]

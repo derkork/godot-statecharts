@@ -693,10 +693,9 @@ graph_offset = Vector2(84, -7)
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_63x7j"]
 
-[node name="NinjaFrog" type="CharacterBody2D" node_paths=PackedStringArray("state_chart", "animation_tree")]
+[node name="NinjaFrog" type="CharacterBody2D" groups=["player"]]
+input_pickable = true
 script = ExtResource("1_xi1lh")
-state_chart = NodePath("StateChart")
-animation_tree = NodePath("AnimationTree")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -15)
@@ -719,7 +718,7 @@ active = true
 process_callback = 0
 parameters/playback = SubResource("AnimationNodeStateMachinePlayback_63x7j")
 parameters/DoubleJump/blend_position = 0
-parameters/Idle/blend_position = 0.297152
+parameters/Idle/blend_position = 0.513191
 parameters/Move/blend_position = Vector2(0.147908, 0.247826)
 
 [node name="StateChart" type="Node" parent="."]
@@ -805,6 +804,7 @@ script = ExtResource("9_wswdv")
 to = NodePath("../../Idle")
 event = &"idle"
 
+[connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="." method="_on_jump_enabled_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne/CoyoteJumpEnabled" to="." method="_on_jump_enabled_state_physics_processing"]
 [connection signal="event_received" from="StateChart/Root/Movement/Airborne/DoubleJumpEnabled" to="." method="_on_double_jump_state_event_received"]

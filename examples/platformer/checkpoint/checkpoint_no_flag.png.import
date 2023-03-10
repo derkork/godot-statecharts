@@ -2,18 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bbudjoa3ds4qj"
-path="res://.godot/imported/compound_state.svg-84780d78ec1f15e1cbb9d20f4df031a7.ctex"
+uid="uid://4nlen5j7etvq"
+path="res://.godot/imported/checkpoint_no_flag.png-7c2e12294c5773a9b3ca09ebee082bbd.ctex"
 metadata={
-"editor_scale": 1.0,
-"has_editor_variant": true,
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/godot_state_charts/compound_state.svg"
-dest_files=["res://.godot/imported/compound_state.svg-84780d78ec1f15e1cbb9d20f4df031a7.ctex"]
+source_file="res://examples/platformer/checkpoint/checkpoint_no_flag.png"
+dest_files=["res://.godot/imported/checkpoint_no_flag.png-7c2e12294c5773a9b3ca09ebee082bbd.ctex"]
 
 [params]
 
@@ -34,6 +32,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=true
-editor/convert_colors_with_editor_theme=false

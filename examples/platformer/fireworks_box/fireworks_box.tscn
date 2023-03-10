@@ -1,0 +1,243 @@
+[gd_scene load_steps=18 format=3 uid="uid://cpx8xsq5138be"]
+
+[ext_resource type="Script" path="res://examples/platformer/fireworks_box/fireworks_box.gd" id="1_6vg3k"]
+[ext_resource type="Texture2D" uid="uid://roilgifkgiii" path="res://examples/platformer/fireworks_box/box.png" id="1_aido8"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_ahjdl"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="3_b1cau"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="4_ot1ih"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_bf3gq"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="7_tu34q"]
+
+[sub_resource type="Resource" id="Resource_y5h70"]
+script = ExtResource("7_tu34q")
+expression = "counter > 0"
+
+[sub_resource type="Resource" id="Resource_lsbaa"]
+script = ExtResource("7_tu34q")
+expression = "counter > 2"
+
+[sub_resource type="Resource" id="Resource_t7gf7"]
+script = ExtResource("7_tu34q")
+expression = "counter == 0"
+
+[sub_resource type="Animation" id="Animation_0njji"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Box:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -10)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Box:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.132645]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Box:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("GPUParticles2D:emitting")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_81tef"]
+resource_name = "explode"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Box:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.2, 0.2), Vector2(1e-05, 1e-05)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("GPUParticles2D:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_yw5k5"]
+resource_name = "idle"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Box:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_tug1d"]
+resource_name = "rattle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Box:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -10)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Box:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3, 0.5, 0.7, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.132645, 0.263545, -0.139626, -0.261799, -0.122173, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_stxxq"]
+_data = {
+"RESET": SubResource("Animation_0njji"),
+"explode": SubResource("Animation_81tef"),
+"idle": SubResource("Animation_yw5k5"),
+"rattle": SubResource("Animation_tug1d")
+}
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_c15xx"]
+lifetime_randomness = 0.17
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 42.97
+gravity = Vector3(0, 20, 0)
+initial_velocity_min = 26.32
+initial_velocity_max = 52.63
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+turbulence_noise_scale = 8.14
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4ryt0"]
+
+[node name="FireworksBox" type="Node2D"]
+script = ExtResource("1_6vg3k")
+
+[node name="Box" type="Sprite2D" parent="."]
+position = Vector2(0, -10)
+texture = ExtResource("1_aido8")
+
+[node name="StateChart" type="Node" parent="."]
+editor_description = "A state chart controlling the rattling and explosion of a box. You can probably use a simple script to achieve the same behaviour but it shows how to use expression guards."
+script = ExtResource("2_ahjdl")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("3_b1cau")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root"]
+script = ExtResource("4_ot1ih")
+
+[node name="Rattle on Counter" type="Node" parent="StateChart/Root/Idle"]
+script = ExtResource("6_bf3gq")
+to = NodePath("../../Rattling")
+event = &"counter_changed"
+guard = SubResource("Resource_y5h70")
+
+[node name="Rattling" type="Node" parent="StateChart/Root"]
+script = ExtResource("4_ot1ih")
+
+[node name="Explode on Counter" type="Node" parent="StateChart/Root/Rattling"]
+script = ExtResource("6_bf3gq")
+to = NodePath("../../Exploding")
+event = &"counter_changed"
+guard = SubResource("Resource_lsbaa")
+
+[node name="Get back to Idle" type="Node" parent="StateChart/Root/Rattling"]
+script = ExtResource("6_bf3gq")
+to = NodePath("../../Idle")
+event = &"counter_changed"
+guard = SubResource("Resource_t7gf7")
+
+[node name="Exploding" type="Node" parent="StateChart/Root"]
+script = ExtResource("4_ot1ih")
+
+[node name="Die after 4s" type="Node" parent="StateChart/Root/Exploding"]
+script = ExtResource("6_bf3gq")
+to = NodePath("../../Dead")
+delay_seconds = 4.0
+
+[node name="Dead" type="Node" parent="StateChart/Root"]
+script = ExtResource("4_ot1ih")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+reset_on_save = false
+libraries = {
+"": SubResource("AnimationLibrary_stxxq")
+}
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+position = Vector2(0, -10)
+emitting = false
+amount = 300
+process_material = SubResource("ParticleProcessMaterial_c15xx")
+lifetime = 2.81
+one_shot = true
+explosiveness = 0.86
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_4ryt0")
+
+[connection signal="state_entered" from="StateChart/Root/Idle" to="AnimationPlayer" method="play" binds= ["idle"]]
+[connection signal="state_entered" from="StateChart/Root/Rattling" to="AnimationPlayer" method="play" binds= ["rattle"]]
+[connection signal="state_entered" from="StateChart/Root/Exploding" to="AnimationPlayer" method="play" binds= ["explode"]]
+[connection signal="state_entered" from="StateChart/Root/Dead" to="." method="queue_free"]
+[connection signal="input_event" from="Area2D" to="." method="_on_area_2d_input_event"]

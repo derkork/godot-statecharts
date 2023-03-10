@@ -42,7 +42,12 @@ func evaluate_guard() -> bool:
 	if guard == null: 
 		return true
 
-	return guard.is_satisfied()
+	var parent_state = get_parent()
+	if parent_state == null or not (parent_state is State):
+		push_error("Transitions must be children of states.")
+		return false	
+		
+	return guard.is_satisfied(self, get_parent())
 
 ## Resolves the target state and returns it. If the target state is not found,
 ## this function will return null.
@@ -66,6 +71,9 @@ func _get_configuration_warnings():
 		warnings.append("The target state is not set")
 	elif resolve_target() == null:
 		warnings.append("The target state " + str(to) + " could not be found")
+
+	if not (get_parent() is State):
+		warnings.append("Transitions must be children of states.")
 	
 	return warnings
 
