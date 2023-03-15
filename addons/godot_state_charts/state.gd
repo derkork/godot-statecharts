@@ -45,7 +45,7 @@ func _state_init():
 	
 ## Called when the state is entered.
 func _state_enter():
-	print("state_enter: " + name)
+	# print("state_enter: " + name)
 	process_mode = Node.PROCESS_MODE_INHERIT
 	# emit the signal
 	state_entered.emit()
@@ -58,7 +58,7 @@ func _state_enter():
 
 ## Called when the state is exited.
 func _state_exit():
-	print("state_exit: " + name)
+	# print("state_exit: " + name)
 	# cancel any pending transitions
 	_pending_transition = null
 	_pending_transition_time = 0
@@ -84,7 +84,7 @@ func _process(delta:float):
 			var transition_to_send = _pending_transition
 			_pending_transition = null
 			_pending_transition_time = 0
-			print("requesting transition from " + name + " to " + transition_to_send.to.get_concatenated_names() + " now")
+			# print("requesting transition from " + name + " to " + transition_to_send.to.get_concatenated_names() + " now")
 			_handle_transition(transition_to_send, self)
 
 
@@ -109,7 +109,7 @@ func _state_event(event:StringName) -> bool:
 	# check all transitions which have the event
 	for transition in _transitions:
 		if transition.event == event and transition.evaluate_guard():
-			print(name +  ": consuming event " + event)
+			# print(name +  ": consuming event " + event)
 			# first match wins
 			_queue_transition(transition)
 			return true
@@ -118,7 +118,7 @@ func _state_event(event:StringName) -> bool:
 ## Queues the transition to be triggered after the delay.
 ## Executes the transition immediately if the delay is 0.
 func _queue_transition(transition:Transition):
-	print("transitioning from " + name + " to " + transition.to.get_concatenated_names() + " in " + str(transition.delay_seconds) + " seconds" )
+	# print("transitioning from " + name + " to " + transition.to.get_concatenated_names() + " in " + str(transition.delay_seconds) + " seconds" )
 	# queue the transition for the delay time (0 means next frame)
 	_pending_transition = transition
 	_pending_transition_time = transition.delay_seconds

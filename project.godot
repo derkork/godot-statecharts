@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="godot-state-charts"
-run/main_scene="res://examples/platformer_demo.tscn"
+run/main_scene="res://examples/ant_hill/ant_hill_level.tscn"
 config/features=PackedStringArray("4.0", "Forward Plus")
 config/icon="res://icon.svg"
 

@@ -59,7 +59,7 @@ func _on_jump_enabled_state_physics_processing(_delta):
 func _on_double_jump_state_event_received(event:StringName):
 	# if we get an event "jump" while in the double jump state we play the double jump animation
 	if event == "jump":
-		print("playing double jump")
+		# print("playing double jump")
 		_animation_state_machine.travel("DoubleJump")
 
 

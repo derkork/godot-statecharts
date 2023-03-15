@@ -1,22 +1,23 @@
 [gd_scene load_steps=8 format=3 uid="uid://cc5s0ojmmh172"]
 
-[ext_resource type="TileSet" uid="uid://0xigl1e8anx" path="res://examples/platformer/terrain/terrain_tiles.tres" id="1_jlok0"]
-[ext_resource type="PackedScene" uid="uid://bwn05h8lx4cde" path="res://examples/platformer/ninja_frog/ninja_frog.tscn" id="2_w1rs3"]
-[ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://new_theme.tres" id="3_qpw42"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="4_566lt"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/animation_tree_debugger.gd" id="5_k7nq5"]
-[ext_resource type="PackedScene" uid="uid://pu453ge5wosa" path="res://examples/platformer/checkpoint/checkpoint.tscn" id="6_ipawt"]
-[ext_resource type="PackedScene" uid="uid://cpx8xsq5138be" path="res://examples/platformer/fireworks_box/fireworks_box.tscn" id="7_2c5m6"]
+[ext_resource type="TileSet" uid="uid://0xigl1e8anx" path="res://examples/platformer/terrain/terrain_tiles.tres" id="1_l1t3g"]
+[ext_resource type="PackedScene" uid="uid://bwn05h8lx4cde" path="res://examples/platformer/ninja_frog/ninja_frog.tscn" id="2_3w7a1"]
+[ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://new_theme.tres" id="3_nfp8v"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="4_qtefp"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/animation_tree_debugger.gd" id="5_kyiiy"]
+[ext_resource type="PackedScene" uid="uid://pu453ge5wosa" path="res://examples/platformer/checkpoint/checkpoint.tscn" id="6_spkwb"]
+[ext_resource type="PackedScene" uid="uid://cpx8xsq5138be" path="res://examples/platformer/fireworks_box/fireworks_box.tscn" id="7_pg57e"]
 
 [node name="Level" type="Node2D"]
 
 [node name="TileMap" type="TileMap" parent="."]
-tile_set = ExtResource("1_jlok0")
+tile_set = ExtResource("1_l1t3g")
 collision_animatable = true
 format = 2
+layer_0/name = "FG"
 layer_0/tile_data = PackedInt32Array(1507331, 393216, 4, 1572867, 393216, 5, 1638403, 393216, 6, 1507332, 458752, 4, 1572868, 458752, 5, 1638404, 458752, 6, 1507333, 524288, 4, 1572869, 524288, 5, 1638405, 524288, 6, 1507334, 393216, 4, 1572870, 393216, 5, 1638406, 393216, 6, 1507335, 458752, 4, 1572871, 458752, 5, 1638407, 458752, 6, 1507336, 524288, 4, 1572872, 524288, 5, 1638408, 524288, 6, 1507337, 393216, 4, 1572873, 393216, 5, 1638409, 393216, 6, 1507338, 458752, 4, 1572874, 458752, 5, 1638410, 458752, 6, 1507339, 524288, 4, 1572875, 524288, 5, 1638411, 524288, 6, 1507340, 393216, 4, 1572876, 393216, 5, 1638412, 393216, 6, 1507341, 458752, 4, 1572877, 458752, 5, 1638413, 458752, 6, 1507342, 524288, 4, 1572878, 524288, 5, 1638414, 524288, 6, 1507343, 393216, 4, 1572879, 393216, 5, 1638415, 393216, 6, 1507344, 458752, 4, 1572880, 458752, 5, 1638416, 458752, 6, 1507345, 524288, 4, 1572881, 524288, 5, 1638417, 524288, 6, 1507346, 393216, 4, 1572882, 393216, 5, 1638418, 393216, 6, 1507347, 458752, 4, 1572883, 458752, 5, 1638419, 458752, 6, 1507348, 524288, 4, 1572884, 524288, 5, 1638420, 524288, 6, 1507349, 393216, 4, 1572885, 393216, 5, 1638421, 393216, 6, 1507350, 458752, 4, 1572886, 458752, 5, 1638422, 458752, 6, 1507351, 524288, 4, 1572887, 524288, 5, 1638423, 524288, 6, 1507352, 393216, 4, 1572888, 393216, 5, 1638424, 393216, 6, 1507353, 458752, 4, 1572889, 458752, 5, 1638425, 458752, 6, 1507354, 524288, 4, 1572890, 524288, 5, 1638426, 524288, 6, 1507355, 393216, 4, 1572891, 393216, 5, 1638427, 393216, 6, 1507356, 458752, 4, 1572892, 458752, 5, 1638428, 458752, 6, 1507357, 524288, 4, 1572893, 524288, 5, 1638429, 524288, 6, 1507358, 393216, 4, 1572894, 393216, 5, 1638430, 393216, 6, 1507359, 458752, 4, 1572895, 458752, 5, 1638431, 458752, 6, 1507360, 524288, 4, 1572896, 524288, 5, 1638432, 524288, 6, 1507361, 393216, 4, 1572897, 393216, 5, 1638433, 393216, 6, 1507362, 458752, 4, 1572898, 458752, 5, 1638434, 458752, 6, 1507363, 524288, 4, 1572899, 524288, 5, 1638435, 524288, 6, 131073, 393216, 5, 196609, 393216, 6, 131074, 458752, 5, 196610, 458752, 6, 262145, 393216, 5, 327681, 393216, 6, 262146, 458752, 5, 327682, 458752, 6, 393217, 393216, 5, 458753, 393216, 6, 393218, 458752, 5, 458754, 458752, 6, 524289, 393216, 5, 589825, 393216, 6, 524290, 458752, 5, 589826, 458752, 6, 655361, 393216, 5, 720897, 393216, 6, 655362, 458752, 5, 720898, 458752, 6, 786433, 393216, 5, 851969, 393216, 6, 786434, 458752, 5, 851970, 458752, 6, 917505, 393216, 5, 983041, 393216, 6, 917506, 458752, 5, 983042, 458752, 6, 1048577, 393216, 5, 1114113, 393216, 6, 1048578, 458752, 5, 1114114, 458752, 6, 1179649, 393216, 5, 1245185, 393216, 6, 1179650, 458752, 5, 1245186, 458752, 6, 1310721, 393216, 5, 1376257, 393216, 6, 1310722, 458752, 5, 1376258, 458752, 6, 1441793, 393216, 5, 1507329, 393216, 6, 1441794, 458752, 5, 1507330, 458752, 6, 1572865, 393216, 5, 1638401, 393216, 6, 1572866, 458752, 5, 1638402, 458752, 6, 131108, 393216, 5, 196644, 393216, 6, 131109, 458752, 5, 196645, 458752, 6, 262180, 393216, 5, 327716, 393216, 6, 262181, 458752, 5, 327717, 458752, 6, 393252, 393216, 5, 458788, 393216, 6, 393253, 458752, 5, 458789, 458752, 6, 524324, 393216, 5, 589860, 393216, 6, 524325, 458752, 5, 589861, 458752, 6, 655396, 393216, 5, 720932, 393216, 6, 655397, 458752, 5, 720933, 458752, 6, 786468, 393216, 5, 852004, 393216, 6, 786469, 458752, 5, 852005, 458752, 6, 917540, 393216, 5, 983076, 393216, 6, 917541, 458752, 5, 983077, 458752, 6, 1048612, 393216, 5, 1114148, 393216, 6, 1048613, 458752, 5, 1114149, 458752, 6, 1179684, 393216, 5, 1245220, 393216, 6, 1179685, 458752, 5, 1245221, 458752, 6, 1310756, 393216, 5, 1376292, 393216, 6, 1310757, 458752, 5, 1376293, 458752, 6, 1441828, 393216, 5, 1507364, 393216, 6, 1441829, 458752, 5, 1507365, 458752, 6, 1572900, 393216, 5, 1638436, 393216, 6, 1572901, 458752, 5, 1638437, 458752, 6, 1179659, 393216, 4, 1179660, 458752, 4, 1179661, 524288, 4, 1179662, 393216, 4, 1179663, 458752, 4, 1179664, 524288, 4, 1179665, 393216, 4, 1179666, 458752, 4, 1179667, 524288, 4, 720899, 393216, 4, 720900, 458752, 4, 720901, 524288, 4, 720902, 393216, 4, 720903, 458752, 4, 720904, 524288, 4, 720905, 393216, 4, 720906, 458752, 4, 720907, 524288, 4)
 
-[node name="NinjaFrog" parent="." instance=ExtResource("2_w1rs3")]
+[node name="NinjaFrog" parent="." instance=ExtResource("2_3w7a1")]
 z_index = 2048
 position = Vector2(78, 361)
 
@@ -25,27 +26,27 @@ offset_left = 394.0
 offset_top = 3.0
 offset_right = 636.0
 offset_bottom = 241.0
-theme = ExtResource("3_qpw42")
-script = ExtResource("4_566lt")
+theme = ExtResource("3_nfp8v")
+script = ExtResource("4_qtefp")
 
 [node name="AnimationTreeDebugger" type="Tree" parent="."]
 offset_right = 287.0
 offset_bottom = 40.0
 scroll_horizontal_enabled = false
 scroll_vertical_enabled = false
-script = ExtResource("5_k7nq5")
+script = ExtResource("5_kyiiy")
 animation_tree = NodePath("../NinjaFrog/AnimationTree")
 
-[node name="Checkpoint" parent="." instance=ExtResource("6_ipawt")]
+[node name="Checkpoint" parent="." instance=ExtResource("6_spkwb")]
 position = Vector2(409, 369)
 
-[node name="Checkpoint2" parent="." instance=ExtResource("6_ipawt")]
+[node name="Checkpoint2" parent="." instance=ExtResource("6_spkwb")]
 position = Vector2(261, 289)
 
-[node name="Checkpoint3" parent="." instance=ExtResource("6_ipawt")]
+[node name="Checkpoint3" parent="." instance=ExtResource("6_spkwb")]
 position = Vector2(92, 177)
 
-[node name="FireworksBox" parent="." instance=ExtResource("7_2c5m6")]
+[node name="FireworksBox" parent="." instance=ExtResource("7_pg57e")]
 position = Vector2(345, 368)
 
 [connection signal="clicked" from="NinjaFrog" to="StateChartDebugger" method="debug_node"]

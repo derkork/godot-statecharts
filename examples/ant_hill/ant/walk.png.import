@@ -2,18 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c4ojtah20jtxc"
-path="res://.godot/imported/atomic_state.svg-5ab16e5747cef5b5980c4bf84ef9b1af.ctex"
+uid="uid://bqgc7cft671q0"
+path="res://.godot/imported/walk.png-314720ef7b8771c48b3c84f248aa29f0.ctex"
 metadata={
-"editor_scale": 2.0,
-"has_editor_variant": true,
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/godot_state_charts/atomic_state.svg"
-dest_files=["res://.godot/imported/atomic_state.svg-5ab16e5747cef5b5980c4bf84ef9b1af.ctex"]
+source_file="res://examples/ant_hill/ant/walk.png"
+dest_files=["res://.godot/imported/walk.png-314720ef7b8771c48b3c84f248aa29f0.ctex"]
 
 [params]
 
@@ -34,6 +32,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=true
-editor/convert_colors_with_editor_theme=false

@@ -59,7 +59,7 @@ func _state_event(event:StringName) -> bool:
 
 
 func _handle_transition(transition:Transition, source:State):
-	print("CompoundState._handle_transition: " + name + " from " + source.name + " to " + str(transition.to))
+	# print("CompoundState._handle_transition: " + name + " from " + source.name + " to " + str(transition.to))
 	# resolve the target state
 	var target = transition.resolve_target()
 	if not target is State:
