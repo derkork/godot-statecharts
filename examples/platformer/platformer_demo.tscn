@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://cc5s0ojmmh172"]
+[gd_scene load_steps=7 format=3 uid="uid://cc5s0ojmmh172"]
 
 [ext_resource type="TileSet" uid="uid://0xigl1e8anx" path="res://examples/platformer/terrain/terrain_tiles.tres" id="1_l1t3g"]
 [ext_resource type="PackedScene" uid="uid://bwn05h8lx4cde" path="res://examples/platformer/ninja_frog/ninja_frog.tscn" id="2_3w7a1"]
 [ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://new_theme.tres" id="3_nfp8v"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="4_qtefp"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/animation_tree_debugger.gd" id="5_kyiiy"]
 [ext_resource type="PackedScene" uid="uid://pu453ge5wosa" path="res://examples/platformer/checkpoint/checkpoint.tscn" id="6_spkwb"]
 [ext_resource type="PackedScene" uid="uid://cpx8xsq5138be" path="res://examples/platformer/fireworks_box/fireworks_box.tscn" id="7_pg57e"]
 
@@ -29,14 +28,6 @@ offset_bottom = 241.0
 theme = ExtResource("3_nfp8v")
 script = ExtResource("4_qtefp")
 
-[node name="AnimationTreeDebugger" type="Tree" parent="."]
-offset_right = 287.0
-offset_bottom = 40.0
-scroll_horizontal_enabled = false
-scroll_vertical_enabled = false
-script = ExtResource("5_kyiiy")
-animation_tree = NodePath("../NinjaFrog/AnimationTree")
-
 [node name="Checkpoint" parent="." instance=ExtResource("6_spkwb")]
 position = Vector2(409, 369)
 
@@ -48,6 +39,22 @@ position = Vector2(92, 177)
 
 [node name="FireworksBox" parent="." instance=ExtResource("7_pg57e")]
 position = Vector2(345, 368)
+
+[node name="Label" type="RichTextLabel" parent="."]
+offset_left = 53.0
+offset_top = -1.0
+offset_right = 403.0
+offset_bottom = 84.0
+mouse_filter = 2
+bbcode_enabled = true
+text = "[font_size=10]
+[ul]
+Press Left+Right to move, Space to jump. You can double-jump mid-air and coyote-jump shortly after you fall from a ledge. 
+Try to walk to all three flagpoles to make the box explode.
+You can click the flag poles, the box and the frog to see their state charts.
+[/ul]
+[/font_size]"
+fit_content = true
 
 [connection signal="clicked" from="NinjaFrog" to="StateChartDebugger" method="debug_node"]
 [connection signal="activated" from="Checkpoint" to="FireworksBox" method="count_up" unbinds=1]

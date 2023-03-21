@@ -464,7 +464,7 @@ radius = 4.0
 height = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_htg24"]
-radius = 60.0
+radius = 80.0
 
 [node name="Ant" type="CharacterBody2D"]
 z_index = 2048
@@ -482,11 +482,13 @@ rotation = 1.5708
 scale = Vector2(0.05, 0.05)
 sprite_frames = SubResource("SpriteFrames_kcoy1")
 animation = &"walk"
-frame_progress = 0.850975
+frame_progress = 0.328023
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 editor_description = "This navigation agent sends the \"navigation_finished\" event to the state chart whenever the navigation is done."
-debug_enabled = true
+avoidance_enabled = true
+radius = 40.0
+max_speed = 50.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 1)
@@ -505,6 +507,7 @@ script = ExtResource("4_ejp2e")
 initial_state = NodePath("Initializing")
 
 [node name="Initializing" type="Node" parent="StateChart/Root"]
+editor_description = "This state is used for script initialization."
 script = ExtResource("5_21sgy")
 
 [node name="Transition" type="Node" parent="StateChart/Root/Initializing"]
@@ -513,10 +516,12 @@ to = NodePath("../../Seeking Food")
 event = &"initialized"
 
 [node name="Seeking Food" type="Node" parent="StateChart/Root"]
+editor_description = "In this state, the ant will look for food."
 script = ExtResource("4_ejp2e")
 initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateChart/Root/Seeking Food"]
+editor_description = "This state is active when the ant currently has no target. It is connected to the script which will look for a new target."
 script = ExtResource("5_21sgy")
 
 [node name="On Next Destination" type="Node" parent="StateChart/Root/Seeking Food/Idle"]
@@ -530,6 +535,7 @@ to = NodePath("../../../Picking up Food")
 event = &"food_detected"
 
 [node name="Travelling" type="Node" parent="StateChart/Root/Seeking Food"]
+editor_description = "This state is active when the ant has a destination and is moving towards it."
 script = ExtResource("5_21sgy")
 
 [node name="On Navigation Finish" type="Node" parent="StateChart/Root/Seeking Food/Travelling"]
@@ -539,10 +545,12 @@ to = NodePath("../../Idle")
 event = &"navigation_finished"
 
 [node name="Picking up Food" type="Node" parent="StateChart/Root"]
+editor_description = "This state is active when the ant has detected food and wants to pick it up."
 script = ExtResource("4_ejp2e")
 initial_state = NodePath("Travelling")
 
 [node name="Travelling" type="Node" parent="StateChart/Root/Picking up Food"]
+editor_description = "This state is active while the ant is moving towards the food."
 script = ExtResource("5_21sgy")
 
 [node name="On Navigation Finish" type="Node" parent="StateChart/Root/Picking up Food/Travelling"]
@@ -552,6 +560,7 @@ to = NodePath("../../Picking Up")
 event = &"navigation_finished"
 
 [node name="Picking Up" type="Node" parent="StateChart/Root/Picking up Food"]
+editor_description = "This state is active when the ant has reached the food and now picks it up."
 script = ExtResource("5_21sgy")
 
 [node name="On Picked Up" type="Node" parent="StateChart/Root/Picking up Food/Picking Up"]
@@ -560,11 +569,19 @@ script = ExtResource("7_qj278")
 to = NodePath("../../../Returning Home")
 event = &"food_picked_up"
 
+[node name="On Food Vanished" type="Node" parent="StateChart/Root/Picking up Food/Picking Up"]
+editor_description = "When navigation is finished return to idle state."
+script = ExtResource("7_qj278")
+to = NodePath("../../../Seeking Food")
+event = &"food_vanished"
+
 [node name="Returning Home" type="Node" parent="StateChart/Root"]
+editor_description = "This state is active when the ant has found food and wants to return home."
 script = ExtResource("4_ejp2e")
 initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateChart/Root/Returning Home"]
+editor_description = "This state is active when the ant currently has no destination. It calls back into the script which will setup a new destination."
 script = ExtResource("5_21sgy")
 
 [node name="On Next Destination" type="Node" parent="StateChart/Root/Returning Home/Idle"]
@@ -578,6 +595,7 @@ to = NodePath("../../../Delivering Food")
 event = &"nest_detected"
 
 [node name="Travelling" type="Node" parent="StateChart/Root/Returning Home"]
+editor_description = "This state is active when the ant has a destination and is currently travelling."
 script = ExtResource("5_21sgy")
 
 [node name="On Navigation Finish" type="Node" parent="StateChart/Root/Returning Home/Travelling"]
@@ -587,10 +605,12 @@ to = NodePath("../../Idle")
 event = &"navigation_finished"
 
 [node name="Delivering Food" type="Node" parent="StateChart/Root"]
+editor_description = "This state is active when the ant has detected the nest and wants to bring food back."
 script = ExtResource("4_ejp2e")
 initial_state = NodePath("Travelling")
 
 [node name="Travelling" type="Node" parent="StateChart/Root/Delivering Food"]
+editor_description = "This state is active when the ant is moving towards the nest."
 script = ExtResource("5_21sgy")
 
 [node name="On Navigation Finish" type="Node" parent="StateChart/Root/Delivering Food/Travelling"]
@@ -600,6 +620,7 @@ to = NodePath("../../Dropping")
 event = &"navigation_finished"
 
 [node name="Dropping" type="Node" parent="StateChart/Root/Delivering Food"]
+editor_description = "This state is active when the ant is dropping the food off at the nest."
 script = ExtResource("5_21sgy")
 
 [node name="On Dropped" type="Node" parent="StateChart/Root/Delivering Food/Dropping"]
@@ -609,9 +630,11 @@ to = NodePath("../../../Seeking Food")
 event = &"food_dropped"
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="ready" from="Sprite2D" to="Sprite2D" method="play" binds= ["walk"]]
 [connection signal="navigation_finished" from="NavigationAgent2D" to="StateChart" method="send_event" binds= [&"navigation_finished"]]
 [connection signal="area_entered" from="SensorArea" to="." method="_on_sensor_area_area_entered"]
 [connection signal="area_exited" from="SensorArea" to="." method="_on_sensor_area_area_exited"]
+[connection signal="state_physics_processing" from="StateChart/Root" to="." method="_maintenance"]
 [connection signal="state_entered" from="StateChart/Root/Seeking Food/Idle" to="." method="_on_idle_seeking_food"]
 [connection signal="state_physics_processing" from="StateChart/Root/Seeking Food/Travelling" to="." method="_on_travelling_state_physics_processing"]
 [connection signal="state_entered" from="StateChart/Root/Picking up Food/Travelling" to="." method="_on_food_detected"]

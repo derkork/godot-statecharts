@@ -1,11 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://dxib8eifpyu02"]
+[gd_scene load_steps=10 format=3 uid="uid://dxib8eifpyu02"]
 
 [ext_resource type="TileSet" uid="uid://0xigl1e8anx" path="res://examples/platformer/terrain/terrain_tiles.tres" id="1_bqip5"]
+[ext_resource type="Script" path="res://examples/ant_hill/ant_hill_demo.gd" id="1_l75mo"]
 [ext_resource type="PackedScene" uid="uid://58ubomshdero" path="res://examples/ant_hill/ant/ant.tscn" id="2_st63i"]
 [ext_resource type="PackedScene" uid="uid://dmw4oltepp7c4" path="res://examples/ant_hill/nest/nest.tscn" id="3_qp6b5"]
 [ext_resource type="PackedScene" uid="uid://dnyj4qh83bqf0" path="res://examples/ant_hill/banana/banana.tscn" id="4_gdnva"]
 [ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://new_theme.tres" id="5_qpq0w"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="6_6m8lx"]
+[ext_resource type="Script" path="res://examples/ant_hill/pause_controller.gd" id="8_kxcui"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_eas1h"]
 vertices = PackedVector2Array(629, 16, 627, 468, 11, 470, 8, 16)
@@ -13,6 +15,7 @@ polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(629, 16, 627, 468, 11, 470, 8, 16)])
 
 [node name="AntHill" type="Node2D"]
+script = ExtResource("1_l75mo")
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource("1_bqip5")
@@ -21,6 +24,21 @@ layer_0/tile_data = PackedInt32Array(262152, 65536, 1, 196616, 65536, 1, 131080,
 
 [node name="Ant" parent="." instance=ExtResource("2_st63i")]
 position = Vector2(67, 84)
+
+[node name="Ant2" parent="." instance=ExtResource("2_st63i")]
+position = Vector2(58, 158)
+
+[node name="Ant3" parent="." instance=ExtResource("2_st63i")]
+position = Vector2(155, 59)
+
+[node name="Ant4" parent="." instance=ExtResource("2_st63i")]
+position = Vector2(122, 38)
+
+[node name="Ant5" parent="." instance=ExtResource("2_st63i")]
+position = Vector2(85, 119)
+
+[node name="Ant6" parent="." instance=ExtResource("2_st63i")]
+position = Vector2(36, 119)
 
 [node name="ant_hill" parent="." instance=ExtResource("3_qp6b5")]
 position = Vector2(40, 31)
@@ -51,6 +69,21 @@ position = Vector2(327, 252)
 
 [node name="banana15" parent="." instance=ExtResource("4_gdnva")]
 position = Vector2(360, 263)
+
+[node name="banana16" parent="." instance=ExtResource("4_gdnva")]
+position = Vector2(300, 377)
+
+[node name="banana17" parent="." instance=ExtResource("4_gdnva")]
+position = Vector2(331, 359)
+
+[node name="banana18" parent="." instance=ExtResource("4_gdnva")]
+position = Vector2(342, 375)
+
+[node name="banana19" parent="." instance=ExtResource("4_gdnva")]
+position = Vector2(510, 185)
+
+[node name="banana20" parent="." instance=ExtResource("4_gdnva")]
+position = Vector2(510, 185)
 
 [node name="banana4" parent="." instance=ExtResource("4_gdnva")]
 position = Vector2(613, 413)
@@ -83,4 +116,31 @@ position = Vector2(2, -6)
 navigation_polygon = SubResource("NavigationPolygon_eas1h")
 metadata/_edit_lock_ = true
 
+[node name="PauseController" type="Node" parent="."]
+script = ExtResource("8_kxcui")
+
+[node name="Label" type="RichTextLabel" parent="."]
+offset_left = 18.0
+offset_top = 271.0
+offset_right = 368.0
+offset_bottom = 356.0
+mouse_filter = 2
+bbcode_enabled = true
+text = "[font_size=10]
+[ul]
+Each ant tries to find food and bring it back to the nest.
+Each ant leaves markers that evaporate over time.
+Blue markers point towards the nest.
+Yellow markers point towards food.
+Ants will refresh nest markers.
+Click on an ant to see its current state chart.
+[/ul]
+[/font_size]"
+fit_content = true
+
 [connection signal="clicked" from="Ant" to="StateChartDebugger" method="debug_node"]
+[connection signal="clicked" from="Ant2" to="StateChartDebugger" method="debug_node"]
+[connection signal="clicked" from="Ant3" to="StateChartDebugger" method="debug_node"]
+[connection signal="clicked" from="Ant4" to="StateChartDebugger" method="debug_node"]
+[connection signal="clicked" from="Ant5" to="StateChartDebugger" method="debug_node"]
+[connection signal="clicked" from="Ant6" to="StateChartDebugger" method="debug_node"]

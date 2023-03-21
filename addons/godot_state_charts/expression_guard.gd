@@ -1,4 +1,5 @@
 @tool
+@icon("expression_guard.svg")
 class_name ExpressionGuard
 extends Guard
 

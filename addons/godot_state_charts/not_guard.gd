@@ -1,3 +1,5 @@
+@tool
+@icon("not_guard.svg")
 ## A guard which is satisfied when the given guard is not satisfied.
 class_name NotGuard
 extends Guard

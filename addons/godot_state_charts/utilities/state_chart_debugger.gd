@@ -15,6 +15,11 @@ var _root:Node
 func _init():
 	scroll_horizontal_enabled = false
 	scroll_vertical_enabled = false
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	
+func _ready():
+	process_mode = Node.PROCESS_MODE_ALWAYS	
 
 ## Sets up the debugger to track the given state chart. If the given node is not 
 ## a state chart, it will search the children for a state chart. If no state chart

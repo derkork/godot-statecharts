@@ -7,7 +7,6 @@
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("2_2b6iy")
-lifetime_seconds = 60.0
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture_filter = 1

@@ -1,3 +1,6 @@
+@tool
+@icon("all_of_guard.svg")
+
 ## A composite guard that is satisfied when all of its guards are satisfied.
 class_name AllOfGuard
 extends Guard

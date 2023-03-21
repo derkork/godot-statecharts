@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://chb8tq62aj2b2"
-path="res://.godot/imported/transition.svg-20a1a52a85a71c731b2386952d47b2f7.ctex"
+uid="uid://ux4ia8xhhjrx"
+path="res://.godot/imported/all_of_guard.svg-49642db22a4a20844b2d39e67c930c8b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/godot_state_charts/transition.svg"
-dest_files=["res://.godot/imported/transition.svg-20a1a52a85a71c731b2386952d47b2f7.ctex"]
+source_file="res://addons/godot_state_charts/all_of_guard.svg"
+dest_files=["res://.godot/imported/all_of_guard.svg-49642db22a4a20844b2d39e67c930c8b.ctex"]
 
 [params]
 

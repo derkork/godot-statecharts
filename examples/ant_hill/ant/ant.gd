@@ -25,6 +25,8 @@ var nest:Node2D = null
 ## The currently carried food
 var carried_food:Node = null
 
+const SEGMENT_LENGTH = 150
+
 func _ready():
 	# start the state chart
 	state_chart.send_event("initialized")
@@ -37,16 +39,13 @@ func _on_idle_seeking_food():
 
 	# if we don't have nest markers nearby place one
 	if nest_markers.size() == 0:
-		var marker = marker_scene.instantiate()
-		marker.initialize(Marker.MarkerType.NEST)
-		# add to the tree on our parent
-		get_parent().add_child(marker)
-		# set the position to our current position
-		marker.set_global_position(current_position)
-		# set the marker rotation to look opposite to the direction we are facing
-		marker.set_rotation(get_rotation() + PI)
-		# add to the nest markers
+		var marker = _place_marker(Marker.MarkerType.NEST, current_position)
 		nest_markers[marker] = true
+		
+	# else refresh them
+	else:
+		for marker in nest_markers.keys():
+			marker.refresh()
 
 	# if we have food nearby grab it
 	if food.size() > 0:
@@ -58,27 +57,15 @@ func _on_idle_seeking_food():
 	if food_markers.size() > 0:
 		var closest_food_marker := _find_closest(food_markers.keys(), current_position)
 		var direction = Vector2.RIGHT.rotated(closest_food_marker.get_rotation())
-		target_position = current_position + (direction * 100)
-		# don't heed this marker again until we see it again
-		food_markers.erase(closest_food_marker)
+		target_position = current_position + (direction * SEGMENT_LENGTH)
 
-	# if we have nest markers nearby, find the closest one and then travel
-	# somewhere opposite to the direction it is pointing
-	elif nest_markers.size() > 0:
-		var nest_marker = _find_closest(nest_markers.keys(), current_position)
-		var away_angle = nest_marker.get_rotation() + PI + randf_range(-PI/4, PI/4)
-		var direction = Vector2.RIGHT.rotated(away_angle)
-		target_position = current_position + (direction * 100)
-		# don't heed this marker again until we see it again
-		nest_markers.erase(nest_marker)
 	else:
-		# otherwise pick a random position in a radius of 100 pixels
-		# pick a random position in a radius of 100 pixels
+		# otherwise pick a random position in a radius of SEGMENT_LENGTH pixels
 		# first calculate a random angle in radians
 		var random_angle := randf() * 2 * PI
 		# then calculate the x and y components of the vector
-		var random_x := cos(random_angle) * 100
-		var random_y := sin(random_angle) * 100
+		var random_x := cos(random_angle) * SEGMENT_LENGTH
+		var random_y := sin(random_angle) * SEGMENT_LENGTH
 
 		# add the random vector to the current position
 		target_position = current_position + Vector2(random_x, random_y)
@@ -99,6 +86,11 @@ func _on_food_detected():
 ## Called when we arrived at the food and want to pick it up
 func _on_food_reached():
 	var closest_food = _find_closest(food.keys(), get_global_position())
+	if not is_instance_valid(closest_food):
+		# some other ant must have picked it up
+		state_chart.send_event("food_vanished")
+		return
+		
 	closest_food.get_parent().remove_child(closest_food)
 	carried_food = closest_food
 	# remove it from the food set
@@ -109,8 +101,15 @@ func _on_food_reached():
 	add_child(closest_food)
 	closest_food.position = Vector2.ZERO
 	closest_food.scale = Vector2(0.5, 0.5)
+	
+	# place a marker pointing to the food (0 means point into the current direction)
+	var marker = _place_marker(Marker.MarkerType.FOOD, global_position, 0)
+	food_markers[marker] = true
+
 	# notify the state chart that we picked up food
 	state_chart.send_event("food_picked_up")
+	
+ 
 
 ## Called when we are returning home and need a new target.
 func _on_idle_returning_home():
@@ -119,15 +118,7 @@ func _on_idle_returning_home():
 
 	# if we don't have food markers nearby place one, so we can find back to the food later
 	if food_markers.size() == 0:
-		var marker = marker_scene.instantiate()
-		marker.initialize(Marker.MarkerType.FOOD)
-		# add to the tree on our parent
-		get_parent().add_child(marker)
-		# set the position to our current position
-		marker.set_global_position(current_position)
-		# set the marker rotation to look opposite to the direction we are facing
-		marker.set_rotation(get_rotation() + PI)
-		# add to the food markers
+		var marker = _place_marker(Marker.MarkerType.FOOD, current_position)
 		food_markers[marker] = true
 
 	# if the nest is nearby, drop off the food
@@ -138,17 +129,19 @@ func _on_idle_returning_home():
 	var target_position := Vector2()
 	# if we have nest markers nearby travel into the general direction of the closest one points
 	if nest_markers.size() > 0:
+		# refresh them
+		for marker in nest_markers.keys():
+			marker.refresh()
+			
 		var closest_nest_marker := _find_closest(nest_markers.keys(), current_position)
 		var direction = Vector2.RIGHT.rotated(closest_nest_marker.get_rotation()) 
-		target_position = current_position + (direction * 100)
-		# don't heed this marker again until we see it again
-		nest_markers.erase(closest_nest_marker)
+		target_position = current_position + (direction * SEGMENT_LENGTH)
 	# otherwise just pick a random direction
 	else:
 		var random_angle := randf() * 2 * PI
 		# then calculate the x and y components of the vector
-		var random_x := cos(random_angle) * 100
-		var random_y := sin(random_angle) * 100
+		var random_x := cos(random_angle) * SEGMENT_LENGTH
+		var random_y := sin(random_angle) * SEGMENT_LENGTH
 
 		# add the random vector to the current position
 		target_position = current_position + Vector2(random_x, random_y)
@@ -180,7 +173,7 @@ func _on_travelling_state_physics_processing(_delta):
 	# get the next position on the path
 	var path_position = navigation_agent.get_next_path_position()
 	# and move towards it
-	velocity = (path_position - get_global_position())
+	velocity = (path_position - get_global_position()).normalized() * navigation_agent.max_speed
 	look_at(path_position)
 	move_and_slide()
 
@@ -193,7 +186,6 @@ func _on_input_event(_viewport, event, _shape_idx):
 
 ## Called when the ant is sensing something nearby.
 func _on_sensor_area_area_entered(area:Area2D):
-
 	var node = area
 	if area.has_meta("owner"):
 		node = area.get_node(area.get_meta("owner"))
@@ -211,6 +203,9 @@ func _on_sensor_area_area_entered(area:Area2D):
 	elif node.is_in_group("nest"):
 		# it's the nest
 		nest = node
+
+	state_chart.set_expression_property("nest_markers", nest_markers.size())
+	state_chart.set_expression_property("food_markers", food_markers.size())
 
 
 
@@ -231,6 +226,10 @@ func _on_sensor_area_area_exited(area:Area2D):
 	elif node.is_in_group("nest"):
 		# it's the nest
 		nest = null
+		
+	state_chart.set_expression_property("nest_markers", nest_markers.size())
+	state_chart.set_expression_property("food_markers", nest_markers.size())
+	
 
 
 
@@ -246,5 +245,32 @@ func _find_closest(targets:Array, from:Vector2) -> Node2D:
 			result = target
 	
 	return result
+
+
+## Places a marker of the given type at the given position	
+func _place_marker(type:Marker.MarkerType, target_position:Vector2, offset:float = PI) -> Marker:
+	var marker = marker_scene.instantiate()
+	marker.initialize(type)
+	# add to the tree on our parent
+	get_parent().add_child(marker)
+	# set the position to our current position
+	marker.set_global_position(target_position)
+	# set the marker rotation to look opposite to the direction we are facing
+	marker.set_rotation(get_rotation() + offset)
+	return marker
 	
 
+
+
+func _maintenance(delta):
+	# remove all markers which are no longer valid
+	for marker in food_markers.keys():
+		if not is_instance_valid(marker):
+			food_markers.erase(marker)
+			
+	for marker in nest_markers.keys():
+		if not is_instance_valid(marker):
+			nest_markers.erase(marker)
+		
+		
+	pass # Replace with function body.

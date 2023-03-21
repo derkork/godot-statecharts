@@ -1,4 +1,5 @@
 @tool
+@icon("animation_tree_state.svg")
 class_name AnimationTreeState
 extends AtomicState
 

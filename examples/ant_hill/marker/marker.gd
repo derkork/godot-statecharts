@@ -22,10 +22,15 @@ func initialize(type:MarkerType):
 			modulate = Color.YELLOW
 			add_to_group("food")
 		MarkerType.NEST:
-			modulate = Color.BROWN
+			modulate = Color.CORNFLOWER_BLUE
 			add_to_group("nest")
+			lifetime_seconds *= 2
 
+## Refreshes the marker, so it stays for another lifetime
+func refresh():
+	expired_time = 0
 
+## Updates the marker and destroys it if has evaporated.
 func _process(delta):
 	expired_time += delta
 	# Fade out the marker as it expires.
@@ -33,7 +38,7 @@ func _process(delta):
 	if expired_time > lifetime_seconds:
 		queue_free()
 
-
+## Some debug drawing currently disabled.
 func __draw():
 	var offset = 0.0 if is_in_group("food") else PI
 	var start_angle = - PI / 2 + offset
