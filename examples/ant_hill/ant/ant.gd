@@ -262,7 +262,7 @@ func _place_marker(type:Marker.MarkerType, target_position:Vector2, offset:float
 
 
 
-func _maintenance(delta):
+func _maintenance(_delta):
 	# remove all markers which are no longer valid
 	for marker in food_markers.keys():
 		if not is_instance_valid(marker):

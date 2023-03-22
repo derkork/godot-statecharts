@@ -31,6 +31,7 @@ extends Node
 		delay_seconds = value
 		update_configuration_warnings()
 
+
 ## Read-only property that returns true if the transition has an event specified.
 var has_event:bool:
 	get:

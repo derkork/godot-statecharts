@@ -13,13 +13,26 @@ extends State
 		initial_state = value
 		update_configuration_warnings() 
 
+
 ## The currently active substate.
 var _active_state:State = null
 @onready var _initial_state:State = get_node_or_null(initial_state)
 
+## The history states of this compound state.
+var _history_states:Array[HistoryState] = []
+## Whether any of the history states needs a deep history.
+var _needs_deep_history = false
 
 func _state_init():
 	super._state_init()
+
+	# check if we have any history states
+	for child in get_children():
+		if child is HistoryState:
+			var child_as_history_state:HistoryState = child as HistoryState
+			_history_states.append(child_as_history_state)
+			# remember if any of the history states needs a deep history
+			_needs_deep_history = _needs_deep_history or child_as_history_state.deep
 
 	# initialize all substates. find all children of type State and call _state_init on them.
 	for child in get_children():
@@ -35,12 +48,42 @@ func _state_enter():
 		_active_state = _initial_state
 		_active_state._state_enter()
 
+
+func _state_save(saved_state:SavedState, child_levels:int = -1):
+	super._state_save(saved_state, child_levels)
+
+	# in addition save all history states, as they are never active and normally would not be saved
+	var parent = saved_state.get_substate_or_null(self)
+	if parent == null:
+		push_error("Probably a bug: The state of '" + name + "' was not saved.")
+		return
+
+	for history_state in _history_states:
+		history_state._state_save(parent, child_levels)
+
+
 func _state_exit():
+	# if we have any history states, we need to save the current active state
+	if _history_states.size() > 0:
+		var saved_state = SavedState.new()
+		# we save the entire hierarchy if any of the history states needs a deep history
+		# otherwise we only save this level. This way we can save memory and processing time
+		_state_save(saved_state, -1 if _needs_deep_history else 1)
+
+		# now save the saved state in all history states
+		for history_state in _history_states:
+			# when saving history it's ok when we save deep history in a history state that doesn't need it
+			# because at restore time we will use the state's deep flag to determine if we need to restore
+			# the entire hierarchy or just this level. This way we don't need multiple copies of the same
+			# state hierarchy.
+			history_state.history = saved_state
+
 	# deactivate the current state
 	if _active_state != null:
 		_active_state._state_exit()
 		_active_state = null
 	super._state_exit()
+
 
 func _state_event(event:StringName) -> bool:
 	if not active:
@@ -79,8 +122,28 @@ func _handle_transition(transition:Transition, source:State):
 		# all good, now first deactivate the current state
 		if is_instance_valid(_active_state):
 			_active_state._state_exit()
+		
+		# now check if the target is a history state, if this is the 
+		# case, we need to restore the saved state
+		if target is HistoryState:
+			print("Target is history state, restoring saved state.")
+			var saved_state = target.history
+			if saved_state != null:
+				# restore the saved state
+				_state_restore(saved_state, -1 if target.deep else 1)
+				return
+			print("No history saved so far, activating default state.")
+			# if we don't have history, we just activate the default state
+			var default_state = target.get_node_or_null(target.default_state)
+			if is_instance_valid(default_state):
+				_active_state = default_state
+				_active_state._state_enter()
+				return
+			else:
+				push_error("The default state '" + target.default_state + "' of the history state '" + target.name + "' cannot be found.")
+				return
 
-		# then activate the new state
+		# else, just activate the target state
 		_active_state = target
 		_active_state._state_enter()
 		return

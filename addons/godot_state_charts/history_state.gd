@@ -1,4 +1,5 @@
 @tool
+@icon("history_state.svg")
 class_name HistoryState
 extends State
 
@@ -8,10 +9,28 @@ extends State
 @export var deep:bool = false
 
 ## The default state to transition to if no history is available.
-@export_node_path("State") var default_state:NodePath 
+@export_node_path("State") var default_state:NodePath:
+	set(value):
+		default_state = value
+		update_configuration_warnings()
 
 
+## The stored history, if any.
+var history:SavedState = null
 
+
+func _state_save(saved_state:SavedState, child_levels:int = -1) -> void:
+	# History states are pseudo states, so they only save remembered history if any
+	var our_state = SavedState.new()
+	our_state.history = history
+	saved_state.add_substate(self, our_state)
+
+
+func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
+	# History states are pseudo states, so they only restore remembered history if any
+	var our_state = saved_state.get_substate_or_null(self)
+	if our_state != null:
+		history = our_state.history
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -35,5 +54,5 @@ func _get_configuration_warnings() -> PackedStringArray:
 	if get_child_count() > 0:
 		warnings.append("History states cannot have child nodes.")
 
-	return []
+	return warnings
 		

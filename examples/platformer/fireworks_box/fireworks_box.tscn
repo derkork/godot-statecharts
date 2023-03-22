@@ -178,7 +178,6 @@ script = ExtResource("2_ahjdl")
 
 [node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("3_b1cau")
-initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateChart/Root"]
 script = ExtResource("4_ot1ih")

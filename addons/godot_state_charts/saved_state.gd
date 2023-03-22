@@ -16,3 +16,13 @@ extends Resource
 
 ## History of the state, if this state is a history state, otherwise null
 @export var history:SavedState = null
+
+
+## Adds the given substate to this saved state
+func add_substate(state:State, saved_state:SavedState):
+	child_states[state.name] = saved_state
+
+## Returns the saved state of the given substate, or null if it does not exist
+func get_substate_or_null(state:State) -> SavedState:
+	return child_states.get(state.name)
+
