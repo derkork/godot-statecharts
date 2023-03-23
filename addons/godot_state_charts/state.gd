@@ -198,5 +198,17 @@ func _queue_transition(transition:Transition):
 
 
 func _get_configuration_warnings() -> PackedStringArray:
-	return []
-		
+	var result = []
+	# if not at least one of our ancestors is a StateChart add a warning
+	var parent = get_parent()
+	var found = false
+	while is_instance_valid(parent):
+		if parent is StateChart:
+			found = true
+			break
+		parent = parent.get_parent()
+	
+	if not found:
+		result.append("State is not a child of a StateChart. This will not work.")
+
+	return result		
