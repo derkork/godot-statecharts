@@ -16,6 +16,8 @@ extends State
 
 ## The currently active substate.
 var _active_state:State = null
+
+## The initial state
 @onready var _initial_state:State = get_node_or_null(initial_state)
 
 ## The history states of this compound state.
@@ -47,6 +49,8 @@ func _state_enter():
 	if _initial_state != null:
 		_active_state = _initial_state
 		_active_state._state_enter()
+	else:
+		push_error("No initial state set for state '" + name + "'.")
 
 
 func _state_save(saved_state:SavedState, child_levels:int = -1):
@@ -61,6 +65,16 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 	for history_state in _history_states:
 		history_state._state_save(parent, child_levels)
 
+func _state_restore(saved_state:SavedState, child_levels:int = -1):
+	super._state_restore(saved_state, child_levels)
+
+	# in addition check if we are now active and if so determine the current active state
+	if active:
+		# find the currently active child
+		for child in get_children():
+			if child is State and child.active:
+				_active_state = child
+				break
 
 func _state_exit():
 	# if we have any history states, we need to save the current active state
