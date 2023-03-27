@@ -251,7 +251,9 @@ script = ExtResource("5_a58ma")
 script = ExtResource("6_53g38")
 
 [node name="Player Presence" type="Node" parent="StateChart/Root"]
+editor_description = "This compound state represents whether the player is currently present at the checkpoint."
 script = ExtResource("6_qkwqk")
+initial_state = NodePath("Absent")
 
 [node name="Absent" type="Node" parent="StateChart/Root/Player Presence"]
 script = ExtResource("7_a74k1")
@@ -271,6 +273,7 @@ event = &"player_exited"
 
 [node name="Animation Control" type="Node" parent="StateChart/Root"]
 script = ExtResource("6_qkwqk")
+initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateChart/Root/Animation Control"]
 script = ExtResource("7_a74k1")
@@ -290,6 +293,7 @@ delay_seconds = 0.9
 
 [node name="Activated" type="Node" parent="StateChart/Root/Animation Control"]
 script = ExtResource("6_qkwqk")
+initial_state = NodePath("Expanded")
 
 [node name="Expanded" type="Node" parent="StateChart/Root/Animation Control/Activated"]
 script = ExtResource("7_a74k1")

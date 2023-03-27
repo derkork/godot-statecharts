@@ -729,6 +729,7 @@ script = ExtResource("8_mdf33")
 
 [node name="Movement" type="Node" parent="StateChart/Root"]
 script = ExtResource("4_g6c55")
+initial_state = NodePath("Grounded")
 
 [node name="Grounded" type="Node" parent="StateChart/Root/Movement"]
 script = ExtResource("6_vmkuk")
@@ -747,6 +748,7 @@ event = &"airborne"
 
 [node name="Airborne" type="Node" parent="StateChart/Root/Movement"]
 script = ExtResource("4_g6c55")
+initial_state = NodePath("CoyoteJumpEnabled")
 
 [node name="On Grounded" type="Node" parent="StateChart/Root/Movement/Airborne"]
 script = ExtResource("9_wswdv")
@@ -782,9 +784,11 @@ script = ExtResource("6_vmkuk")
 
 [node name="Animation Control" type="Node" parent="StateChart/Root"]
 script = ExtResource("4_g6c55")
+initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateChart/Root/Animation Control"]
 script = ExtResource("12_8s1ek")
+animation_tree = NodePath("../../../../AnimationTree")
 
 [node name="On Moving" type="Node" parent="StateChart/Root/Animation Control/Idle"]
 script = ExtResource("9_wswdv")
@@ -793,6 +797,7 @@ event = &"moving"
 
 [node name="Move" type="Node" parent="StateChart/Root/Animation Control"]
 script = ExtResource("12_8s1ek")
+animation_tree = NodePath("../../../../AnimationTree")
 
 [node name="On Idle" type="Node" parent="StateChart/Root/Animation Control/Move"]
 script = ExtResource("9_wswdv")

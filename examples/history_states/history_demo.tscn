@@ -33,7 +33,6 @@ texture = ExtResource("1_3v23e")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/Area2D"]
 position = Vector2(0.0747795, 3.8147e-06)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_kl3ga")
 
 [node name="StateChart" type="Node" parent="."]
