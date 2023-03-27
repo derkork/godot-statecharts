@@ -6,14 +6,20 @@ Godot State Charts is a plugin for Godot Engine that allows you to use state cha
 
 > Put simply, a state chart is a beefed up state machine.  The beefing up solves a lot of the problems that state machines have, especially state explosion that happens as state machines grow.
 
+Godot State Charts allows you to build state charts using nodes in the Godot editor.  The library is built in an idiomatic way, so you can use nodes to define states and transitions and use Godot signals to connect your code to the state machine. As states and transitions are nodes you can also easily modularize your state charts by using scenes for re-using states and transitions.
+
 ## Installation
 
-The easiest way to install the plugin is to use the Godot Asset Library. Search for "Godot State Charts" and install the plugin. You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
+The easiest way to install the plugin is to use the Godot Asset Library. Search for "Godot State Charts" and install the plugin. You can exclude the `examples` folder if you don't need the examples. 
+
+You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
+
 
 ## Usage
 
+The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with. 
 
-The plugin adds a new node type called _State Chart_. This node is the root of your state chart. Below this node you can add the root state of your state chart, this will usually be a _Compound State_ or a _Parallel State_. You can add as many states as you want to your state chart, but you can only have one root state. Below each state you can add _Transition_ nodes. These nodes define the transitions between states. You can add as many transitions as you want to any state.
+Below this node you can add the root state of your state chart, this will usually be a _Compound State_ or a _Parallel State_. You can add as many states as you want to your state chart, but you can only have one root state. Below each state you can add _Transition_ nodes. These nodes define the transitions between states. You can add as many transitions as you want to any state.
 
 ![example image of a state chart](state_chart_example.png)
 
@@ -24,7 +30,7 @@ The _State Chart_ node is your main way of interacting with the state charts. It
 
 ### States
 
-States can be either active or inactive. On start the root state of the state chart will be activated. When a state has child states, one or more of these child states will be activated as well. States provide a range of signals which you can use to react to state changes or to execute code while the state is active. The following signals are available:
+States are the building blocks from which you build your state charts. A state can be either active or inactive.  On start the root state of the state chart will be activated. When a state has child states, one or more of these child states will be activated as well. States provide a range of signals which you can use to react to state changes or to execute code while the state is active. The following signals are available:
 
 - `state_entered()` - this signal is emitted when the state is entered.
 - `state_exited()` - this signal is emitted when the state is exited.
@@ -34,7 +40,7 @@ States can be either active or inactive. On start the root state of the state ch
 
 #### Atomic states
 
-Atomic states are the most basic type of state. They cannot have child states and can either be active or inactive. Atomic states have no additional properties.
+Atomic states are the most basic type of state. They cannot have child states. Atomic states have no additional properties.
 
 #### Compound states
 
@@ -59,9 +65,21 @@ History states are pseudo-states. They are not really a state but rather activat
 
 ### Transitions
 
-Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. These events then trigger one or more transitions.  You can send events to the state chart by calling the `send_event(event)` method. 
+Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. These events then trigger one or more transitions.  You can send events to the state chart by calling the `send_event(event)` method. For example, if we have a compound state with two child states _Idle_ and _Walking_ and we have set up two transitions, one reacting to the event `move` and one reacting to the event `stop`. The _Idle_ state is the initial state.
 
-The event will be passed to the active states going all the way down until a leaf state (a state which has no more child states) is reached. Now all transitions of that state will be checked, whether they react to that event. If a transition reacts to that event it will be queued for execution and the event is considered as handled. If no transition handles a given event, the event will bubble up to the parent state until it is consumed or reaches the root state. If the event reaches the root state and is not consumed, it will be ignored.
+![Alt text](compound_transition.gif)
+
+Now we start by sending the `move` event to the state chart. The transition which reacts to the `move` event will be executed and the state chart will switch to the  _Walking_ state. If we then send the `stop` event to the state chart, the transition which reacts to the `stop` event will be executed and the state chart will switch back to the _Idle_ state.
+
+In deeper state charts, events will be passed to the active states going all the way down until an active leaf state (a state which has no more child states) is reached. Now all transitions of that state will be checked, whether they react to that event. If a transition reacts to that event it will be queued for execution and the event is considered as handled. If no transition handles a given event, the event will bubble up to the parent state until it is consumed or reaches the root state. If the event reaches the root state and is not consumed, it will be ignored.
+
+#### Transitions on entering a state
+
+It is possible to immediately transition elsewhere when a state is entered. This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html). To make a transition execute immediately when a state is entered, leave the _Event_ field empty. Usually you will put a guard on such a transition to make sure it is only taken when a certain condition is met.
+
+![Alt text](immediate_transition.png)
+
+#### Delayed transitions
 
 Transitions can execute immediately or after a certain time has elapsed. If a transition has no time delay it will be executed in the next frame after the event triggering it has been sent. If a transition has a time delay, it will be executed after the time delay has elapsed but only if the state to which the transition belongs is still active and was not left temporarily. Once a state is left, all transitions which were queued for execution will be discarded. There is one exception to this rule, when you are using history states. This is explained in more detail in the section on history states.
 
