@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" uid="uid://cqt6bgiwgqym7" path="res://godot_state_charts_examples/ant_hill/banana/banana.svg" id="1_uoy0d"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_vo3bi"]
+radius = 7.99901
+height = 32.0275
+
+[node name="banana" type="Node2D" groups=["food"]]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_uoy0d")
+
+[node name="Area2D" type="Area2D" parent="."]
+metadata/owner = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+rotation = 1.5865
+shape = SubResource("CapsuleShape2D_vo3bi")

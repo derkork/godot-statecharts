@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b3k7i5rrn5hhl" path="res://godot_state_charts_examples/ant_hill/marker/circle_white.svg" id="1_2vg4s"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/ant_hill/marker/marker.gd" id="2_2b6iy"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0xsut"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("2_2b6iy")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = 1.5708
+texture = ExtResource("1_2vg4s")
+
+[node name="Area2D" type="Area2D" parent="."]
+metadata/owner = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_0xsut")

@@ -1,0 +1,647 @@
+[gd_scene load_steps=75 format=3 uid="uid://dy43c80qlfftx"]
+
+[ext_resource type="Shader" path="res://godot_state_charts_examples/ant_hill/ant/ant.gdshader" id="1_01qat"]
+[ext_resource type="Texture2D" uid="uid://bqgc7cft671q0" path="res://godot_state_charts_examples/ant_hill/ant/walk.png" id="1_7ajse"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/ant_hill/ant/ant.gd" id="1_i761n"]
+[ext_resource type="PackedScene" path="res://godot_state_charts_examples/ant_hill/marker/marker.tscn" id="2_lqnr1"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="3_lard5"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="4_ejp2e"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_21sgy"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_qj278"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bjtx1"]
+shader = ExtResource("1_01qat")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p0h5v"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mubvl"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nj3h7"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fij1g"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i21td"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a0fxu"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bwhdr"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hm8dw"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 0, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lfnfv"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kljff"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t8fco"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_blb68"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2k7ie"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vpjgq"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ykqrl"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yq06r"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 248, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m8wtm"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ytxlu"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jiy2o"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vfiyg"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sl3a2"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nmj2f"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sngog"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_71qgv"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 496, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_88uru"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kqc1k"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ar5xr"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xs12g"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6mpdc"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lqwgf"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xrg7o"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kmp2k"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 744, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hpmfd"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3osu6"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gdwlg"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hau5u"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2uawa"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aj6m3"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lnduy"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bqt77"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 992, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_plrtj"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ggvde"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xavhi"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ev8ji"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_65x5e"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yi6fp"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eseb1"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ux63t"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 1240, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ocabh"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8sepc"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4d7on"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jsu7m"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vhyb2"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t2dka"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e6l64"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1212, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mdp8v"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1414, 1488, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ywpdo"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(0, 1736, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1d2bj"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(202, 1736, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_80asc"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(404, 1736, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m5ngl"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(606, 1736, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r7ql0"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(808, 1736, 202, 248)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w0vp4"]
+atlas = ExtResource("1_7ajse")
+region = Rect2(1010, 1736, 202, 248)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kcoy1"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p0h5v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mubvl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nj3h7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fij1g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i21td")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a0fxu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bwhdr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hm8dw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lfnfv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kljff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t8fco")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_blb68")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2k7ie")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vpjgq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ykqrl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yq06r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m8wtm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ytxlu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jiy2o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vfiyg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sl3a2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nmj2f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sngog")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_71qgv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_88uru")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kqc1k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ar5xr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xs12g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6mpdc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lqwgf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xrg7o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kmp2k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hpmfd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3osu6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gdwlg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hau5u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2uawa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aj6m3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lnduy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bqt77")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_plrtj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ggvde")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xavhi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ev8ji")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_65x5e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yi6fp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eseb1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ux63t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ocabh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8sepc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4d7on")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jsu7m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vhyb2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t2dka")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e6l64")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mdp8v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ywpdo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1d2bj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_80asc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m5ngl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r7ql0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w0vp4")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 64.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1lk3q"]
+radius = 4.0
+height = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_htg24"]
+radius = 80.0
+
+[node name="Ant" type="CharacterBody2D"]
+z_index = 2048
+z_as_relative = false
+input_pickable = true
+motion_mode = 1
+platform_on_leave = 2
+safe_margin = 2.615
+script = ExtResource("1_i761n")
+marker_scene = ExtResource("2_lqnr1")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_bjtx1")
+rotation = 1.5708
+scale = Vector2(0.05, 0.05)
+sprite_frames = SubResource("SpriteFrames_kcoy1")
+animation = &"walk"
+frame_progress = 0.197569
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+editor_description = "This navigation agent sends the \"navigation_finished\" event to the state chart whenever the navigation is done."
+avoidance_enabled = true
+radius = 40.0
+max_speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1)
+shape = SubResource("CapsuleShape2D_1lk3q")
+
+[node name="SensorArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SensorArea"]
+shape = SubResource("CircleShape2D_htg24")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("3_lard5")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("4_ejp2e")
+initial_state = NodePath("Initializing")
+
+[node name="Initializing" type="Node" parent="StateChart/Root"]
+editor_description = "This state is used for script initialization."
+script = ExtResource("5_21sgy")
+
+[node name="Transition" type="Node" parent="StateChart/Root/Initializing"]
+script = ExtResource("7_qj278")
+to = NodePath("../../Seeking Food")
+event = &"initialized"
+
+[node name="Seeking Food" type="Node" parent="StateChart/Root"]
+editor_description = "In this state, the ant will look for food."
+script = ExtResource("4_ejp2e")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root/Seeking Food"]
+editor_description = "This state is active when the ant currently has no target. It is connected to the script which will look for a new target."
+script = ExtResource("5_21sgy")
+
+[node name="On Next Destination" type="Node" parent="StateChart/Root/Seeking Food/Idle"]
+script = ExtResource("7_qj278")
+to = NodePath("../../Travelling")
+event = &"destination_set"
+
+[node name="On Food Detected" type="Node" parent="StateChart/Root/Seeking Food/Idle"]
+script = ExtResource("7_qj278")
+to = NodePath("../../../Picking up Food")
+event = &"food_detected"
+
+[node name="Travelling" type="Node" parent="StateChart/Root/Seeking Food"]
+editor_description = "This state is active when the ant has a destination and is moving towards it."
+script = ExtResource("5_21sgy")
+
+[node name="On Navigation Finish" type="Node" parent="StateChart/Root/Seeking Food/Travelling"]
+editor_description = "When navigation is finished return to idle state."
+script = ExtResource("7_qj278")
+to = NodePath("../../Idle")
+event = &"navigation_finished"
+
+[node name="Picking up Food" type="Node" parent="StateChart/Root"]
+editor_description = "This state is active when the ant has detected food and wants to pick it up."
+script = ExtResource("4_ejp2e")
+initial_state = NodePath("Travelling")
+
+[node name="Travelling" type="Node" parent="StateChart/Root/Picking up Food"]
+editor_description = "This state is active while the ant is moving towards the food."
+script = ExtResource("5_21sgy")
+
+[node name="On Navigation Finish" type="Node" parent="StateChart/Root/Picking up Food/Travelling"]
+editor_description = "When navigation is finished we can pick up the food."
+script = ExtResource("7_qj278")
+to = NodePath("../../Picking Up")
+event = &"navigation_finished"
+
+[node name="Picking Up" type="Node" parent="StateChart/Root/Picking up Food"]
+editor_description = "This state is active when the ant has reached the food and now picks it up."
+script = ExtResource("5_21sgy")
+
+[node name="On Picked Up" type="Node" parent="StateChart/Root/Picking up Food/Picking Up"]
+editor_description = "When navigation is finished return to idle state."
+script = ExtResource("7_qj278")
+to = NodePath("../../../Returning Home")
+event = &"food_picked_up"
+
+[node name="On Food Vanished" type="Node" parent="StateChart/Root/Picking up Food/Picking Up"]
+editor_description = "When navigation is finished return to idle state."
+script = ExtResource("7_qj278")
+to = NodePath("../../../Seeking Food")
+event = &"food_vanished"
+
+[node name="Returning Home" type="Node" parent="StateChart/Root"]
+editor_description = "This state is active when the ant has found food and wants to return home."
+script = ExtResource("4_ejp2e")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/Root/Returning Home"]
+editor_description = "This state is active when the ant currently has no destination. It calls back into the script which will setup a new destination."
+script = ExtResource("5_21sgy")
+
+[node name="On Next Destination" type="Node" parent="StateChart/Root/Returning Home/Idle"]
+script = ExtResource("7_qj278")
+to = NodePath("../../Travelling")
+event = &"destination_set"
+
+[node name="On Nest Detected" type="Node" parent="StateChart/Root/Returning Home/Idle"]
+script = ExtResource("7_qj278")
+to = NodePath("../../../Delivering Food")
+event = &"nest_detected"
+
+[node name="Travelling" type="Node" parent="StateChart/Root/Returning Home"]
+editor_description = "This state is active when the ant has a destination and is currently travelling."
+script = ExtResource("5_21sgy")
+
+[node name="On Navigation Finish" type="Node" parent="StateChart/Root/Returning Home/Travelling"]
+editor_description = "When navigation is finished return to idle state."
+script = ExtResource("7_qj278")
+to = NodePath("../../Idle")
+event = &"navigation_finished"
+
+[node name="Delivering Food" type="Node" parent="StateChart/Root"]
+editor_description = "This state is active when the ant has detected the nest and wants to bring food back."
+script = ExtResource("4_ejp2e")
+initial_state = NodePath("Travelling")
+
+[node name="Travelling" type="Node" parent="StateChart/Root/Delivering Food"]
+editor_description = "This state is active when the ant is moving towards the nest."
+script = ExtResource("5_21sgy")
+
+[node name="On Navigation Finish" type="Node" parent="StateChart/Root/Delivering Food/Travelling"]
+editor_description = "When navigation is finished we can pick up the food."
+script = ExtResource("7_qj278")
+to = NodePath("../../Dropping")
+event = &"navigation_finished"
+
+[node name="Dropping" type="Node" parent="StateChart/Root/Delivering Food"]
+editor_description = "This state is active when the ant is dropping the food off at the nest."
+script = ExtResource("5_21sgy")
+
+[node name="On Dropped" type="Node" parent="StateChart/Root/Delivering Food/Dropping"]
+editor_description = "When navigation is finished return to idle state."
+script = ExtResource("7_qj278")
+to = NodePath("../../../Seeking Food")
+event = &"food_dropped"
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="ready" from="Sprite2D" to="Sprite2D" method="play" binds= ["walk"]]
+[connection signal="navigation_finished" from="NavigationAgent2D" to="StateChart" method="send_event" binds= [&"navigation_finished"]]
+[connection signal="area_entered" from="SensorArea" to="." method="_on_sensor_area_area_entered"]
+[connection signal="area_exited" from="SensorArea" to="." method="_on_sensor_area_area_exited"]
+[connection signal="state_physics_processing" from="StateChart/Root" to="." method="_maintenance"]
+[connection signal="state_entered" from="StateChart/Root/Seeking Food/Idle" to="." method="_on_idle_seeking_food"]
+[connection signal="state_physics_processing" from="StateChart/Root/Seeking Food/Travelling" to="." method="_on_travelling_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Picking up Food/Travelling" to="." method="_on_food_detected"]
+[connection signal="state_physics_processing" from="StateChart/Root/Picking up Food/Travelling" to="." method="_on_travelling_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Picking up Food/Picking Up" to="." method="_on_food_reached"]
+[connection signal="state_entered" from="StateChart/Root/Returning Home/Idle" to="." method="_on_idle_returning_home"]
+[connection signal="state_physics_processing" from="StateChart/Root/Returning Home/Travelling" to="." method="_on_travelling_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Delivering Food/Travelling" to="." method="_on_nest_detected"]
+[connection signal="state_physics_processing" from="StateChart/Root/Delivering Food/Travelling" to="." method="_on_travelling_state_physics_processing"]
+[connection signal="state_entered" from="StateChart/Root/Delivering Food/Dropping" to="." method="_on_nest_reached"]

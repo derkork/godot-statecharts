@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" uid="uid://xb5fialweqfw" path="res://godot_state_charts_examples/ant_hill/nest/nest.svg" id="1_8slek"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_b8f1n"]
+radius = 37.1214
+
+[node name="Nest" type="Sprite2D" groups=["nest"]]
+texture = ExtResource("1_8slek")
+
+[node name="Area2D" type="Area2D" parent="."]
+metadata/owner = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(-1, -1)
+shape = SubResource("CircleShape2D_b8f1n")
