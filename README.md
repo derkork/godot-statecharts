@@ -11,7 +11,7 @@ Godot State Charts is a plugin for Godot Engine 4 or later that allows you to us
 
 <p align="center">
   <a href="https://TODO">Download from Godot Asset Libary</a> | 
-  <a href="https://github.com/derkork/godot-state-charts/blob/master/manual/manual.md">Read the manual</a> 
+  <a href="blob/main/manual/manual.md">Read the manual</a> 
 </p>
 
 ## Features
