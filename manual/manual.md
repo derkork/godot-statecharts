@@ -134,11 +134,15 @@ Another option is to directly use built-in signals and set the node to debug in 
 
 ![Setting the node to debug with the editor UI.](debugger_with_signals.png)
 
+At runtime, the state chart debugger will show the current state of the state chart, including all currently set expression properties. It also indicates time left for delayed transitions, so you have a good overview of what is going on in your state chart.
+
+![Live view of the state chart debugger](state_chart_debugger_live.png)
+
 ## Tips and tricks
 
 ### Keep state and logic separate
 
-State charts work best when you keep the state and the logic separate. This means that the state charts should contain all the rules for changing states while your code should only contain the logic that is executed when when being in a state or when entering or leaving a state. You should not track the current state in your code, that is the responsibility of the state chart. The StateCharts class deliberately does not expose the current state of the state chart for this reason.
+State charts work best when you keep the state and the logic separate. This means that the state charts should contain all the rules for changing states while your code should only contain the logic that is executed when when being in a state or when entering or leaving a state. You should not track the current state in your code, that is the responsibility of the state chart. The `StateChart` class deliberately does not expose the current state of the state chart for this reason.
 
 Instead, use the provided state events to trigger logic in your code. Many times you don't even need to write any code. For example if you have a bomb that explodes and you want to play a sound when it enters the _Exploding_ state, you can simply link up the `state_entered` signal of the _Exploding_ state to the `play` function of your audio player.
 
@@ -148,3 +152,24 @@ If you only want to allow input in certain states, connect the `state_processing
 
 ![Running the same code in multiple states](running_same_code_in_multiple_states.png)
 
+The way this is set up the code doesn't need to know which states may exist or when you are allowed to jump. The state chart takes care of that and the jumping code is only executed when the state chart is in a state where jumping is allowed.
+
+```gdscript
+## Called in states that allow jumping, we process jumps only in these.
+func _on_jump_enabled_state_physics_processing(_delta):
+	if Input.is_action_just_pressed("ui_accept"):
+		velocity.y = JUMP_VELOCITY
+		_state_chart.send_event("jump")
+```
+
+### Remember that events bubble up in the chart tree
+
+When you have multiple states that need to react on the same event, you can handle the event in the parent state. For example in the platformer demo, the frog can be in multiple different states while it is airborne.
+
+![Sub-states of the airborne state](airborne_substates.png)
+
+However no matter in which specific airborne state the frog is, once it lands on the ground it always should transition back to the _Grounded_ state. Therefore the transition for handling this has been added to the _Airborne_ state. This way the transition will be taken no matter in which specific airborne state the frog is. Since no sub-state of _Airborne_  (_CoyoteJumpEnabled_, _DoubleJumpEnabled_, _CannotJump_) handles the event, the event will bubble up to the parent state _Airborne_ and the transition will be taken.
+
+### Give everything meaningful names
+
+Because both states and transitions are nodes, it is very easy to rename them in the editor. Use this to provide meaningful names for your states and transitions. This makes it easier to understand what is going on in your state chart and also makes it easier to find the right node in the editor. Transitions should have the event they react on in their name, for example _On Jump_ or _On Attack_.  State names should be descriptive, for example _Grounded_, _Airborne_, _CoyoteJumpEnabled_, _DoubleJumpEnabled_, _CannotJump_. Since you will never use a state name or transition name directly in your code, you can use longer names that are easy to understand.
