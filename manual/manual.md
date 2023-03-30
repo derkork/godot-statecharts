@@ -6,7 +6,9 @@ Godot State Charts is a plugin for Godot Engine that allows you to use state cha
 
 > Put simply, a state chart is a beefed up state machine.  The beefing up solves a lot of the problems that state machines have, especially state explosion that happens as state machines grow.
 
-Godot State Charts allows you to build state charts using nodes in the Godot editor.  The library is built in an idiomatic way, so you can use nodes to define states and transitions and use Godot signals to connect your code to the state machine. As states and transitions are nodes you can also easily modularize your state charts by using scenes for re-using states and transitions.
+Godot State Charts allows you to build state charts in the Godot editor.  The library is built in an idiomatic way, so you can use nodes to define states and transitions and use Godot signals to connect your code to the state machine. As states and transitions are nodes you can also easily modularize your state charts by using scenes for re-using states and transitions.
+
+There is only a single class with two methods for your code to interface with the state chart. This makes it easy to integrate state charts into your game, as you don't need to extend from a base class or implement an interface for your states.
 
 ## Installation
 
@@ -63,13 +65,15 @@ History states are pseudo-states. They are not really a state but rather activat
 
 ![History state properties](history_state.png)
 
-### Transitions
+### Events and transitions
 
 Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. These events then trigger one or more transitions.  You can send events to the state chart by calling the `send_event(event)` method. For example, if we have a compound state with two child states _Idle_ and _Walking_ and we have set up two transitions, one reacting to the event `move` and one reacting to the event `stop`. The _Idle_ state is the initial state.
 
-![Alt text](compound_transition.gif)
+![Transition in a compound state](compound_transition.gif)
 
-Now we start by sending the `move` event to the state chart. The transition which reacts to the `move` event will be executed and the state chart will switch to the  _Walking_ state. If we then send the `stop` event to the state chart, the transition which reacts to the `stop` event will be executed and the state chart will switch back to the _Idle_ state.
+Now we start by sending the `move` event to the state chart. The compound state will forward the event to the currently active state, which is the _Idle_ state. On the _Idle_ state a transition reacting to the `move` event is defined, so this transition will execute and the state chart will switch to the  _Walking_ state. 
+
+Now we send a `stop` event to the state chart. The currently active state is now _Walking_ so the the compound state will forward the event to the _Walking_ state. On the _Walking_ state a transition reacting to the `stop` event is defined, so that transition will execute and the state chart will switch back to the _Idle_ state.
 
 In deeper state charts, events will be passed to the active states going all the way down until an active leaf state (a state which has no more child states) is reached. Now all transitions of that state will be checked, whether they react to that event. If a transition reacts to that event it will be queued for execution and the event is considered as handled. If no transition handles a given event, the event will bubble up to the parent state until it is consumed or reaches the root state. If the event reaches the root state and is not consumed, it will be ignored.
 
@@ -96,13 +100,51 @@ A transition can have a guard which determines whether the transition should be 
 ##### Expression guards
 Expression guards give you the most flexibility when it comes to guards. You can use expressions to determine whether a transition should be taken or not. Expression guards are evaluated using the [Godot Expression](https://docs.godotengine.org/en/stable/classes/class_expression.html) class. You can add so-called _expression properties_ to the state chart node by calling the `set_expression_property(name, value)` method. 
 
-```swift
+```gdscript
 @onready var state_chart: StateChart = $StateChart
 
 func _ready():
-    #// Add an expression property called "player_health" with the value 100
+    # Set an expression property called "player_health" with the value 100
     state_chart.set_expression_property("player_health", 100)
 ```
 These properties can then be used in your expressions. The following example shows how to use expression guards to check whether the player's health is below 50%:
 
 ![Example of an expression guard for transitioning into berserk mode when player's health sinks below 50%](expression_guard.png)
+
+### Debugging
+
+When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. 
+
+You can add the debugger through the _Add Node_ dialog. Search for _StateChartDebugger_ and add it to your scene. It is a tree control that you can position anywhere in your scene where it makes sense (maybe you already have an in-game debugging screen where you can add it).
+
+![The state chart debugger](state_chart_debugger.png)
+
+The state chart debugger is has a property _Initial node to watch_ where you can set a node that should be watched. It doesn't necessarily need to be a state chart node, the debugger will search for a state chart anywhere below the node you set. This is usefuly when you have the state chart nested in a sub-scene and you want to watch the state chart from the root scene where you don't have access to the state chart node.
+
+You can also use the `debug_node` function of the state chart debugger to change the node that is being watched at runtime. For example you could add code that changes the debugged node when clicking on a unit or object in your game
+
+```gdscript
+@onready var debugger: StateChartDebugger = $StateChartDebugger
+
+func _on_unit_clicked(unit):
+    debugger.debug_node(unit)
+```
+
+Another option is to directly use built-in signals and set the node to debug in the editor UI. This is how it was done in the example projects:
+
+![Setting the node to debug with the editor UI.](debugger_with_signals.png)
+
+## Tips and tricks
+
+### Keep state and logic separate
+
+State charts work best when you keep the state and the logic separate. This means that the state charts should contain all the rules for changing states while your code should only contain the logic that is executed when when being in a state or when entering or leaving a state. You should not track the current state in your code, that is the responsibility of the state chart. The StateCharts class deliberately does not expose the current state of the state chart for this reason.
+
+Instead, use the provided state events to trigger logic in your code. Many times you don't even need to write any code. For example if you have a bomb that explodes and you want to play a sound when it enters the _Exploding_ state, you can simply link up the `state_entered` signal of the _Exploding_ state to the `play` function of your audio player.
+
+![Running code when a state is entered.](running_code_on_state_entering.png)
+
+If you only want to allow input in certain states, connect the `state_processing` or `state_physics_processing` signals to the same method of your code for all the states where the input is allowed. You can see one example of this in the platformer example, where jumping is only allowed in certain states:
+
+![Running the same code in multiple states](running_same_code_in_multiple_states.png)
+
