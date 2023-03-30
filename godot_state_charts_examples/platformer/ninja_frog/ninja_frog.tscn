@@ -728,10 +728,12 @@ script = ExtResource("3_qw75p")
 script = ExtResource("8_mdf33")
 
 [node name="Movement" type="Node" parent="StateChart/Root"]
+editor_description = "This is the root of all movement related states."
 script = ExtResource("4_g6c55")
 initial_state = NodePath("Grounded")
 
 [node name="Grounded" type="Node" parent="StateChart/Root/Movement"]
+editor_description = "This state is active when the player is on the ground."
 script = ExtResource("6_vmkuk")
 
 [node name="On Jump" type="Node" parent="StateChart/Root/Movement/Grounded"]
@@ -747,6 +749,7 @@ to = NodePath("../../Airborne")
 event = &"airborne"
 
 [node name="Airborne" type="Node" parent="StateChart/Root/Movement"]
+editor_description = "This is the root state for when the player is in the air. We have sub-states to handle the various input that is allowed when in the air."
 script = ExtResource("4_g6c55")
 initial_state = NodePath("CoyoteJumpEnabled")
 
@@ -756,6 +759,7 @@ to = NodePath("../../Grounded")
 event = &"grounded"
 
 [node name="CoyoteJumpEnabled" type="Node" parent="StateChart/Root/Movement/Airborne"]
+editor_description = "While in this state, the player can jump for a short time. The state is activated by default when the player becomes airborne from falling. Allowing a jump for a short time makes the controls feel nicer. The \"On Expiration\" transition will leave this state after the grace period."
 script = ExtResource("6_vmkuk")
 
 [node name="On Jump" type="Node" parent="StateChart/Root/Movement/Airborne/CoyoteJumpEnabled"]
@@ -771,6 +775,7 @@ to = NodePath("../../CannotJump")
 delay_seconds = 0.2
 
 [node name="DoubleJumpEnabled" type="Node" parent="StateChart/Root/Movement/Airborne"]
+editor_description = "This state is active while the player is in the air and has jumped one time already. While the state is active, a second jump is allowed."
 script = ExtResource("6_vmkuk")
 
 [node name="On Jump" type="Node" parent="StateChart/Root/Movement/Airborne/DoubleJumpEnabled"]
@@ -780,13 +785,16 @@ to = NodePath("../../CannotJump")
 event = &"jump"
 
 [node name="CannotJump" type="Node" parent="StateChart/Root/Movement/Airborne"]
+editor_description = "This state is active when the player is airborne but can no longer jump either because the coyote-jump grace period has expired or the player has already used the double-jump."
 script = ExtResource("6_vmkuk")
 
 [node name="Animation Control" type="Node" parent="StateChart/Root"]
+editor_description = "These states are bound to the animation tree and will trigger the corresponding animation states when activated. They are independent of the movement state, so they run in a separate substate in parallel to the movement state."
 script = ExtResource("4_g6c55")
 initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateChart/Root/Animation Control"]
+editor_description = "Animation tree state that that will cause the animation tree to go to the idle state once we get the idle event."
 script = ExtResource("12_8s1ek")
 animation_tree = NodePath("../../../../AnimationTree")
 
@@ -796,6 +804,7 @@ to = NodePath("../../Move")
 event = &"moving"
 
 [node name="Move" type="Node" parent="StateChart/Root/Animation Control"]
+editor_description = "Animation tree state that that will cause the animation tree to go to the Move  state once we get the moving event."
 script = ExtResource("12_8s1ek")
 animation_tree = NodePath("../../../../AnimationTree")
 

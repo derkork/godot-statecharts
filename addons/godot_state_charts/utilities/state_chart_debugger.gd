@@ -1,3 +1,4 @@
+@icon("state_chart_debugger.svg")
 class_name StateChartDebugger
 extends Tree
 

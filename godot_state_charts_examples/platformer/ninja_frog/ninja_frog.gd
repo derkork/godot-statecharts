@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
-
-## Emitted when this node is clicked with a mouse s
+## Emitted when this node is clicked with a mouse 
 signal clicked(node:Node2D)
 
 const SPEED = 300.0

@@ -12,18 +12,27 @@ There is only a single class with two methods for your code to interface with th
 
 ## Installation
 
-The easiest way to install the plugin is to use the Godot Asset Library. Search for "Godot State Charts" and install the plugin. You can exclude the `examples` folder if you don't need the examples. 
+The easiest way to install the plugin is to use the Godot Asset Library. Search for "Godot State Charts" and install the plugin. You can exclude the `godot_state_charts_examples` folder if you don't need the examples. 
 
 You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
-
 
 ## Usage
 
 The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with. 
 
-Below this node you can add the root state of your state chart, this will usually be a _Compound State_ or a _Parallel State_. You can add as many states as you want to your state chart, but you can only have one root state. Below each state you can add _Transition_ nodes. These nodes define the transitions between states. You can add as many transitions as you want to any state.
+Below this node you can add the root state of your state chart, this will usually be a _Compound State_ or a _Parallel State_. You can add as many states as you want to your state chart, but you can only have one root state. Below each state you can add _Transition_ nodes. These nodes define the transitions between states. You can add as many transitions as you want to any state. 
 
-![example image of a state chart](state_chart_example.png)
+You can add nodes through the usual _Add node_ dialog in Godot. Just type "state" or "transition" into the search field and you will see the nodes in the list.
+
+![Creating a node in the editor](create_node.png)
+
+### Examples
+
+The plugin comes with a few examples. You can find them in the `godot_state_charts_examples` folder. To run an example, open and run it's main scene. The examples are:
+
+- `platformer` - a simple platformer game with a state chart for the player character that handles movement, jumping, falling, double jumps, coyote jumps and animation control. This example shows how state charts can massively simplify the code needed to implement a full player character controller. The character controller code is less than 70 lines of code.
+- `ant_hill` - a rudimentary ant hill simulation. The ants are controlled by a state chart that handles the different states of the ants such as searching for food, carrying food, returning to the nest, etc. This example shows how state charts can simplify a lot of the if-else logic that is often needed to implement AI.
+- `history_states` - an example that shows how you can use history states to implement a state machine that can remember the last active state of a compound state. 
 
 ### The _State Chart_ node
 
@@ -42,11 +51,11 @@ States are the building blocks from which you build your state charts. A state c
 
 #### Atomic states
 
-Atomic states are the most basic type of state. They cannot have child states. Atomic states have no additional properties.
+<img src="../addons/godot_state_charts/atomic_state.svg" width="32" height="32" align="left"> Atomic states are the most basic type of state. They cannot have child states. Atomic states have no additional properties.
 
 #### Compound states
 
-Compound states are states which have at least one child state (though having at least two child states makes more sense). Only one child state of a compound state can be active at any given time. Compound states have the following properties:
+<img src="../addons/godot_state_charts/compound_state.svg" width="32" height="32" align="left"> Compound states are states which have at least one child state (though having at least two child states makes more sense). Only one child state of a compound state can be active at any given time. Compound states have the following properties:
 
 - _Initial state_ - this property determines which child state will be activated when the compound state is entered directly. You can always activate a child state by explicitly transitioning to it. If you do not set an initial state then no child state will be activated and an error will be printed to the console.
 
@@ -54,20 +63,35 @@ Compound states are states which have at least one child state (though having at
 
 #### Parallel states
 
-Parallel states are similar to compound states in that they can have multiple child states. However, all child states of a parallel state are active at the same time when the parallel state is active. They allow you to model multiple states which are independent of each other. As such they are a great tool for avoiding combinatorial state explosion that you can get with simple state machines. Parallel states have no additional properties.
+<img src="../addons/godot_state_charts/parallel_state.svg" width="32" height="32" align="left"> Parallel states are similar to compound states in that they can have multiple child states. However, all child states of a parallel state are active at the same time when the parallel state is active. They allow you to model multiple states which are independent of each other. As such they are a great tool for avoiding combinatorial state explosion that you can get with simple state machines. Parallel states have no additional properties.
 
 #### History states
 
-<img src="../addons/godot_state_charts/history_state.svg" width="32", height="32" /> History states are pseudo-states. They are not really a state but rather activate the last active state when being transitioned to. They can only be used as child states of compound states. They are useful when you temporarily want to leave a compound state and then return to the state you were in before you left. History states have the following properties:
+<img src="../addons/godot_state_charts/history_state.svg" width="32" height="32" align="left"> History states are pseudo-states. They are not really a state but rather activate the last active state when being transitioned to. They can only be used as child states of compound states. They are useful when you temporarily want to leave a compound state and then return to the state you were in before you left. History states have the following properties:
 
 - _Deep_ - if true the history state will capture and restore the state of the whole sub-tree below the compound state. If false the history state will only capture and restore the last active state of its immediate parent compound state.
 - _Default state_ - this is the state which will be activated if the history state is entered and no history has been captured yet. If you do not set a default state, the history state will not activate any state when it is entered and an error will be printed to the console.
 
 ![History state properties](history_state.png)
 
+
+#### Animation tree states
+
+_Note: this feature is currently experimental and may change or be removed in the future._
+
+<img src="../addons/godot_state_charts/animation_tree_state.svg" width="32" height="32" align="left"> Animation tree states are a variation of atomic states. They can be linked to an animation tree. When an animation tree state is activated it will ask the animation tree to travel to the same state (the animation tree state and the state inside the animation tree should have the same name). This can be used to control animation trees with the same state chart events that you use to control your game logic. Animation tree states have the following properties:
+
+- _Animation tree_ - the animation tree that should be controlled by the animation tree state.
+
+![Animation tree state properties](animation_tree_state.png)
+
+Animation tree states are usually independent of the rest of the states, so it is usually a good idea to use a parallel state to separate them from the rest of the states.
+
+![Separation of animation tree states](animation_tree_state_separation.png)
+
 ### Events and transitions
 
-Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. These events then trigger one or more transitions.  You can send events to the state chart by calling the `send_event(event)` method. For example, if we have a compound state with two child states _Idle_ and _Walking_ and we have set up two transitions, one reacting to the event `move` and one reacting to the event `stop`. The _Idle_ state is the initial state.
+<img src="../addons/godot_state_charts/transition.svg" width="32" height="32" align="left"> Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. These events then trigger one or more transitions.  You can send events to the state chart by calling the `send_event(event)` method. For example, if we have a compound state with two child states _Idle_ and _Walking_ and we have set up two transitions, one reacting to the event `move` and one reacting to the event `stop`. The _Idle_ state is the initial state.
 
 ![Transition in a compound state](compound_transition.gif)
 
@@ -91,11 +115,11 @@ Transitions can execute immediately or after a certain time has elapsed. If a tr
 
 A transition can have a guard which determines whether the transition should be taken or not. If a transition reacts to an event the transition's guard will be evaluated. If the guard evaluates to `true` the transition will be taken. Otherwise the next transition which reacts to the event will be checked. If a transition has no guard, it will always be taken. Guards can be nested to create more complex guards. The following guards are available:
 
-- _AllOfGuard_ - this guard evaluates to `true` if all of its child guards evaluate to `true` (logical AND).
-- _AnyOfGuard_ - this guard evaluates to `true` if any of its child guards evaluate to `true` (logical OR).
-- _NotGuard_ - this guard evaluates to the opposite of its child guard.
-- _StateIsActiveGuard_ - this guard allows you to configure and monitor a state. The guard evaluates to `true` if the state is active and to `false` if the state is inactive.
-- _ExpressionGuard_ - this guard allows you to use expressions to determine whether the transition should be taken or not. 
+- <img src="../addons/godot_state_charts/all_of_guard.svg" width="16" height="16" align="left"> _AllOfGuard_ - this guard evaluates to `true` if all of its child guards evaluate to `true` (logical AND).
+- <img src="../addons/godot_state_charts/any_of_guard.svg" width="16" height="16" align="left"> _AnyOfGuard_ - this guard evaluates to `true` if any of its child guards evaluate to `true` (logical OR).
+- <img src="../addons/godot_state_charts/not_guard.svg" width="16" height="16" align="left"> _NotGuard_ - this guard evaluates to the opposite of its child guard.
+- <img src="../addons/godot_state_charts/state_is_active_guard.svg" width="16" height="16" align="left"> _StateIsActiveGuard_ - this guard allows you to configure and monitor a state. The guard evaluates to `true` if the state is active and to `false` if the state is inactive.
+- <img src="../addons/godot_state_charts/expression_guard.svg" width="16" height="16" align="left"> _ExpressionGuard_ - this guard allows you to use expressions to determine whether the transition should be taken or not. 
 
 ##### Expression guards
 Expression guards give you the most flexibility when it comes to guards. You can use expressions to determine whether a transition should be taken or not. Expression guards are evaluated using the [Godot Expression](https://docs.godotengine.org/en/stable/classes/class_expression.html) class. You can add so-called _expression properties_ to the state chart node by calling the `set_expression_property(name, value)` method. 
@@ -113,9 +137,7 @@ These properties can then be used in your expressions. The following example sho
 
 ### Debugging
 
-When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. 
-
-You can add the debugger through the _Add Node_ dialog. Search for _StateChartDebugger_ and add it to your scene. It is a tree control that you can position anywhere in your scene where it makes sense (maybe you already have an in-game debugging screen where you can add it).
+<img src="../addons/godot_state_charts/utilities/state_chart_debugger.svg" width="32" height="32" align="left"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add the debugger through the _Add Node_ dialog. Search for _StateChartDebugger_ and add it to your scene. It is a tree control that you can position anywhere in your scene where it makes sense (maybe you already have an in-game debugging screen where you can add it).
 
 ![The state chart debugger](state_chart_debugger.png)
 
@@ -138,7 +160,7 @@ At runtime, the state chart debugger will show the current state of the state ch
 
 ![Live view of the state chart debugger](state_chart_debugger_live.png)
 
-## Tips and tricks
+## Tips & tricks
 
 ### Keep state and logic separate
 
@@ -172,4 +194,10 @@ However no matter in which specific airborne state the frog is, once it lands on
 
 ### Give everything meaningful names
 
-Because both states and transitions are nodes, it is very easy to rename them in the editor. Use this to provide meaningful names for your states and transitions. This makes it easier to understand what is going on in your state chart and also makes it easier to find the right node in the editor. Transitions should have the event they react on in their name, for example _On Jump_ or _On Attack_.  State names should be descriptive, for example _Grounded_, _Airborne_, _CoyoteJumpEnabled_, _DoubleJumpEnabled_, _CannotJump_. Since you will never use a state name or transition name directly in your code, you can use longer names that are easy to understand.
+Because both states and transitions are nodes, it is very easy to rename them in the editor. Use this to provide meaningful names for your states and transitions. This makes it easier to understand what is going on in your state chart and also makes it easier to find the right node in the editor. Transitions should have the event they react on in their name, for example _On Jump_ or _On Attack_.  State names should be descriptive, for example _Grounded_, _Airborne_, _CoyoteJumpEnabled_, _DoubleJumpEnabled_, _CannotJump_. Since you will never type a state name or transition name directly in your code, you can use longer names that are easy to understand.
+
+### Use the built-in "Editor Description" feature
+
+Godot has a very nice built-in comment field named "Editor Description". Use this to write down some thoughts about why a state or transition exists and how it works in conjunction with other states and transitions. This is especially useful when you have a complex state chart with many states and transitions. Just like you write comments for your code, it is a good idea to write comments for your state charts.
+
+![An example of the editor description](editor_description.png)
