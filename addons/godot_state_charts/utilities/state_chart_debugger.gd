@@ -8,6 +8,11 @@ extends Tree
 		if not Engine.is_editor_hint():
 			_setup_processing(enabled)
 
+## The initial node that should be watched. Optional, if not set
+## then no node will be watched. You can set the node that should
+## be watched at runtime by calling debug_node().
+@export var initial_node_to_watch:NodePath
+
 # the state chart we track
 var _state_chart:StateChart
 var _root:Node
@@ -19,7 +24,12 @@ func _init():
 	
 	
 func _ready():
+	# always run, even if the game is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS	
+
+	var to_watch = get_node_or_null(initial_node_to_watch)
+	if is_instance_valid(to_watch):
+		debug_node(to_watch)
 
 ## Sets up the debugger to track the given state chart. If the given node is not 
 ## a state chart, it will search the children for a state chart. If no state chart
