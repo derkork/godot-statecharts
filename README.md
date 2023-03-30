@@ -2,6 +2,7 @@
 
 Godot State Charts is a plugin for Godot Engine 4 or later that allows you to use [state charts](https://statecharts.dev) in your game. State Charts are similar to finite state machines, but they are more powerful and avoid the state explosion problem of traditional FSMs. 
 
+_This library is still quite new and has not seen much use yet. While it works reasonably well, there may still be bugs and missing features. Please report any issues you find._
 
 
 <!--suppress HtmlDeprecatedAttribute -->
@@ -12,6 +13,7 @@ Godot State Charts is a plugin for Godot Engine 4 or later that allows you to us
 <p align="center">
   <a href="https://TODO">Download from Godot Asset Libary</a> | 
   <a href="manual/manual.md">Read the manual</a> 
+  <a href="manual/faq.md">Frequently Asked Questions</a>
 </p>
 
 ## Features
