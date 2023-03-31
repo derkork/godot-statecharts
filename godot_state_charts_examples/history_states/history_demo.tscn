@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c0u1chb26e6fq"]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Texture2D" uid="uid://bgw8xgbwc2flx" path="res://godot_state_charts_examples/history_states/white_rectangle.svg" id="1_3v23e"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_pqmip"]
@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_lh5sp"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_xvm5g"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="8_i07w7"]
-[ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://new_theme.tres" id="8_najew"]
+[ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://godot_state_charts_examples/new_theme.tres" id="8_najew"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kl3ga"]
 size = Vector2(34.243, 33.536)
