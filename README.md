@@ -8,7 +8,7 @@ _This library is still quite new and has not seen much use yet. While it works r
 ## Quick Links
 
 <p align="center">
-  <a href="https://TODO">Install from the Godot Asset Libary</a> | 
+  <a href="https://godotengine.org/asset-library/asset/1778">Install from the Godot Asset Libary</a> | 
   <a href="manual/manual.md">Read the manual</a> |
   <a href="manual/faq.md">FAQ</a> |
   <a href="https://discord.gg/4JBkykG">Godot Engine Discord</a>
