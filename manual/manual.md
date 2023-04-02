@@ -16,6 +16,8 @@ The easiest way to install the plugin is to use the Godot Asset Library. Search 
 
 You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
 
+After you installed it, make sure you enable the plugin in the project settings.
+
 ## Usage
 
 The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with. 
