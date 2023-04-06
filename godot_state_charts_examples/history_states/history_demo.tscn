@@ -1,13 +1,13 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=11 format=3 uid="uid://b18rv6o4duide"]
 
 [ext_resource type="Texture2D" uid="uid://bgw8xgbwc2flx" path="res://godot_state_charts_examples/history_states/white_rectangle.svg" id="1_3v23e"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_fgw1q"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_pqmip"]
 [ext_resource type="Script" path="res://godot_state_charts_examples/history_states/history_demo.gd" id="2_vphtk"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="3_nsw2j"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/history_state.gd" id="4_0qaqv"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_lh5sp"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_xvm5g"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="8_i07w7"]
 [ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://godot_state_charts_examples/new_theme.tres" id="8_najew"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kl3ga"]
@@ -16,13 +16,13 @@ size = Vector2(34.243, 33.536)
 [node name="Node" type="Node"]
 script = ExtResource("2_vphtk")
 
-[node name="StateChartDebugger" type="Tree" parent="."]
-offset_left = 325.0
-offset_top = 5.0
-offset_right = 627.0
-offset_bottom = 167.0
+[node name="StateChartDebugger" parent="." instance=ExtResource("2_fgw1q")]
+offset_left = 280.0
+offset_top = 9.0
+offset_right = -12.0
+offset_bottom = -190.0
 theme = ExtResource("8_najew")
-script = ExtResource("8_i07w7")
+initial_node_to_watch = NodePath("../StateChart")
 
 [node name="Node2D" type="Sprite2D" parent="."]
 position = Vector2(145, 206)

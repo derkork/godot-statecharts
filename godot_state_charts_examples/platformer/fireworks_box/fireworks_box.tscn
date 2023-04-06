@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=18 format=3 uid="uid://bvrbfp870t0kd"]
 
 [ext_resource type="Script" path="res://godot_state_charts_examples/platformer/fireworks_box/fireworks_box.gd" id="1_6vg3k"]
 [ext_resource type="Texture2D" uid="uid://roilgifkgiii" path="res://godot_state_charts_examples/platformer/fireworks_box/box.png" id="1_aido8"]

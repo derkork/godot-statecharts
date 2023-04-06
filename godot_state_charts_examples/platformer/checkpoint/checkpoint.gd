@@ -15,7 +15,7 @@ signal deactivated(checkpoint:Node2D)
 func _on_area_2d_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):
 	# if event was left mouse button up, emit clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
-		print("Checkpoint clicked")
+		# print("Checkpoint clicked")
 		clicked.emit(self)
 
 

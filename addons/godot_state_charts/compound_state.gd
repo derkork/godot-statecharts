@@ -141,13 +141,13 @@ func _handle_transition(transition:Transition, source:State):
 		# now check if the target is a history state, if this is the 
 		# case, we need to restore the saved state
 		if target is HistoryState:
-			print("Target is history state, restoring saved state.")
+			# print("Target is history state, restoring saved state.")
 			var saved_state = target.history
 			if saved_state != null:
 				# restore the saved state
 				_state_restore(saved_state, -1 if target.deep else 1)
 				return
-			print("No history saved so far, activating default state.")
+			# print("No history saved so far, activating default state.")
 			# if we don't have history, we just activate the default state
 			var default_state = target.get_node_or_null(target.default_state)
 			if is_instance_valid(default_state):

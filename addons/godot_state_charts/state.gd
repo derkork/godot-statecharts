@@ -112,7 +112,7 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 ## If the state was not active when it was saved, this method still will be called
 ## but the given SavedState object will not contain any data for this state.
 func _state_restore(saved_state:SavedState, child_levels:int = -1):
-	print("restoring state " + name)
+	# print("restoring state " + name)
 	var our_saved_state = saved_state.get_substate_or_null(self)
 	if our_saved_state == null:
 		# if we are currently active, deactivate the state
@@ -128,10 +128,10 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 	_pending_transition = get_node_or_null(our_saved_state.pending_transition_name) as Transition
 	_pending_transition_time = our_saved_state.pending_transition_time
 	
-	if _pending_transition != null:
-		print("restored pending transition " + _pending_transition.name + " with time " + str(_pending_transition_time))
-	else:
-		print("no pending transition restored")
+	# if _pending_transition != null:
+	#	print("restored pending transition " + _pending_transition.name + " with time " + str(_pending_transition_time))
+	# else:
+	#	print("no pending transition restored")
 
 	if child_levels == 0:
 		return

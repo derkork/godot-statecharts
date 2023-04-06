@@ -71,6 +71,8 @@ func debug_node(root:Node) -> bool:
 	else:
 		# find all state nodes below the state chart and connect their signals
 		_connect_all_signals()
+		# clear the history
+		_historyEdit.text = ""
 		_setup_processing(true)
 
 	return success
@@ -103,6 +105,7 @@ func _setup_processing(enabled:bool):
 func _disconnect_all_signals():
 	for state in _connected_states:
 		state.state_entered.disconnect(_on_state_entered)
+		state.state_exited.disconnect(_on_state_exited)
 
 
 ## Connects all signals from the currently processing state chart
@@ -124,6 +127,7 @@ func _connect_all_signals():
 func _connect_signals(state:State):
 	state.state_entered.connect(_on_state_entered.bind(state))
 	state.state_exited.connect(_on_state_exited.bind(state))
+	_connected_states.append(state)
 
 	# recurse into children
 	for child in state.get_children():

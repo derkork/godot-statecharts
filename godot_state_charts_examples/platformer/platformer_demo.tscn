@@ -2,10 +2,10 @@
 
 [ext_resource type="TileSet" uid="uid://cd6hbvgl1e2xy" path="res://godot_state_charts_examples/platformer/terrain/terrain_tiles.tres" id="1_l1t3g"]
 [ext_resource type="PackedScene" uid="uid://v5vg88it87oj" path="res://godot_state_charts_examples/platformer/ninja_frog/ninja_frog.tscn" id="2_3w7a1"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="3_fqmqq"]
 [ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://godot_state_charts_examples/new_theme.tres" id="3_n1xun"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="4_qtefp"]
 [ext_resource type="PackedScene" path="res://godot_state_charts_examples/platformer/checkpoint/checkpoint.tscn" id="6_spkwb"]
-[ext_resource type="PackedScene" path="res://godot_state_charts_examples/platformer/fireworks_box/fireworks_box.tscn" id="7_pg57e"]
+[ext_resource type="PackedScene" uid="uid://bvrbfp870t0kd" path="res://godot_state_charts_examples/platformer/fireworks_box/fireworks_box.tscn" id="7_pg57e"]
 
 [node name="Level" type="Node2D"]
 
@@ -20,13 +20,13 @@ layer_0/tile_data = PackedInt32Array(1507331, 393216, 4, 1572867, 393216, 5, 163
 z_index = 2048
 position = Vector2(78, 361)
 
-[node name="StateChartDebugger" type="Tree" parent="."]
-offset_left = 394.0
-offset_top = 3.0
-offset_right = 636.0
-offset_bottom = 241.0
+[node name="StateChartDebugger" parent="." instance=ExtResource("3_fqmqq")]
+modulate = Color(1, 1, 1, 0.572549)
+offset_left = 378.0
+offset_top = 34.0
+offset_right = 640.0
+offset_bottom = 265.0
 theme = ExtResource("3_n1xun")
-script = ExtResource("4_qtefp")
 initial_node_to_watch = NodePath("../NinjaFrog")
 
 [node name="Checkpoint" parent="." instance=ExtResource("6_spkwb")]
