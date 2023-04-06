@@ -41,8 +41,12 @@ func _state_init():
 		if child is Transition:
 			_transitions.append(child)
 	
-## Called when the state is entered.
-func _state_enter():
+## Called when the state is entered. The parameter indicates whether the state
+## is expected to immediately handle a transition after it has been entered.
+## In this case the state should not automatically activate a default child state.
+## This is to avoid a situation where a state is entered, activates a child then immediately
+## exits and activates another child due to a transition.
+func _state_enter(expect_transition:bool = false):
 	# print("state_enter: " + name)
 	process_mode = Node.PROCESS_MODE_INHERIT
 	# emit the signal
