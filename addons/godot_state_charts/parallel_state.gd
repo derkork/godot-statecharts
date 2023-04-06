@@ -52,7 +52,7 @@ func _handle_transition(transition:Transition, source:State):
 	# ask the parent
 	get_parent()._handle_transition(transition, source)
 
-func _state_enter():
+func _state_enter(expect_transition:bool = false):
 	super._state_enter()
 	# enter all children
 	for child in _sub_states:

@@ -27,7 +27,7 @@ func _ready():
 		push_error("The animation tree is invalid. This node will not work.")
 
 
-func _state_enter():
+func _state_enter(expect_transition:bool = false):
 	super._state_enter()
 
 	if not is_instance_valid(_animation_tree_state_machine):

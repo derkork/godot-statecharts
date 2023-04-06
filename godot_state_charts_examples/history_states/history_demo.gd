@@ -1,12 +1,6 @@
 extends Node
 
 @onready var state_chart:StateChart = $StateChart
-@onready var debugger:StateChartDebugger = $StateChartDebugger
-
-
-func _ready():
-	debugger.debug_node(state_chart)
-
 
 func _on_area_2d_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):
 	if event is InputEventMouseButton:

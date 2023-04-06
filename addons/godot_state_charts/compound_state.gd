@@ -43,14 +43,15 @@ func _state_init():
 			child_as_state._state_init()
 
 
-func _state_enter():
+func _state_enter(expect_transition:bool = false):
 	super._state_enter()
-	# activate the initial state
-	if _initial_state != null:
-		_active_state = _initial_state
-		_active_state._state_enter()
-	else:
-		push_error("No initial state set for state '" + name + "'.")
+	# activate the initial state unless we expect a transition
+	if not expect_transition:
+		if _initial_state != null:
+			_active_state = _initial_state
+			_active_state._state_enter()
+		else:
+			push_error("No initial state set for state '" + name + "'.")
 
 
 func _state_save(saved_state:SavedState, child_levels:int = -1):
@@ -125,7 +126,7 @@ func _handle_transition(transition:Transition, source:State):
 	
 	# the target state can be
 	# 1. a direct child of this state. this is the easy case in which
-	#    we will deactivate the current _active_state and activate the targer
+	#    we will deactivate the current _active_state and activate the target
 	# 2. a descendant of this state. in this case we find the direct child which
 	#    is the ancestor of the target state, activate it and then ask it to perform
 	#    the transition.
@@ -140,13 +141,13 @@ func _handle_transition(transition:Transition, source:State):
 		# now check if the target is a history state, if this is the 
 		# case, we need to restore the saved state
 		if target is HistoryState:
-			print("Target is history state, restoring saved state.")
+			# print("Target is history state, restoring saved state.")
 			var saved_state = target.history
 			if saved_state != null:
 				# restore the saved state
 				_state_restore(saved_state, -1 if target.deep else 1)
 				return
-			print("No history saved so far, activating default state.")
+			# print("No history saved so far, activating default state.")
 			# if we don't have history, we just activate the default state
 			var default_state = target.get_node_or_null(target.default_state)
 			if is_instance_valid(default_state):
@@ -173,7 +174,10 @@ func _handle_transition(transition:Transition, source:State):
 						_active_state._state_exit()
 
 					_active_state = child
-					_active_state._state_enter()
+					# set the "expect_transition" flag to true because we will send
+					# the transition to the child state right after we activate it.
+					# this avoids the child needlessly entering the initial state
+					_active_state._state_enter(true)
 					
 				# ask child to handle the transition
 				child._handle_transition(transition, source)

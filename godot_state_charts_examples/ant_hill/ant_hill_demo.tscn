@@ -1,12 +1,12 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=10 format=3 uid="uid://bdqi413verijg"]
 
 [ext_resource type="TileSet" uid="uid://cd6hbvgl1e2xy" path="res://godot_state_charts_examples/platformer/terrain/terrain_tiles.tres" id="1_bqip5"]
 [ext_resource type="Script" path="res://godot_state_charts_examples/ant_hill/ant_hill_demo.gd" id="1_l75mo"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_02gbl"]
 [ext_resource type="PackedScene" uid="uid://dy43c80qlfftx" path="res://godot_state_charts_examples/ant_hill/ant/ant.tscn" id="2_st63i"]
 [ext_resource type="PackedScene" path="res://godot_state_charts_examples/ant_hill/nest/nest.tscn" id="3_qp6b5"]
 [ext_resource type="PackedScene" path="res://godot_state_charts_examples/ant_hill/banana/banana.tscn" id="4_gdnva"]
 [ext_resource type="Theme" uid="uid://s2bj74tt0y7f" path="res://godot_state_charts_examples/new_theme.tres" id="5_qpq0w"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/state_chart_debugger.gd" id="6_6m8lx"]
 [ext_resource type="Script" path="res://godot_state_charts_examples/ant_hill/pause_controller.gd" id="8_kxcui"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_eas1h"]
@@ -16,6 +16,16 @@ outlines = Array[PackedVector2Array]([PackedVector2Array(629, 16, 627, 468, 11, 
 
 [node name="AntHill" type="Node2D"]
 script = ExtResource("1_l75mo")
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("2_02gbl")]
+modulate = Color(1, 1, 1, 0.811765)
+z_index = 5
+offset_left = 394.0
+offset_top = -1.0
+offset_right = 634.0
+offset_bottom = 235.0
+theme = ExtResource("5_qpq0w")
+initial_node_to_watch = NodePath("../Ant")
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource("1_bqip5")
@@ -102,14 +112,6 @@ position = Vector2(604, 35)
 
 [node name="banana9" parent="." instance=ExtResource("4_gdnva")]
 position = Vector2(585, 57)
-
-[node name="StateChartDebugger" type="Tree" parent="."]
-offset_left = 394.0
-offset_top = 3.0
-offset_right = 636.0
-offset_bottom = 241.0
-theme = ExtResource("5_qpq0w")
-script = ExtResource("6_6m8lx")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 position = Vector2(2, -6)
