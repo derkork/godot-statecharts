@@ -137,11 +137,15 @@ These properties can then be used in your expressions. The following example sho
 
 ### Debugging
 
-<img src="../addons/godot_state_charts/utilities/state_chart_debugger.svg" width="32" height="32" align="left"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add the debugger through the _Add Node_ dialog. Search for _StateChartDebugger_ and add it to your scene. It is a tree control that you can position anywhere in your scene where it makes sense (maybe you already have an in-game debugging screen where you can add it).
+<img src="../addons/godot_state_charts/utilities/state_chart_debugger.svg" width="32" height="32" align="left"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add it to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":
+
+![Adding the state chart debugger](add_statechart_debugger.gif)
+
+ The debugger is a control node that you can position anywhere in your scene where it makes sense (maybe you already have an in-game debugging screen where you can add it). Since it is a control it can easily be integrated into an existing UI.
 
 ![The state chart debugger](state_chart_debugger.png)
 
-The state chart debugger is has a property _Initial node to watch_ where you can set a node that should be watched. It doesn't necessarily need to be a state chart node, the debugger will search for a state chart anywhere below the node you set. This is usefuly when you have the state chart nested in a sub-scene and you want to watch the state chart from the root scene where you don't have access to the state chart node.
+The state chart debugger is has a property _Initial node to watch_ where you can set a node that should be watched. It doesn't necessarily need to be a state chart node, the debugger will search for a state chart anywhere below the node you set. This is useful when you have the state chart nested in a sub-scene and you want to watch the state chart from the root scene where you don't have access to the state chart node.
 
 You can also use the `debug_node` function of the state chart debugger to change the node that is being watched at runtime. For example you could add code that changes the debugged node when clicking on a unit or object in your game
 
@@ -159,6 +163,21 @@ Another option is to directly use built-in signals and set the node to debug in 
 At runtime, the state chart debugger will show the current state of the state chart, including all currently set expression properties. It also indicates time left for delayed transitions, so you have a good overview of what is going on in your state chart.
 
 ![Live view of the state chart debugger](state_chart_debugger_live.png)
+
+By default, the state chart debugger will track state changes in the state chart it watches and print them into the "History" tab. This way you can see which state transitioned into which state and when. 
+
+![Tracking history with the debugger](debugger_history_tracking.png)
+
+
+You can add custom lines into the history by calling the `add_history_entry` function. This is useful if you want to have additional information in the history. 
+
+```gdscript
+debugger.add_history_entry("Player died")
+```
+
+The debugger will only track state changes of the currently watched state chart. If you connect the debugger to a different state chart, it will start tracking the state changes of the new state chart.
+
+If you want to disable the history tracking, you can unset the _Auto Track State Changes_ checkbox in the editor UI.
 
 ## Tips & tricks
 
