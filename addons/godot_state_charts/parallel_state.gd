@@ -28,6 +28,8 @@ func _handle_transition(transition:Transition, source:State):
 		return
 	
 	# the target state can be
+	# 0. this state. in this case just activate the state and all its children.
+	#    this can happen when a child state transfers back to its parent state.
 	# 1. a direct child of this state. this is the easy case in which
 	#    we will do nothing, because our direct children are always active.
 	# 2. a descendant of this state. in this case we find the direct child which
@@ -35,6 +37,13 @@ func _handle_transition(transition:Transition, source:State):
 	#    the transition.
 	# 3. no descendant of this state. in this case, we ask our parent state to
 	#    perform the transition
+
+	if target == self:
+		# exit this state
+		_state_exit()
+		# then re-enter it
+		_state_enter(false)
+		return
 
 	if target in get_children():
 		# all good, nothing to do.

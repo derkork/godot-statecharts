@@ -125,6 +125,8 @@ func _handle_transition(transition:Transition, source:State):
 		return
 	
 	# the target state can be
+	# 0. this state. in this case exit this state and re-enter it. This can happen when
+	#    a child state transfers to its parent state.
 	# 1. a direct child of this state. this is the easy case in which
 	#    we will deactivate the current _active_state and activate the target
 	# 2. a descendant of this state. in this case we find the direct child which
@@ -132,6 +134,12 @@ func _handle_transition(transition:Transition, source:State):
 	#    the transition.
 	# 3. no descendant of this state. in this case, we ask our parent state to
 	#    perform the transition
+
+	if target == self:
+		# exit this state and re-enter it
+		_state_exit()
+		_state_enter(false)
+		return
 
 	if target in get_children():
 		# all good, now first deactivate the current state
