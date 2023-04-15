@@ -1,0 +1,120 @@
+[gd_scene load_steps=8 format=3 uid="uid://doqbalc388d8s"]
+
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/editor_sidebar.gd" id="1_7kcy8"]
+[ext_resource type="Texture2D" uid="uid://c4ojtah20jtxc" path="res://addons/godot_state_charts/atomic_state.svg" id="2_0k4pg"]
+[ext_resource type="Texture2D" uid="uid://bbudjoa3ds4qj" path="res://addons/godot_state_charts/compound_state.svg" id="3_b4okj"]
+[ext_resource type="Texture2D" uid="uid://dsa1nco51br8d" path="res://addons/godot_state_charts/parallel_state.svg" id="4_lmfic"]
+[ext_resource type="Texture2D" uid="uid://bkf1e240ouleb" path="res://addons/godot_state_charts/history_state.svg" id="5_oj1t0"]
+[ext_resource type="Texture2D" uid="uid://3wqyduuj0fq" path="res://addons/godot_state_charts/animation_tree_state.svg" id="6_8npp8"]
+[ext_resource type="Texture2D" uid="uid://chb8tq62aj2b2" path="res://addons/godot_state_charts/transition.svg" id="6_72e5q"]
+
+[node name="EditorSidebar" type="MarginContainer"]
+custom_minimum_size = Vector2(192, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_7kcy8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="SelectedNodeNameLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Selected Node"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectedNodeLineEdit" type="LineEdit" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+expand_to_text_length = true
+select_all_on_focus = true
+caret_blink = true
+caret_blink_interval = 0.5
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="AddLabel" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AddNodeNameLineEdit" type="LineEdit" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+caret_blink = true
+caret_blink_interval = 0.5
+
+[node name="AddGridContainer" type="GridContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 2
+
+[node name="CompoundState" type="Button" parent="VBoxContainer/AddGridContainer" groups=["statebutton"]]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "CompoundState"
+icon = ExtResource("3_b4okj")
+icon_alignment = 1
+
+[node name="ParallelState" type="Button" parent="VBoxContainer/AddGridContainer" groups=["statebutton"]]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "ParallelState"
+icon = ExtResource("4_lmfic")
+icon_alignment = 1
+
+[node name="AtomicState" type="Button" parent="VBoxContainer/AddGridContainer" groups=["statebutton"]]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "AtomicState"
+icon = ExtResource("2_0k4pg")
+icon_alignment = 1
+
+[node name="HistoryState" type="Button" parent="VBoxContainer/AddGridContainer" groups=["statebutton"]]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "HistoryState"
+icon = ExtResource("5_oj1t0")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Transition" type="Button" parent="VBoxContainer/AddGridContainer"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Transition"
+icon = ExtResource("6_72e5q")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AnimationTreeState" type="Button" parent="VBoxContainer/AddGridContainer" groups=["statebutton"]]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "AnimationTreeState"
+icon = ExtResource("6_8npp8")
+icon_alignment = 1
+expand_icon = true
+
+[connection signal="text_changed" from="VBoxContainer/SelectedNodeLineEdit" to="." method="_on_selected_node_line_edit_text_changed"]
+[connection signal="pressed" from="VBoxContainer/AddGridContainer/CompoundState" to="." method="_on_compound_state_pressed"]
+[connection signal="pressed" from="VBoxContainer/AddGridContainer/ParallelState" to="." method="_on_parallel_state_pressed"]
+[connection signal="pressed" from="VBoxContainer/AddGridContainer/AtomicState" to="." method="_on_atomic_state_pressed"]
+[connection signal="pressed" from="VBoxContainer/AddGridContainer/HistoryState" to="." method="_on_history_state_pressed"]
+[connection signal="pressed" from="VBoxContainer/AddGridContainer/Transition" to="." method="_on_transition_pressed"]
+[connection signal="pressed" from="VBoxContainer/AddGridContainer/AnimationTreeState" to="." method="_on_animation_tree_state_pressed"]
