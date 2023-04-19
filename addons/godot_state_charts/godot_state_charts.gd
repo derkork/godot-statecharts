@@ -1,55 +1,61 @@
 @tool
 extends EditorPlugin
 
-# Sidebar
-var ui_sidebar_canvas:Control
-var ui_sidebar_spatial:Control
+## The sidebar control for 2D
+var _ui_sidebar_canvas:Control
+## The sidebar control for 3D
+var _ui_sidebar_spatial:Control
 
-func _ready():
+## Scene holding the sidebar
+var _sidebar_ui:PackedScene = preload("utilities/editor_sidebar.tscn")
 
-	# Sidebar
-	ui_sidebar_canvas.set_interface(get_editor_interface())
-	ui_sidebar_spatial.set_interface(get_editor_interface())
 
 func _enter_tree():
-	# Initialization of the plugin goes here.
+	# prepare a copy of the sidebar for both 2D and 3D.
+	_ui_sidebar_canvas = _sidebar_ui.instantiate()
+	_ui_sidebar_canvas.hide()
+	_ui_sidebar_spatial = _sidebar_ui.instantiate()
+	_ui_sidebar_spatial.hide()
+	# and add it to the right place in the editor ui
+	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, _ui_sidebar_spatial)
+	add_control_to_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT, _ui_sidebar_canvas)
+	# get notified when selection changes so we can 
+	# update the sidebar contents accordingly
+	get_editor_interface().get_selection().selection_changed.connect(_on_selection_changed)
 
-	# Sidebar
-	ui_sidebar_canvas = load("res://addons/godot_state_charts/utilities/editor_sidebar.tscn").instantiate()
-	ui_sidebar_canvas.hide()
-	ui_sidebar_spatial = load("res://addons/godot_state_charts/utilities/editor_sidebar.tscn").instantiate()
-	ui_sidebar_spatial.hide()
-	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, ui_sidebar_spatial)
-	add_control_to_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT, ui_sidebar_canvas)
-	get_editor_interface().get_selection().connect("selection_changed", self._on_selection_changed)
+
+func _ready():
+	# inititalize the side bars
+	_ui_sidebar_canvas.setup(get_editor_interface(), get_undo_redo())
+	_ui_sidebar_spatial.setup(get_editor_interface(), get_undo_redo())
 
 
 func _exit_tree():
+	# remove the side bars
+	remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, _ui_sidebar_spatial)
+	remove_control_from_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT, _ui_sidebar_canvas)
+	if is_instance_valid(_ui_sidebar_canvas):
+		_ui_sidebar_canvas.queue_free()
+	if is_instance_valid(_ui_sidebar_spatial):
+		_ui_sidebar_spatial.queue_free()
 
-	# Remove Sidebar
-	remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, ui_sidebar_spatial)
-	remove_control_from_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT, ui_sidebar_canvas)
-	if ui_sidebar_canvas:
-		ui_sidebar_canvas.free()
-	if ui_sidebar_spatial:
-		ui_sidebar_spatial.free()
 
-
-## Scene Tree Node Select
 func _on_selection_changed() -> void:
-	# Sidebar
+	# get the current selection
 	var selection = get_editor_interface().get_selection().get_selected_nodes()
+	
+	# show sidebar if we selected a chart or a state 
 	if selection.size() == 1:
-		if(selection[0] is StateChart
-		or selection[0] is State\
-		or selection[0] is Transition):
-			ui_sidebar_canvas.show()
-			ui_sidebar_canvas.change_selected_node(selection[0])
-			ui_sidebar_spatial.show()
-			ui_sidebar_spatial.change_selected_node(selection[0])
-		else:
-			ui_sidebar_canvas.hide()
-			ui_sidebar_spatial.hide()
-	else:
-		ui_sidebar_canvas.hide()
-		ui_sidebar_spatial.hide()
+		var selected_node = selection[0]
+		if selected_node is StateChart \
+			or selected_node is State \
+			or selected_node is Transition:
+			_ui_sidebar_canvas.show()
+			_ui_sidebar_canvas.change_selected_node(selected_node)
+			_ui_sidebar_spatial.show()
+			_ui_sidebar_spatial.change_selected_node(selected_node)
+			return
+			
+	# otherwise hide it
+	_ui_sidebar_canvas.hide()
+	_ui_sidebar_spatial.hide()

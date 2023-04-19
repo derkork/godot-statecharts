@@ -1,123 +1,99 @@
 @tool
 extends Control
 
-var selected_node:Node
-var interface:EditorInterface
+## The currently selected node or null
+var _selected_node:Node
+## The editor interface
+var _editor_interface:EditorInterface
+## The undo/redo facility
+var _undo_redo:EditorUndoRedoManager
 
-@onready var selected_node_line_edit:LineEdit = %SelectedNodeLineEdit
+@onready var _add_section:Control = %AddSection
+@onready var _no_options_label:Control = %NoOptionsLabel
+@onready var _add_node_name_line_edit:LineEdit = %AddNodeNameLineEdit
+@onready var _add_grid_container:GridContainer = %AddGridContainer
 
-@onready var add_label:Label = %AddLabel
-@onready var add_node_name_line_edit:LineEdit = %AddNodeNameLineEdit
-@onready var add_grid_container:GridContainer = %AddGridContainer
 
-const animation_tree_state_script = preload("res://addons/godot_state_charts/animation_tree_state.gd")
-const atomic_state_script = preload("res://addons/godot_state_charts/atomic_state.gd")
-const compound_state_script = preload("res://addons/godot_state_charts/compound_state.gd")
-const history_state_script = preload("res://addons/godot_state_charts/history_state.gd")
-const parallel_state_script = preload("res://addons/godot_state_charts/parallel_state.gd")
-const transition_script = preload("res://addons/godot_state_charts/transition.gd")
+func setup(editor_interface:EditorInterface, undo_redo:EditorUndoRedoManager):
+	_editor_interface = editor_interface
+	_undo_redo = undo_redo
 
-func set_interface(__interface:EditorInterface):
-	interface = __interface
 
 func change_selected_node(node):
-	if(
-		# StateChart must have exactly one child
-		(node is StateChart \
-		and node.get_child_count() == 0) \
-	or node is CompoundState\
-	or node is ParallelState):
-		_toggle_add_visible(true)
-		_toggle_states_visible(true)
-	elif node is AtomicState:
-		_toggle_add_visible(true)
-		_toggle_states_visible(false)
-	else:
-		_toggle_add_visible(false)
+	_selected_node = node
+	_repaint()
 
-	selected_node = node
-	selected_node_line_edit.text = node.name
-
-func _toggle_add_visible(is_visible:bool):
-	add_label.visible = is_visible
-	add_node_name_line_edit.visible = is_visible
-	add_grid_container.visible = is_visible
-
-func _toggle_states_visible(is_visible:bool):
-	for btn in add_grid_container.get_children():
+func _repaint():
+	# we can add states to all composite states and to the 
+	# root if the root has no child state yet.
+	var can_add_states = \
+		( _selected_node is StateChart and _selected_node.get_child_count() == 0 ) \
+		or _selected_node is ParallelState \
+		or _selected_node is CompoundState
+		
+	# we can add transitions to all states
+	var can_add_transitions = \
+		_selected_node is State
+		
+	_add_section.visible = can_add_states or can_add_transitions
+	_no_options_label.visible = not (can_add_states or can_add_transitions)
+	
+	
+	for btn in _add_grid_container.get_children():
 		if btn.is_in_group("statebutton"):
-			btn.visible = is_visible
+			btn.visible = can_add_states
+		else:
+			btn.visible = can_add_transitions
 
-func _get_node_name(default) -> String:
-	var nodename:String = add_node_name_line_edit.text
-	if nodename.length() == 0:
-		return default
-	else:
-		return nodename
 
-func create_node(script:GDScript,default_node_name):
-	var node:Node = script.new()
-	selected_node.add_child(node)
-	node.owner = selected_node.get_tree().edited_scene_root
-	node.name = _get_node_name(default_node_name)
-	interface.edit_node(node)
+func _create_node(type, name:StringName):
+	
+	var final_name = _add_node_name_line_edit.text.strip_edges()
+	if final_name.length() == 0:
+		final_name = name
+	
+	var new_node = type.new()
+	_undo_redo.create_action("Add " + final_name)
+	_undo_redo.add_do_method(_selected_node, "add_child", new_node)
+	_undo_redo.add_undo_method(_selected_node, "remove_child", new_node)
+	_undo_redo.add_do_reference(new_node)
+	_undo_redo.add_do_method(new_node, "set_owner", _selected_node.get_tree().edited_scene_root)
+	_undo_redo.add_do_property(new_node, "name", final_name)
+	_undo_redo.commit_action()
+		
+	
+	if Input.is_key_pressed(KEY_SHIFT):
+		_editor_interface.get_selection().clear()
+		_editor_interface.get_selection().add_node(new_node)
 
-#
-## Buttons
-#
+	_add_node_name_line_edit.grab_focus()
+	_editor_interface.edit_node(new_node)
+	_repaint()
+		
+
 
 func _on_atomic_state_pressed():
-	create_node(atomic_state_script,"AtomicState")
+	_create_node(AtomicState, "AtomicState")
+
 
 func _on_compound_state_pressed():
-	create_node(compound_state_script,"CompoundState")
+	_create_node(CompoundState, "CompoundState")
+
 
 func _on_parallel_state_pressed():
-	create_node(parallel_state_script,"ParallelState")
+	_create_node(ParallelState, "ParallelState")
+
 
 func _on_history_state_pressed():
-	create_node(history_state_script,"HistoryState")
+	_create_node(HistoryState, "HistoryState")
+
 
 func _on_transition_pressed():
-	create_node(transition_script,"Transition")
+	_create_node(Transition, "Transition")
+
 
 func _on_animation_tree_state_pressed():
-	create_node(animation_tree_state_script,"AnimationTreeState")
-
-###
+	_create_node(AnimationTreeState, "AnimationTreeState")
 
 
 
-func _on_selected_node_line_edit_text_changed(new_text):
-	selected_node.name = new_text
-
-
-func _on_node_duplicate_pressed():
-#	var duplicate_node = selected_node.duplicate()
-	var parent = selected_node.get_parent()
-	var duplicate_node = duplicate_recursive(selected_node,parent)
-	if parent == null:
-		return
-#	parent.add_child(duplicate_node)
-#	duplicate_node.owner = selected_node.get_tree().edited_scene_root
-#	duplicate_node.name = selected_node.name
-	interface.edit_node(duplicate_node)
-
-func duplicate_recursive(node:Node,parent:Node) -> Node:
-	var duplicate_node := node.duplicate(
-		DUPLICATE_SIGNALS|\
-		DUPLICATE_GROUPS|\
-		DUPLICATE_SCRIPTS|\
-		DUPLICATE_USE_INSTANTIATION
-	)
-	parent.add_child(duplicate_node)
-	duplicate_node.name = node.name
-	for child in node.get_children():
-		var duplicate_child := duplicate_recursive(child, duplicate_node)
-		duplicate_child.name = child.name
-	duplicate_node.owner = parent.get_tree().edited_scene_root
-	return duplicate_node
-
-func _on_node_remove_pressed():
-	selected_node.get_parent().remove_child(selected_node)
-	selected_node.queue_free()
