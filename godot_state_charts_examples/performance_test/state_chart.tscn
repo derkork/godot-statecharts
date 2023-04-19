@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://b8rr57grye1kw"]
+
+[ext_resource type="Script" path="res://godot_state_charts_examples/performance_test/state_chart_receiver.gd" id="1_44fbg"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="1_x4how"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="2_2eb2m"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="3_qtc2o"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="4_ue85n"]
+
+[node name="state_chart" type="Node2D"]
+script = ExtResource("1_44fbg")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("1_x4how")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("2_2eb2m")
+initial_state = NodePath("A")
+
+[node name="A" type="Node" parent="StateChart/Root"]
+script = ExtResource("3_qtc2o")
+
+[node name="To B" type="Node" parent="StateChart/Root/A"]
+script = ExtResource("4_ue85n")
+to = NodePath("../../B")
+delay_seconds = 10.0
+
+[node name="B" type="Node" parent="StateChart/Root"]
+script = ExtResource("3_qtc2o")
+
+[node name="To A" type="Node" parent="StateChart/Root/B"]
+script = ExtResource("4_ue85n")
+to = NodePath("../../A")
+delay_seconds = 20.0
+
+[connection signal="state_processing" from="StateChart/Root/A" to="." method="_on_a_state_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/B" to="." method="_on_b_state_physics_processing"]

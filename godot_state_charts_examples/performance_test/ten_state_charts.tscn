@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://berg2d0lm33m0"]
+
+[ext_resource type="PackedScene" uid="uid://b8rr57grye1kw" path="res://godot_state_charts_examples/performance_test/state_chart.tscn" id="1_sc64n"]
+
+[node name="ten_state_charts" type="Node2D"]
+
+[node name="state_chart" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart2" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart3" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart4" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart5" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart6" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart7" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart8" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart9" parent="." instance=ExtResource("1_sc64n")]
+
+[node name="state_chart10" parent="." instance=ExtResource("1_sc64n")]

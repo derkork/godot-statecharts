@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://byh6mcqhp6ky2"]
+
+[ext_resource type="PackedScene" uid="uid://bddhmoj1g5lv3" path="res://godot_state_charts_examples/performance_test/hundred_state_charts.tscn" id="1_1oume"]
+
+[node name="thousand_state_charts" type="Node2D"]
+
+[node name="hundred_state_charts" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts2" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts3" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts4" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts5" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts6" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts7" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts8" parent="." instance=ExtResource("1_1oume")]
+
+[node name="hundred_state_charts9" parent="." instance=ExtResource("1_1oume")]
