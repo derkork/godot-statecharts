@@ -11,18 +11,23 @@ extends Control
 ## Whether or not the debugger should automatically track state changes.
 @export var auto_track_state_changes:bool = true
 
-## The list of collected events.
-var _events:Array[Dictionary] = []
 
 ## The initial node that should be watched. Optional, if not set
 ## then no node will be watched. You can set the node that should
 ## be watched at runtime by calling debug_node().
 @export var initial_node_to_watch:NodePath
 
+## Maximum lines to display in the history. Keep at 300 or below
+## for best performance.
+@export var maximum_lines:int = 300
+
 ## The tree that shows the state chart.
 @onready var _tree:Tree = %Tree
 ## The text field with the history.
 @onready var _historyEdit:TextEdit = %HistoryEdit
+
+# the number of lines in the edit
+var _lines = 0
 
 # the state chart we track
 var _state_chart:StateChart
@@ -36,7 +41,7 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS	
 
 	%CopyToClipboardButton.pressed.connect(func (): DisplayServer.clipboard_set(_historyEdit.text))
-	%ClearButton.pressed.connect(func (): _historyEdit.text = "")
+	%ClearButton.pressed.connect(_clear_history)
 
 	var to_watch = get_node_or_null(initial_node_to_watch)
 	if is_instance_valid(to_watch):
@@ -46,6 +51,12 @@ func _ready():
 func add_history_entry(text:String):
 	var seconds = Time.get_ticks_msec() / 1000.0
 	_historyEdit.text += "[%.3f]: %s \n" % [seconds, text]
+	if _lines + 1 < maximum_lines:
+		_lines += 1
+	else:
+		# cut the first line from the text
+		_historyEdit.remove_text(0,0,1,0)
+	
 	_historyEdit.scroll_vertical = _historyEdit.get_line_count() - 1
 
 
@@ -71,8 +82,7 @@ func debug_node(root:Node) -> bool:
 	else:
 		# find all state nodes below the state chart and connect their signals
 		_connect_all_signals()
-		# clear the history
-		_historyEdit.text = ""
+		_clear_history()
 		_setup_processing(true)
 
 	return success
@@ -179,7 +189,11 @@ func _collect_active_states(root:Node, parent:TreeItem):
 					transition_item.set_text(0, ">> %s (%.2f)" % [child._pending_transition.name, child._pending_transition_time])
 
 				_collect_active_states(child, state_item)
-		
+
+
+func _clear_history():
+	_historyEdit.text = ""
+	_lines = 0		
 	
 func _on_state_entered(state:State):
 	add_history_entry("Enter: %s" % state.name)
