@@ -11,7 +11,7 @@ var _undo_redo:EditorUndoRedoManager
 @onready var _add_section:Control = %AddSection
 @onready var _no_options_label:Control = %NoOptionsLabel
 @onready var _add_node_name_line_edit:LineEdit = %AddNodeNameLineEdit
-@onready var _add_grid_container:GridContainer = %AddGridContainer
+@onready var _add_grid_container:Control = %AddGridContainer
 
 
 func setup(editor_interface:EditorInterface, undo_redo:EditorUndoRedoManager):
