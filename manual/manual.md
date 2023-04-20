@@ -61,6 +61,8 @@ States are the building blocks from which you build your state charts. A state c
 - `event_received(event)` - this signal is emitted when an event is received by the state while the state is active. The event is passed as a parameter.
 - `state_processing(delta)` - this signal is emitted every frame while the state is active. The delta time is passed as a parameter. The signal will obey pause mode of the tree, so if the node is paused, this signal will not be emitted.
 - `state_physics_processing(delta)` - this signal is emitted every physics frame while the state is active. The delta time is passed as a parameter. The signal will obey pause mode of the tree, so if the node is paused, this signal will not be emitted.
+- `state_input(input_event)` - called when input is received while the state is active. This is useful to limit input to certain states.
+- `state_unhandled_input(input_event)` - called when unhandled input is received while the state is active. Again this is useful to limit input to certain states.
 
 #### Atomic states
 
