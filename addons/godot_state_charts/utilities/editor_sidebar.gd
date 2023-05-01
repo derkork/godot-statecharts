@@ -96,4 +96,6 @@ func _on_animation_tree_state_pressed():
 	_create_node(AnimationTreeState, "AnimationTreeState")
 
 
+func _on_animation_player_state_pressed():
+	_create_node(AnimationPlayerState, "AnimationPlayerState")
 

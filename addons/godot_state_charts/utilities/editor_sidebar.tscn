@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bephgxrkhh3e2"]
+[gd_scene load_steps=9 format=3 uid="uid://bephgxrkhh3e2"]
 
 [ext_resource type="Script" path="res://addons/godot_state_charts/utilities/editor_sidebar.gd" id="1_7kcy8"]
 [ext_resource type="Texture2D" uid="uid://c4ojtah20jtxc" path="res://addons/godot_state_charts/atomic_state.svg" id="2_0k4pg"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bkf1e240ouleb" path="res://addons/godot_state_charts/history_state.svg" id="5_oj1t0"]
 [ext_resource type="Texture2D" uid="uid://3wqyduuj0fq" path="res://addons/godot_state_charts/animation_tree_state.svg" id="6_8npp8"]
 [ext_resource type="Texture2D" uid="uid://chb8tq62aj2b2" path="res://addons/godot_state_charts/transition.svg" id="6_72e5q"]
+[ext_resource type="Texture2D" uid="uid://b3m20gsesp4i0" path="res://addons/godot_state_charts/animation_player_state.svg" id="8_4o8y7"]
 
 [node name="EditorSidebar" type="MarginContainer"]
 custom_minimum_size = Vector2(192, 0)
@@ -96,6 +97,14 @@ tooltip_text = "AnimationTreeState"
 icon = ExtResource("6_8npp8")
 icon_alignment = 1
 
+[node name="AnimationPlayerState" type="Button" parent="AddSection/AddGridContainer" groups=["statebutton"]]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "AnimationPlayerState"
+icon = ExtResource("8_4o8y7")
+icon_alignment = 1
+
 [node name="NoOptionsLabel" type="Label" parent="."]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
@@ -111,3 +120,4 @@ autowrap_mode = 2
 [connection signal="pressed" from="AddSection/AddGridContainer/HistoryState" to="." method="_on_history_state_pressed"]
 [connection signal="pressed" from="AddSection/AddGridContainer/Transition" to="." method="_on_transition_pressed"]
 [connection signal="pressed" from="AddSection/AddGridContainer/AnimationTreeState" to="." method="_on_animation_tree_state_pressed"]
+[connection signal="pressed" from="AddSection/AddGridContainer/AnimationPlayerState" to="." method="_on_animation_player_state_pressed"]
