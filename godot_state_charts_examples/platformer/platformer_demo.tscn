@@ -63,6 +63,7 @@ text = "[font_size=10]
 Press Left+Right to move, Space to jump. You can double-jump mid-air and coyote-jump shortly after you fall from a ledge. 
 Try to walk to all three flagpoles to make the box explode.
 You can click the flag poles, the box and the frog to see their state charts.
+You can jump on the iron crates to destroy them.
 [/ul]
 [/font_size]"
 fit_content = true
