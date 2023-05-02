@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=19 format=3 uid="uid://b22lg10c7wxrq"]
 
 [ext_resource type="Texture2D" uid="uid://4nlen5j7etvq" path="res://godot_state_charts_examples/platformer/checkpoint/checkpoint_no_flag.png" id="1_7vf2w"]
 [ext_resource type="Script" path="res://godot_state_charts_examples/platformer/checkpoint/checkpoint.gd" id="1_jot5v"]

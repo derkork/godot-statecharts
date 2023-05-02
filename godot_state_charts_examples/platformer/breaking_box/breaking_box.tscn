@@ -1,0 +1,438 @@
+[gd_scene load_steps=22 format=3 uid="uid://h0af1dot82p3"]
+
+[ext_resource type="Script" path="res://godot_state_charts_examples/platformer/breaking_box/breaking_box.gd" id="1_c2rh2"]
+[ext_resource type="Texture2D" uid="uid://c5dogybcf6yfo" path="res://godot_state_charts_examples/platformer/breaking_box/idle.png" id="1_dixph"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_atynw"]
+[ext_resource type="Texture2D" uid="uid://dq0ww6xvgeap3" path="res://godot_state_charts_examples/platformer/breaking_box/hit.png" id="3_ngvxc"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="4_4y463"]
+[ext_resource type="Texture2D" uid="uid://p8vbysdruo4o" path="res://godot_state_charts_examples/platformer/breaking_box/break.png" id="4_jb7vf"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="5_wouwd"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="6_p4jwe"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_1ecad"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="8_8riiw"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/animation_player_state.gd" id="9_dgb23"]
+
+[sub_resource type="Animation" id="Animation_toibu"]
+resource_name = "Break"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BoxSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("4_jb7vf")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BoxSprite:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [4]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BoxSprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(16.5643, 1),
+"update": 0,
+"values": [0, 3]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("BoxCollider:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("BoxSprite:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 8.87654),
+"update": 0,
+"values": [Vector2(0, -10), Vector2(0, 50)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("BoxSprite:modulate:a")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_rc67x"]
+resource_name = "Hit"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BoxSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("3_ngvxc")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BoxSprite:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [2]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BoxSprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 1]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_yu346"]
+resource_name = "Idle"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BoxSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_dixph")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BoxSprite:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BoxSprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("BoxCollider:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_a7q8m"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BoxSprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_dixph")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BoxSprite:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BoxSprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Label:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("BoxCollider:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("BoxSprite:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -10)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("BoxSprite:modulate")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_t7nrw"]
+_data = {
+"Break": SubResource("Animation_toibu"),
+"Hit": SubResource("Animation_rc67x"),
+"Idle": SubResource("Animation_yu346"),
+"RESET": SubResource("Animation_a7q8m")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8vd2b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jbwph"]
+size = Vector2(14.5, 2)
+
+[sub_resource type="Resource" id="Resource_v858x"]
+script = ExtResource("8_8riiw")
+expression = "health <= 0"
+
+[sub_resource type="Resource" id="Resource_ble3h"]
+script = ExtResource("8_8riiw")
+expression = "health > 0"
+
+[sub_resource type="Resource" id="Resource_wd8gp"]
+script = ExtResource("8_8riiw")
+expression = "health <= 0"
+
+[node name="BreakingBox" type="StaticBody2D"]
+input_pickable = true
+script = ExtResource("1_c2rh2")
+
+[node name="BoxSprite" type="Sprite2D" parent="."]
+position = Vector2(0, -10)
+texture = ExtResource("1_dixph")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 10
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+editor_description = "The animation player will send an \"animation_finished\" event back to the state chart. This will then take the appropriate transitions (e.g. switch back to the idle animation)."
+libraries = {
+"": SubResource("AnimationLibrary_t7nrw")
+}
+
+[node name="BoxCollider" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_8vd2b")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+position = Vector2(0, -3)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+position = Vector2(0, -19)
+shape = SubResource("RectangleShape2D_jbwph")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("2_atynw")
+
+[node name="ParallelState" type="Node" parent="StateChart"]
+script = ExtResource("4_4y463")
+
+[node name="Root" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("5_wouwd")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/ParallelState/Root"]
+script = ExtResource("6_p4jwe")
+
+[node name="On Break" type="Node" parent="StateChart/ParallelState/Root/Idle"]
+script = ExtResource("7_1ecad")
+to = NodePath("../../Dead")
+event = &"health_changed"
+guard = SubResource("Resource_v858x")
+
+[node name="Dead" type="Node" parent="StateChart/ParallelState/Root"]
+script = ExtResource("6_p4jwe")
+
+[node name="Animations" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("5_wouwd")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateChart/ParallelState/Animations"]
+script = ExtResource("9_dgb23")
+animation_player = NodePath("../../../../AnimationPlayer")
+
+[node name="On Hit" type="Node" parent="StateChart/ParallelState/Animations/Idle"]
+script = ExtResource("7_1ecad")
+to = NodePath("../../Hit")
+event = &"health_changed"
+guard = SubResource("Resource_ble3h")
+
+[node name="On Break" type="Node" parent="StateChart/ParallelState/Animations/Idle"]
+editor_description = "When the health is 0 we move to the break state."
+script = ExtResource("7_1ecad")
+to = NodePath("../../Break")
+event = &"health_changed"
+guard = SubResource("Resource_wd8gp")
+
+[node name="Hit" type="Node" parent="StateChart/ParallelState/Animations"]
+script = ExtResource("9_dgb23")
+animation_player = NodePath("../../../../AnimationPlayer")
+
+[node name="Back To Idle" type="Node" parent="StateChart/ParallelState/Animations/Hit"]
+editor_description = "The \"animation_finished\" event is sent by the animation player once the animation finishes playing. This way we can properly time the state transitions to the animation without having to explicitely stating the length of the animation here."
+script = ExtResource("7_1ecad")
+to = NodePath("../../Idle")
+event = &"animation_finished"
+
+[node name="Break" type="Node" parent="StateChart/ParallelState/Animations"]
+editor_description = "The break animation is final, so we stay in this state indefinitely.
+
+The \"event_received\" signal is used to notify the root script when the break animation is finished. The root script will then destroy the whole box."
+script = ExtResource("9_dgb23")
+animation_player = NodePath("../../../../AnimationPlayer")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
+[connection signal="event_received" from="StateChart/ParallelState/Root/Idle" to="." method="_on_idle_event_received"]
+[connection signal="event_received" from="StateChart/ParallelState/Animations/Break" to="." method="_on_break_animation_event_received"]
