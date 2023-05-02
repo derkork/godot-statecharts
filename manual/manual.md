@@ -74,7 +74,7 @@ States are the building blocks from which you build your state charts. A state c
 
 - _Initial state_ - this property determines which child state will be activated when the compound state is entered directly. You can always activate a child state by explicitly transitioning to it. If you do not set an initial state then no child state will be activated and an error will be printed to the console.
 
-![Compound state properties](compound_state.png)
+<img src="compound_state.png" width="400" alt="Compound state properties">
 
 #### Parallel states
 
@@ -87,22 +87,42 @@ States are the building blocks from which you build your state charts. A state c
 - _Deep_ - if true the history state will capture and restore the state of the whole sub-tree below the compound state. If false the history state will only capture and restore the last active state of its immediate parent compound state.
 - _Default state_ - this is the state which will be activated if the history state is entered and no history has been captured yet. If you do not set a default state, the history state will not activate any state when it is entered and an error will be printed to the console.
 
-![History state properties](history_state.png)
 
+<img src="history_state.png" width="400" alt="History state properties">
+
+To use a history state, set up a transition that transitions directly to the history state. This will restore the last known state or activate the default state if no history has been captured yet. If your compound state has a history state as a child but you do not want to restore the history when entering the compound state, you can transition to the compound state directly. This will activate the initial state of the compound state and will not restore the history. Also check the history state example in the examples folder.
 
 #### Animation tree states
 
-_Note: this feature is currently experimental and may change or be removed in the future._
+_Note: this feature is currently experimental and may change or be replaced in the future._
 
 <img src="../addons/godot_state_charts/animation_tree_state.svg" width="32" height="32" align="left"> Animation tree states are a variation of atomic states. They can be linked to an animation tree. When an animation tree state is activated it will ask the animation tree to travel to the same state (the animation tree state and the state inside the animation tree should have the same name). This can be used to control animation trees with the same state chart events that you use to control your game logic. Animation tree states have the following properties:
 
 - _Animation tree_ - the animation tree that should be controlled by the animation tree state.
+- _State Name_ - the name of the state inside the animation tree that should be activated when the animation tree state is activated. This is optional, if you do not set a state name, the animation tree state will activate the state with the same name as the animation tree state.
 
-![Animation tree state properties](animation_tree_state.png)
+<img src="animation_tree_state.png" width="400" alt="Animation tree state properties">
 
 Animation tree states are usually independent of the rest of the states, so it is usually a good idea to use a parallel state to separate them from the rest of the states.
 
 ![Separation of animation tree states](animation_tree_state_separation.png)
+
+
+#### Animation player states
+
+_Note: this feature is currently experimental and may change or be replaced in the future._
+
+<img src="../addons/godot_state_charts/animation_player_state.svg" width="32" height="32" align="left"> Animation player states are similar to animation tree states. They can be linked to an animation player. When an animation player state is activated it will ask the animation player to play the same animation (the animation player state and the animation inside the animation player should have the same name). This can be used to control animation players with the same state chart events that you use to control your game logic. Animation player states have the following properties:
+
+- _Animation player_ - the animation player that should be controlled by the animation player state.
+- _Animation Name_ - the name of the animation inside the animation player that should be played when the animation player state is activated. This is optional, if you do not set an animation name, the animation player state will play the animation with the same name as the animation player state.
+- _Custom Blend_ - a custom animation blend time. The default is `-1` which will use the animation player's default blend time.
+- _Custom Speed_ - a custom animation speed. The default is `1.0` which will play the animation forwards with normal speed. You can use negative values to play the animation backwards or values greater than `1.0` to play the animation faster.
+- _From End_ - if true the animation will be played from the end to the beginning. This is useful if you want to play an animation backwards. Note that you will still need to set the custom speed to a negative value to actually play the animation backwards.
+
+<img src="animation_player_state.png" width="400" alt="Animation player state properties">
+
+Similar to animation tree states, animation player states are usually independent of the rest of the states, so it is usually a good idea to use a parallel state to separate them from the rest of the states.
 
 ### Events and transitions
 

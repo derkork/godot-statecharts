@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2023-05-02
+### Added
+- A new _Animation Player State_ is now available. It works similar to the _Animation Tree State_ but controls an animation player instead of an animation tree. With this you can trigger animations when entering a certain state. A huge thanks goes out to [Junji Takakura](https://github.com/jtakakura) for contributing this feature. The platformer demo has been updated to use this new state for the new destructible iron crates.
+
+### Improved
+- The _Animation Tree State_ now has a new property which allows to specify the name of the state in the animation tree that should be triggered. Previously the name of the state in the state chart and in the animation tree state machine had to match exactly which was not very flexible. The new field is optional, so if you don't specify a name, the state chart will still try to find a state in the animation tree with the same name as the state in the state chart. As such this change is also backwards compatible.
+
+### Fixed
+- The state chart debugger will no longer crash when a new node is debugged and the previously debugged node was destroyed in the meantime.
+
+
 ## [0.2.1] - 2023-04-20
 ### Fixed
 
