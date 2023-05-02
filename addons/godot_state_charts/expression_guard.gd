@@ -23,7 +23,7 @@ func is_satisfied(context_transition:Transition, context_state:State) -> bool:
 	var parse_result = the_expression.parse(expression, input_names)
 
 	if parse_result != OK:
-		push_error("Expression parse error: " + the_expression.get_error_text())
+		push_error("Expression parse error: " + the_expression.get_error_text() + " for expression " + expression)
 		return false
 
 	# input values need to be in the same order as the input names, so we build an array
@@ -34,7 +34,7 @@ func is_satisfied(context_transition:Transition, context_state:State) -> bool:
 
 	var result = the_expression.execute(input_values)
 	if the_expression.has_execute_failed():
-		push_error("Expression execute error: " + the_expression.get_error_text())
+		push_error("Expression execute error: " + the_expression.get_error_text() + " for expression: " + expression)
 		return false
 
 	if typeof(result) != TYPE_BOOL:

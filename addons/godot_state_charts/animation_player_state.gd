@@ -9,20 +9,27 @@ extends AtomicState
 		animation_player = value
 		update_configuration_warnings()
 
+## The name of the animation that should be played when this state is entered.
+## When this is empty, the name of this state will be used.
+@export var animation_name: StringName = ""
+
+## A custom blend time for the animation. The default value of -1.0 will use the
+## default blend time of the animation player.
 @export var custom_blend: float = -1.0
 
+## A custom speed for the animation. Use negative values to play the animation
+## backwards.
 @export var custom_speed: float = 1.0
 
+## Whether the animation should be played from the end.
 @export var from_end: bool = false
 
 var _animation_player: AnimationPlayer
 
 func _ready():
-	var the_player = get_node_or_null(animation_player)
+	_animation_player = get_node_or_null(animation_player)
 
-	if is_instance_valid(the_player):
-		_animation_player = the_player
-	else:
+	if not is_instance_valid(_animation_player):
 		push_error("The animation player is invalid. This node will not work.")
 
 func _state_enter(expect_transition: bool = false):

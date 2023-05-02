@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bkf1e240ouleb" path="res://addons/godot_state_charts/history_state.svg" id="5_oj1t0"]
 [ext_resource type="Texture2D" uid="uid://3wqyduuj0fq" path="res://addons/godot_state_charts/animation_tree_state.svg" id="6_8npp8"]
 [ext_resource type="Texture2D" uid="uid://chb8tq62aj2b2" path="res://addons/godot_state_charts/transition.svg" id="6_72e5q"]
-[ext_resource type="Texture2D" uid="uid://b3m20gsesp4i0" path="res://addons/godot_state_charts/animation_player_state.svg" id="8_4o8y7"]
+[ext_resource type="Texture2D" uid="uid://b3m20gsesp4i0" path="res://addons/godot_state_charts/animation_player_state.svg" id="8_ci7iy"]
 
 [node name="EditorSidebar" type="MarginContainer"]
 custom_minimum_size = Vector2(192, 0)
@@ -102,7 +102,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "AnimationPlayerState"
-icon = ExtResource("8_4o8y7")
+icon = ExtResource("8_ci7iy")
 icon_alignment = 1
 
 [node name="NoOptionsLabel" type="Label" parent="."]

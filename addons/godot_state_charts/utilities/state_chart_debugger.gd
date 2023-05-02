@@ -111,11 +111,14 @@ func _setup_processing(enabled:bool):
 	process_mode = Node.PROCESS_MODE_ALWAYS if enabled else Node.PROCESS_MODE_DISABLED
 	visible = enabled
 
+
 ## Disconnects all signals from the currently connected states.
 func _disconnect_all_signals():
 	for state in _connected_states:
-		state.state_entered.disconnect(_on_state_entered)
-		state.state_exited.disconnect(_on_state_exited)
+		# in case the state has been destroyed meanwhile
+		if is_instance_valid(state):
+			state.state_entered.disconnect(_on_state_entered)
+			state.state_exited.disconnect(_on_state_exited)
 
 
 ## Connects all signals from the currently processing state chart

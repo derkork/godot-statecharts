@@ -10,11 +10,16 @@ extends AtomicState
 		animation_tree = value
 		update_configuration_warnings()
 
+## The name of the state that should be activated in the animation tree
+## when this state is entered. If this is empty, the name of this state
+## will be used.
+@export var state_name:StringName = ""
+
 
 var _animation_tree_state_machine:AnimationNodeStateMachinePlayback
 
 func _ready():
-
+	_animation_tree_state_machine = null
 	var the_tree = get_node_or_null(animation_tree)
 
 	if is_instance_valid(the_tree):
@@ -33,8 +38,12 @@ func _state_enter(expect_transition:bool = false):
 	if not is_instance_valid(_animation_tree_state_machine):
 		return
 
+	var target_state = state_name
+	if target_state == "":
+		target_state = get_name()
+
 	# mirror this state to the animation tree
-	_animation_tree_state_machine.travel(name)
+	_animation_tree_state_machine.travel(target_state)
 
 
 func _get_configuration_warnings():
