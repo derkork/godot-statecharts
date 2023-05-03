@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2023-05-03
+### Fixed
+
+- The _Animation Name_ property of the _Animation Player State_ is now heeded ([#15](https://github.com/derkork/godot-statecharts/issues/15)).
+- All icons are now 16x16 pixels in size like the built-in Godot icons. ([#12](https://github.com/derkork/godot-statecharts/issues/12))
+- The version number is now correctly displayed in the editor.
+- In the ant hill demo ants no longer collide with each other, which caused them to get stuck on each other.
+
+
 ## [0.3.0] - 2023-05-02
 ### Added
 - A new _Animation Player State_ is now available. It works similar to the _Animation Tree State_ but controls an animation player instead of an animation tree. With this you can trigger animations when entering a certain state. A huge thanks goes out to [Junji Takakura](https://github.com/jtakakura) for contributing this feature. The platformer demo has been updated to use this new state for the new destructible iron crates.
