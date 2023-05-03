@@ -41,7 +41,11 @@ func _state_enter(expect_transition: bool = false):
 	if _animation_player.current_animation == name and _animation_player.is_playing():
 		return
 
-	_animation_player.play(name, custom_blend, custom_speed, from_end)
+	var target_animation_name = animation_name
+	if target_animation_name == "":
+		target_animation_name = get_name()
+
+	_animation_player.play(target_animation_name, custom_blend, custom_speed, from_end)
 
 func _get_configuration_warnings():
 	var warnings = super._get_configuration_warnings()
