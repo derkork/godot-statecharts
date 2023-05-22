@@ -32,6 +32,7 @@ Godot State Charts is an extension for Godot Engine 4 or later that allows you t
 - Comprehensive in-editor error checking and warnings will help you avoid common mistakes.
 - Inactive states will not update every frame for improved performance.
 - All states adhere to the pause mode, so state charts will pause when the game is paused.
+- Comprehensive documentation with a proper [manual](manual/manual.md) and annotated examples. 
 
 
 ### Attribution
