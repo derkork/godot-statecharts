@@ -13,6 +13,13 @@ var _state:State = null
 var _expression_properties:Dictionary = {
 }
 
+## A list of events which are still pending resolution.
+var _queued_events:Array[StringName] = []
+
+## Flag indicating if the state chart is currently processing an 
+## event. Until an event is fully processed, new events will be queued
+## and then processed later.
+var _event_processing_active:bool = false
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -38,13 +45,33 @@ func _ready() -> void:
 
 ## Sends an event to this state chart. The event will be passed to the innermost active state first and
 ## is then moving up in the tree until it is consumed. Events will trigger transitions and actions via emitted
-## signals.	
+## signals. There is no guarantee when the event will be processed. The state chart
+## will process the event as soon as possible but there is no guarantee that the 
+## event will be fully processed when this method returns.
 func send_event(event:StringName) -> void:
 	if not is_instance_valid(_state):
 		push_error("StateMachine is not initialized")
 		return
+		
+	if _event_processing_active:
+		# the state chart is currently processing an event
+		# therefore queue the event and process it later.
+		_queued_events.append(event)
+		return	
 
+	# enable the reentrance lock for event processing
+	_event_processing_active = true
+	
+	# first process this event.
 	_state._state_event(event)
+	
+	# if other events have accumulated while the event was processing
+	# process them in order now
+	while _queued_events.size() > 0:
+		var next_event = _queued_events.pop_front()
+		_state._state_event(next_event)
+		
+	_event_processing_active = false
 
 ## Sets a property that can be used in expression guards. The property will be available as a global variable
 ## with the same name. E.g. if you set the property "foo" to 42, you can use the expression "foo == 42" in

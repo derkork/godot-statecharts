@@ -220,7 +220,13 @@ func _state_event(event:StringName) -> bool:
 		if transition.event == event and transition.evaluate_guard():
 			# print(name +  ": consuming event " + event)
 			# first match wins
-			_queue_transition(transition)
+			
+			# if the transition is delayed, schedule it for execution 
+			if transition.delay_seconds > 0:
+				_queue_transition(transition)
+			else:
+				# execute it immediately
+				_handle_transition(transition, self)
 			return true
 	return false
 
