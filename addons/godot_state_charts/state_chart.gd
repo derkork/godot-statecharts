@@ -21,6 +21,10 @@ var _queued_events:Array[StringName] = []
 ## and then processed later.
 var _event_processing_active:bool = false
 
+
+var _queued_transitions:Array[Dictionary] = []
+var _transitions_processing_active:bool = false
+
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return 
@@ -72,6 +76,26 @@ func send_event(event:StringName) -> void:
 		_state._state_event(next_event)
 		
 	_event_processing_active = false
+
+
+func _run_transition(transition:Transition, source:State):
+	
+	# if we are currently inside of a transition, queue it up
+	if _transitions_processing_active:
+		_queued_transitions.append({transition : source})
+		return
+	
+	# run the transition	
+	source._handle_transition(transition, source)
+	
+	# if we still have transitions
+	while _queued_transitions.size() > 0:
+		var next_transition_entry = _queued_transitions.pop_front()
+		var next_transition = next_transition_entry.keys()[0]
+		var next_transition_source = next_transition_entry[next_transition]
+		next_transition_source._handle_transition(next_transition, next_transition_source)
+	
+	
 
 ## Sets a property that can be used in expression guards. The property will be available as a global variable
 ## with the same name. E.g. if you set the property "foo" to 42, you can use the expression "foo == 42" in
