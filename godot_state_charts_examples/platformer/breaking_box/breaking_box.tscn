@@ -333,6 +333,7 @@ input_pickable = true
 script = ExtResource("1_c2rh2")
 
 [node name="BoxSprite" type="Sprite2D" parent="."]
+texture_filter = 1
 position = Vector2(0, -10)
 texture = ExtResource("1_dixph")
 

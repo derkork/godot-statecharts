@@ -230,6 +230,7 @@ metadata/_editor_prop_ptr_state = NodePath("../../../Player Presence/Absent")
 script = ExtResource("1_jot5v")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
 texture = ExtResource("1_7vf2w")
 offset = Vector2(0, -32)
 
