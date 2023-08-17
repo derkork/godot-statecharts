@@ -10,6 +10,7 @@
 [node name="order_of_events" type="Node2D"]
 
 [node name="StateChart" type="Node" parent="."]
+editor_description = "This is just an example state chart to complement the documentation. See the section \"order of events\" in the manual for details."
 script = ExtResource("1_67wci")
 
 [node name="A" type="Node" parent="StateChart"]
@@ -38,6 +39,7 @@ initial_state = NodePath("C1")
 script = ExtResource("4_v7oq1")
 
 [node name="Immediately To C2" type="Node" parent="StateChart/A/C/C1"]
+editor_description = "This transition will immediately transition this state to the C2 state."
 script = ExtResource("5_qwp21")
 to = NodePath("../../C2")
 
@@ -55,6 +57,7 @@ event = &"c2_entered"
 script = ExtResource("4_v7oq1")
 
 [node name="To C4 after delay" type="Node" parent="StateChart/A/C/C3"]
+editor_description = "Another automatic transition, this time with a delay."
 script = ExtResource("5_qwp21")
 to = NodePath("../../C4")
 delay_seconds = 0.5
@@ -78,7 +81,7 @@ initial_node_to_watch = NodePath("../StateChart")
 offset_left = 18.0
 offset_top = 16.0
 offset_right = 174.0
-offset_bottom = 294.0
+offset_bottom = 444.0
 
 [node name="To C Button" type="Button" parent="VBoxContainer"]
 layout_mode = 2
@@ -87,6 +90,15 @@ text = "Go To C"
 [node name="To B Button" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Go To B"
+
+[node name="Spacer" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "This demo shows the order of events when states are changing under various conditions. See the \"Order of events\" section in the manual for some explainers."
+autowrap_mode = 2
 
 [connection signal="state_entered" from="StateChart/A/C/C2" to="StateChart" method="send_event" binds= ["c2_entered"]]
 [connection signal="pressed" from="VBoxContainer/To C Button" to="StateChart" method="send_event" binds= ["c_button_pressed"]]

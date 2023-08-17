@@ -46,6 +46,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 - `ant_hill` - a rudimentary ant hill simulation. The ants are controlled by a state chart that handles the different states of the ants such as searching for food, carrying food, returning to the nest, etc. This example shows how state charts can simplify a lot of the if-else logic that is often needed to implement AI.
 - `history_states` - an example that shows how you can use history states to implement a state machine that can remember the last active state of a compound state. 
 - `performance_test` - this example is a small test harness to evaluate how larger amounts of state charts will perform. It contains a state chart in `state_chart.tscn` which you can adapt to match your desired scenario. The actual performance will depend on what callback signals you will use so you should adapt the state chart in `state_chart.tscn` to match your scenario. Then there are scenes named `ten_state_charts.tscn`, `hundred_state_charts.tscn` and `thousand_state_charts.tscn` which each contain 10, 100 or 1000 instances of the state chart from `state_chart.tscn`. You can run these scenes to see how many instances of the state chart  you can run on your machine. Use the profiler to see how much time is spent in the state chart code. 
+- `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
 
 ### The _State Chart_ node
 
@@ -265,3 +266,32 @@ Usually you don't need to worry too much about the order in which state changes 
 
 For this example we will use the following state chart:
 
+![Example state chart for the order of events](order_of_events_chart.png). When the program starts, state _B_ is active. Since it is a parallel state, it will automatically activate its child states, _B1_ and _B2_. This is the starting position.
+
+![The starting position](ooe_starting_position.png)
+
+
+Now we send an event to the state chart that will trigger a transition to state _C_. Now the following things will happen:
+
+- Since we leave _B_, the child states _B1_ and _B2_ will exited. They are exited in the order in which they are defined, so first _B1_ and then _B2_. This will also emit the `state_exited` signal on each of the child states.
+- Then _B_ will exit and emit the `state_exited` signal.
+- Now we enter _C_ which is a compound state. First the `state_entered` signal will be emitted on _C_. Now _C_ will look for its initial state which is _C1_ and will activate it. This will emit the `state_entered` signal on _C1_.
+- We can see that _C1_ has a transition named _Immediately to C2_ which will immediately transition the active state from _C1_ to _C2_. This will emit the `state_exited` signal on _C1_ and the `state_entered` signal on _C2_.
+- On _C2_ we have another little contraption, a receiver on _C2_'s `state_entered` signal. This will send an event to the state chart which triggers the _To C3_ transition. So we will immediately transition from _C2_ to _C3_. This will emit the `state_exited` signal on _C2_ and the `state_entered` signal on _C3_.
+- Until here, everything happens within the same frame. On _C3_ we have a delayed transition to _C4_ which is executed 0.5 seconds later.  This will emit the `state_exited` signal on _C3_ and the `state_entered` signal on _C4_.
+
+Then we have reached this state:
+
+![The end position](ooe_end_position.png)
+
+Now we can switch back to state _B_ by sending the appropriate event to the state chart. This will trigger the following events:
+
+- Since we leave _C_, the currently active state _C4_ will be exited and the `state_exited` signal will be emitted for this state. Then _C_ will be exited and the `state_exited` signal will be emitted for this state.
+- We now enter _B_ again, and fire the `state_entered` signal on _B_. Since _B_ is a parallel state, it will activate its child states _B1_ and _B2_ again. This will emit the `state_entered` signal on _B1_ and _B2_.
+
+
+You can also see this in action in the `order_of_events` example in the `godot_state_charts_examples` folder. The _History_ tab of the state chart debugger will show you the order in which the events are processed.
+
+![History debugger in action](ooe_debugger.png)
+
+You can also modify this example and explore the order of events yourself.
