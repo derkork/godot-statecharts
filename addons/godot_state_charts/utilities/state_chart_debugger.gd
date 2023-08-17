@@ -49,8 +49,7 @@ func _ready():
 
 ## Adds an item to the history list.
 func add_history_entry(text:String):
-	var seconds = Time.get_ticks_msec() / 1000.0
-	_historyEdit.text += "[%.3f]: %s \n" % [seconds, text]
+	_historyEdit.text += "[%s]: %s \n" % [Engine.get_process_frames(), text]
 	if _lines + 1 < maximum_lines:
 		_lines += 1
 	else:
@@ -69,10 +68,12 @@ func debug_node(root:Node) -> bool:
 		return false
 	
 	_root = root
-	var success = _debug_node(root)
 	
 	# disconnect all existing signals
 	_disconnect_all_signals()
+
+	var success = _debug_node(root)
+	
 
 	# if we have no success, we disable the debugger
 	if not success:
@@ -114,6 +115,10 @@ func _setup_processing(enabled:bool):
 
 ## Disconnects all signals from the currently connected states.
 func _disconnect_all_signals():
+	if is_instance_valid(_state_chart):
+		_state_chart._before_transition.disconnect(_on_before_transition)
+		_state_chart.event_received.disconnect(_on_event_received)
+	
 	for state in _connected_states:
 		# in case the state has been destroyed meanwhile
 		if is_instance_valid(state):
@@ -130,6 +135,9 @@ func _connect_all_signals():
 	
 	if not is_instance_valid(_state_chart):
 		return
+
+	_state_chart._before_transition.connect(_on_before_transition)
+	_state_chart.event_received.connect(_on_event_received)
 
 	# find all state nodes below the state chart and connect their signals
 	for child in _state_chart.get_children():
@@ -197,6 +205,15 @@ func _collect_active_states(root:Node, parent:TreeItem):
 func _clear_history():
 	_historyEdit.text = ""
 	_lines = 0		
+
+
+func _on_before_transition(transition:Transition, source:State):
+	add_history_entry("Transition: %s from %s to %s" % [transition.name, _state_chart.get_path_to(source), _state_chart.get_path_to(transition.resolve_target())])
+
+
+func _on_event_received(event:StringName):
+	add_history_entry("Event received: %s" % event)
+
 	
 func _on_state_entered(state:State):
 	add_history_entry("Enter: %s" % state.name)

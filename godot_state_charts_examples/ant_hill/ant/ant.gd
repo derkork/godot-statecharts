@@ -37,16 +37,6 @@ func _on_idle_seeking_food():
 
 	var current_position := get_global_position()
 
-	# if we don't have nest markers nearby place one
-	if nest_markers.size() == 0:
-		var marker = _place_marker(Marker.MarkerType.NEST, current_position)
-		nest_markers[marker] = true
-		
-	# else refresh them
-	else:
-		for marker in nest_markers.keys():
-			marker.refresh()
-
 	# if we have food nearby grab it
 	if food.size() > 0:
 		state_chart.send_event("food_detected")
@@ -59,7 +49,9 @@ func _on_idle_seeking_food():
 		var direction = Vector2.RIGHT.rotated(closest_food_marker.get_rotation())
 		target_position = current_position + (direction * SEGMENT_LENGTH)
 
-	else:
+	# otherwise or if we couldn't reach the last target position, pick a random 
+	# direction
+	if food_markers.size() == 0 or not navigation_agent.is_target_reachable():
 		# otherwise pick a random position in a radius of SEGMENT_LENGTH pixels
 		# first calculate a random angle in radians
 		var random_angle := randf() * 2 * PI
@@ -115,12 +107,6 @@ func _on_food_reached():
 func _on_idle_returning_home():
 	var current_position := get_global_position()
 
-
-	# if we don't have food markers nearby place one, so we can find back to the food later
-	if food_markers.size() == 0:
-		var marker = _place_marker(Marker.MarkerType.FOOD, current_position)
-		food_markers[marker] = true
-
 	# if the nest is nearby, drop off the food
 	if nest != null:
 		state_chart.send_event("nest_detected")
@@ -136,8 +122,10 @@ func _on_idle_returning_home():
 		var closest_nest_marker := _find_closest(nest_markers.keys(), current_position)
 		var direction = Vector2.RIGHT.rotated(closest_nest_marker.get_rotation()) 
 		target_position = current_position + (direction * SEGMENT_LENGTH)
-	# otherwise just pick a random direction
-	else:
+	
+	# if we have no nest markers or the navigation agent couldn't reach
+	# the position of the last target pick a random direction
+	if nest_markers.size() == 0 or not navigation_agent.is_target_reachable():
 		var random_angle := randf() * 2 * PI
 		# then calculate the x and y components of the vector
 		var random_x := cos(random_angle) * SEGMENT_LENGTH
@@ -181,6 +169,7 @@ func _on_travelling_state_physics_processing(_delta):
 func _on_input_event(_viewport, event, _shape_idx):
 	# if the left mouse button is up emit the clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
+		print("clicked")
 		clicked.emit(self)
 
 
@@ -252,7 +241,7 @@ func _place_marker(type:Marker.MarkerType, target_position:Vector2, offset:float
 	var marker = marker_scene.instantiate()
 	marker.initialize(type)
 	# add to the tree on our parent
-	get_parent().add_child(marker)
+	get_parent().add_child.call_deferred(marker)
 	# set the position to our current position
 	marker.set_global_position(target_position)
 	# set the marker rotation to look opposite to the direction we are facing
@@ -260,6 +249,18 @@ func _place_marker(type:Marker.MarkerType, target_position:Vector2, offset:float
 	return marker
 	
 
+func _place_nest_marker():
+	# if there are already nest markers around, just refresh them
+	if nest_markers.size() > 0:
+		for marker in nest_markers:
+			marker.refresh()
+	else:
+		# otherwise place a new one
+		_place_marker(Marker.MarkerType.NEST, global_position)
+
+
+func _place_food_marker():
+	_place_marker(Marker.MarkerType.FOOD, global_position)
 
 
 func _maintenance(_delta):
@@ -273,4 +274,3 @@ func _maintenance(_delta):
 			nest_markers.erase(marker)
 		
 		
-	pass # Replace with function body.

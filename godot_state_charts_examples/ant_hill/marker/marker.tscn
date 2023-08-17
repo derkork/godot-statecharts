@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=4 format=3 uid="uid://dy5xrmjffewnk"]
 
 [ext_resource type="Texture2D" uid="uid://b3k7i5rrn5hhl" path="res://godot_state_charts_examples/ant_hill/marker/circle_white.svg" id="1_2vg4s"]
 [ext_resource type="Script" path="res://godot_state_charts_examples/ant_hill/marker/marker.gd" id="2_2b6iy"]

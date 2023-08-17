@@ -1,0 +1,105 @@
+[gd_scene load_steps=7 format=3 uid="uid://qr4pvbbdopme"]
+
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="1_67wci"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="2_oks48"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="3_p72eh"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="4_v7oq1"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="5_qwp21"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="5_xychp"]
+
+[node name="order_of_events" type="Node2D"]
+
+[node name="StateChart" type="Node" parent="."]
+editor_description = "This is just an example state chart to complement the documentation. See the section \"order of events\" in the manual for details."
+script = ExtResource("1_67wci")
+
+[node name="A" type="Node" parent="StateChart"]
+script = ExtResource("2_oks48")
+initial_state = NodePath("B")
+
+[node name="B" type="Node" parent="StateChart/A"]
+script = ExtResource("3_p72eh")
+
+[node name="B1" type="Node" parent="StateChart/A/B"]
+script = ExtResource("4_v7oq1")
+
+[node name="B2" type="Node" parent="StateChart/A/B"]
+script = ExtResource("4_v7oq1")
+
+[node name="To C" type="Node" parent="StateChart/A/B"]
+script = ExtResource("5_qwp21")
+to = NodePath("../../C")
+event = &"c_button_pressed"
+
+[node name="C" type="Node" parent="StateChart/A"]
+script = ExtResource("2_oks48")
+initial_state = NodePath("C1")
+
+[node name="C1" type="Node" parent="StateChart/A/C"]
+script = ExtResource("4_v7oq1")
+
+[node name="Immediately To C2" type="Node" parent="StateChart/A/C/C1"]
+editor_description = "This transition will immediately transition this state to the C2 state."
+script = ExtResource("5_qwp21")
+to = NodePath("../../C2")
+
+[node name="C2" type="Node" parent="StateChart/A/C"]
+editor_description = "This state has it's state_entered signal connected. The receiver of this signal will immediately trigger the \"To C3\" transition below."
+script = ExtResource("4_v7oq1")
+
+[node name="To C3" type="Node" parent="StateChart/A/C/C2"]
+editor_description = "This transition will be called by a signal receiver connected to C2's  `state_entered` signal. It will be triggered immediately when C2 is entered."
+script = ExtResource("5_qwp21")
+to = NodePath("../../C3")
+event = &"c2_entered"
+
+[node name="C3" type="Node" parent="StateChart/A/C"]
+script = ExtResource("4_v7oq1")
+
+[node name="To C4 after delay" type="Node" parent="StateChart/A/C/C3"]
+editor_description = "Another automatic transition, this time with a delay."
+script = ExtResource("5_qwp21")
+to = NodePath("../../C4")
+delay_seconds = 0.5
+
+[node name="C4" type="Node" parent="StateChart/A/C"]
+script = ExtResource("4_v7oq1")
+
+[node name="To B" type="Node" parent="StateChart/A/C/C4"]
+script = ExtResource("5_qwp21")
+to = NodePath("../../../B")
+event = &"b_button_pressed"
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("5_xychp")]
+offset_left = 201.0
+offset_top = 11.0
+offset_right = 627.0
+offset_bottom = 450.0
+initial_node_to_watch = NodePath("../StateChart")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 18.0
+offset_top = 16.0
+offset_right = 174.0
+offset_bottom = 444.0
+
+[node name="To C Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Go To C"
+
+[node name="To B Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Go To B"
+
+[node name="Spacer" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "This demo shows the order of events when states are changing under various conditions. See the \"Order of events\" section in the manual for some explainers."
+autowrap_mode = 2
+
+[connection signal="state_entered" from="StateChart/A/C/C2" to="StateChart" method="send_event" binds= ["c2_entered"]]
+[connection signal="pressed" from="VBoxContainer/To C Button" to="StateChart" method="send_event" binds= ["c_button_pressed"]]
+[connection signal="pressed" from="VBoxContainer/To B Button" to="StateChart" method="send_event" binds= ["b_button_pressed"]]

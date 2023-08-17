@@ -707,6 +707,7 @@ libraries = {
 }
 
 [node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
 texture = ExtResource("2_o2aka")
 offset = Vector2(0, -12)
 hframes = 11

@@ -11,6 +11,7 @@
 [node name="Level" type="Node2D"]
 
 [node name="TileMap" type="TileMap" parent="."]
+texture_filter = 1
 tile_set = ExtResource("1_l1t3g")
 collision_animatable = true
 format = 2

@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://bqalfgp8jjady"]
 
 [ext_resource type="Texture2D" uid="uid://cqt6bgiwgqym7" path="res://godot_state_charts_examples/ant_hill/banana/banana.svg" id="1_uoy0d"]
 
@@ -9,6 +9,7 @@ height = 32.0275
 [node name="banana" type="Node2D" groups=["food"]]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
 texture = ExtResource("1_uoy0d")
 
 [node name="Area2D" type="Area2D" parent="."]
