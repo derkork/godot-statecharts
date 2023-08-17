@@ -4,10 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2023-08-xx
+## [0.4.0] - 2023-08-17
 ### Breaking changes
 
-- State changes by transitions with zero delay are now always happening in the same frame in which they were triggered. Before, state changes were delayed until the next frame. Because this could significantly delay complex state chains, this behavior was changed ([#21](https://github.com/derkork/godot-statecharts/issues/21)). 
+- State changes by transitions with zero delay are now always happening in the same frame in which they were triggered. Before, state changes were delayed until the next frame. Because this could significantly delay complex state chains, this behavior was changed ([#21](https://github.com/derkork/godot-statecharts/issues/21)). Since this necessitated some other internal changes as well, there is no option to restore the old behaviour without introducing a lot of internal complexity. If for some reason you really need to delay a state change by one frame, you can use a transition with a very short delay (e.g. 0.0001 seconds).
 
 ### Added
 
