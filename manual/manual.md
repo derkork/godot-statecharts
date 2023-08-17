@@ -266,7 +266,9 @@ Usually you don't need to worry too much about the order in which state changes 
 
 For this example we will use the following state chart:
 
-![Example state chart for the order of events](order_of_events_chart.png). When the program starts, state _B_ is active. Since it is a parallel state, it will automatically activate its child states, _B1_ and _B2_. This is the starting position.
+![Example state chart for the order of events](order_of_events_chart.png) 
+
+When the program starts, state _B_ is active. Since it is a parallel state, it will automatically activate its child states, _B1_ and _B2_. This is the starting position.
 
 ![The starting position](ooe_starting_position.png)
 
