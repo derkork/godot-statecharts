@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2023-08-xx
+### Breaking changes
+
+- State changes by transitions with zero delay are now always happening in the same frame in which they were triggered. Before, state changes were delayed until the next frame. Because this could significantly delay complex state chains, this behavior was changed ([#21](https://github.com/derkork/godot-statecharts/issues/21)). 
+
+### Added
+
+- A new demo was added for showing the exact flow of events when changing states. It is located at `godot_state_charts_examples/order_of_events`. A section explaining this demo was added to the [documentation](manual/manual.md#order-of-events).
+
+### Improved
+
+- The state chart debugger now shows the frame number instead of the time when a change happened. This makes it easier to see the exact timing of events.
+It also now shows an entry when the state chart receives an event and when a transition is about to be triggered.
+
+### Fixed
+- In the ant hill demo the ants now try to take a random direction when they cannot reach their target. This prevents them from getting stuck in corners or edges.
+
+
 ## [0.3.1] - 2023-05-03
 ### Fixed
 
