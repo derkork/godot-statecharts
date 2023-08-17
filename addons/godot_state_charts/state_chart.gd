@@ -5,6 +5,25 @@
 class_name StateChart 
 extends Node
 
+## Emitted when a transition is about to happen. Note that this
+## signal is only intended for the state chart debugger. It is
+## not recommended to use this in your game code, which should 
+## be unaware of transitions (see also the tips and tricks in the
+## manual).
+signal _before_transition(transition:Transition, source:State)
+
+## Emitted when the state chart receives an event. This will be 
+## emitted no matter which state is currently active and can be 
+## useful to trigger additional logic elsewhere in the game 
+## without having to create a custom event bus. It is also used
+## by the state chart debugger. Note that this will emit the 
+## events in the order in which they are processed, which may 
+## be different from the order in which they were received. This is
+## because the state chart will always finish processing one event
+## fully before processing the next. If an event is received
+## while another is still processing, it will be enqueued.
+signal event_received(event:StringName)
+
 ## The root state of the state chart.
 var _state:State = null
 
@@ -24,6 +43,8 @@ var _event_processing_active:bool = false
 
 var _queued_transitions:Array[Dictionary] = []
 var _transitions_processing_active:bool = false
+
+
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -67,12 +88,14 @@ func send_event(event:StringName) -> void:
 	_event_processing_active = true
 	
 	# first process this event.
+	event_received.emit(event)
 	_state._state_event(event)
 	
 	# if other events have accumulated while the event was processing
 	# process them in order now
 	while _queued_events.size() > 0:
 		var next_event = _queued_events.pop_front()
+		event_received.emit(event)
 		_state._state_event(next_event)
 		
 	_event_processing_active = false
@@ -84,18 +107,29 @@ func _run_transition(transition:Transition, source:State):
 	if _transitions_processing_active:
 		_queued_transitions.append({transition : source})
 		return
-	
-	# run the transition	
-	source._handle_transition(transition, source)
+
+	# we can only transition away from a currently active state
+	# if for some reason the state no longer is active, ignore the transition	
+	if source.active:
+		# run the transition	
+		_before_transition.emit(transition, source)
+		source._handle_transition(transition, source)
+	else:
+		_warn_not_active(transition, source)
 	
 	# if we still have transitions
 	while _queued_transitions.size() > 0:
 		var next_transition_entry = _queued_transitions.pop_front()
 		var next_transition = next_transition_entry.keys()[0]
 		var next_transition_source = next_transition_entry[next_transition]
-		next_transition_source._handle_transition(next_transition, next_transition_source)
+		if next_transition_source.active:
+			_before_transition.emit(next_transition, next_transition_source)
+			next_transition_source._handle_transition(next_transition, next_transition_source)
+		else:
+			_warn_not_active(transition, source)
 	
-	
+func _warn_not_active(transition:Transition, source:State):
+	push_warning("Ignoring request for transitioning from ", source.name, " to ", transition.to, " as the source state is no longer active. Check whether your trigger multiple state changes within a single frame.")
 
 ## Sets a property that can be used in expression guards. The property will be available as a global variable
 ## with the same name. E.g. if you set the property "foo" to 42, you can use the expression "foo == 42" in
