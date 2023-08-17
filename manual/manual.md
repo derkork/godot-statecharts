@@ -255,3 +255,13 @@ Because both states and transitions are nodes, it is very easy to rename them in
 Godot has a very nice built-in comment field named "Editor Description". Use this to write down some thoughts about why a state or transition exists and how it works in conjunction with other states and transitions. This is especially useful when you have a complex state chart with many states and transitions. Just like you write comments for your code, it is a good idea to write comments for your state charts.
 
 ![An example of the editor description](editor_description.png)
+
+
+## Appendix
+
+### Order of events
+
+Usually you don't need to worry too much about the order in which state changes are processed but there are some instances where it is important to know the order in which events are processed. The following will give you an overview on the inner workings and the order in which events are processed.
+
+For this example we will use the following state chart:
+
