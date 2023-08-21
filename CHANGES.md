@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.4.1] - 2023-08-21
+### Fixed
+- The state chart debugger's performance has been vastly improved, so it should no longer affect the framerate. The history field is now only updated twice a second rather than every frame and only when it is actually visible. Also history is now held in a ring buffer which helps to speedily add and overwrite history entries as well as keeping memory usage in check ([#24](https://github.com/derkork/godot-statecharts/issues/24)).
+
+### Added
+- You can now filter out information from the state chart debugger. For now you can ignore events, state changes and transitions. These settings can also be changed at runtime, so you can filter out information that is not relevant for the current situation.
+
+### Removed
+- The _Auto Track State Changes_ setting has been removed from the state charts debugger, as its functionality was made obsolete by the new filter settings.
+
+
 ## [0.4.0] - 2023-08-17
 ### Breaking changes
 
