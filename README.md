@@ -14,6 +14,13 @@ _This library is still quite new and has not seen much use yet. While it works r
   <a href="https://discord.gg/4JBkykG">Godot Engine Discord</a>
 </p>
 
+<p align="center">
+  If you prefer to learn in video form, there is also a video tutorial available on YouTube to get you started.
+  <p align="center">
+  <a href="https://www.youtube.com/watch?v=E9h9VnbPGuw"><img src="https://i3.ytimg.com/vi/E9h9VnbPGuw/hqdefault.jpg" alt="Godot State Charts Tutorial on YouTube"></a> 
+  </p>
+</p>
+
 ## What is Godot State Charts?
 
 Godot State Charts is an extension for Godot Engine 4 or later that allows you to use [state charts](https://statecharts.dev) in your game. State Charts are similar to finite state machines, but they are more powerful and avoid the [state explosion](https://statecharts.dev/state-machine-state-explosion.html) problem of traditional FSMs. 
