@@ -14,7 +14,6 @@ script = ExtResource("1_i74os")
 layout_mode = 2
 
 [node name="StateChart" type="MarginContainer" parent="TabContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
@@ -58,6 +57,7 @@ layout_mode = 2
 text = "Copy to Clipboard"
 
 [node name="Settings" type="MarginContainer" parent="TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2023-08-22
+### Fixed
+- The state chart debugger now again properly recognizes the "Maximum Lines" setting ([#26](https://github.com/derkork/godot-statecharts/issues/26)).
+
 
 ## [0.4.1] - 2023-08-21
 ### Fixed
@@ -22,11 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - State changes by transitions with zero delay are now always happening in the same frame in which they were triggered. Before, state changes were delayed until the next frame. Because this could significantly delay complex state chains, this behavior was changed ([#21](https://github.com/derkork/godot-statecharts/issues/21)). Since this necessitated some other internal changes as well, there is no option to restore the old behaviour without introducing a lot of internal complexity. If for some reason you really need to delay a state change by one frame, you can use a transition with a very short delay (e.g. 0.0001 seconds).
 
 ### Added
-
 - A new demo was added for showing the exact flow of events when changing states. It is located at `godot_state_charts_examples/order_of_events`. A section explaining this demo was added to the [documentation](manual/manual.md#order-of-events).
 
 ### Improved
-
 - The state chart debugger now shows the frame number instead of the time when a change happened. This makes it easier to see the exact timing of events.
 It also now shows an entry when the state chart receives an event and when a transition is about to be triggered.
 
@@ -36,7 +38,6 @@ It also now shows an entry when the state chart receives an event and when a tra
 
 ## [0.3.1] - 2023-05-03
 ### Fixed
-
 - The _Animation Name_ property of the _Animation Player State_ is now heeded ([#15](https://github.com/derkork/godot-statecharts/issues/15)).
 - All icons are now 16x16 pixels in size like the built-in Godot icons. ([#12](https://github.com/derkork/godot-statecharts/issues/12))
 - The version number is now correctly displayed in the editor.
@@ -87,7 +88,6 @@ It also now shows an entry when the state chart receives an event and when a tra
 
 ### Fixed
 - When transitioning directly to a state nested below a compound state, the initial state of the compound state will no longer be entered and immediately exited again ([#1](https://github.com/derkork/godot-statecharts/issues/1)).
-
 
 
 ## [0.0.2] - 2023-03-31

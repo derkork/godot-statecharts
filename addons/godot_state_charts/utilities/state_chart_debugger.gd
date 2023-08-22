@@ -56,7 +56,7 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS	
 	
 	# initialize the buffer
-	_buffer = RingBuffer.new()
+	_buffer = RingBuffer.new(maximum_lines)
 
 	%CopyToClipboardButton.pressed.connect(func (): DisplayServer.clipboard_set(_history_edit.text))
 	%ClearButton.pressed.connect(_clear_history)
