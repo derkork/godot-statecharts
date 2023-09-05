@@ -66,7 +66,7 @@ func _ready() -> void:
 	_state._state_init()
 
 	# enter the state
-	_state._state_enter()
+	_state._state_enter.call_deferred()
 
 ## Sends an event to this state chart. The event will be passed to the innermost active state first and
 ## is then moving up in the tree until it is consumed. Events will trigger transitions and actions via emitted
