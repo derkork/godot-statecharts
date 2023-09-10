@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.4] - 2023-09-10
+### Fixed
+- Fixed the ant hill demo which was broken in the last release ([#31](https://github.com/derkork/godot-statecharts/issues/31)).
+
+
 ## [0.4.3] - 2023-09-05
 ### Fixed
 - The state chart now waits for the next frame after being ready to enter its initial state. This allows all nodes which are above the statechart in the three to finish their `_ready` phase and properly initialize before the state chart starts running ([#28](https://github.com/derkork/godot-statecharts/issues/28)).

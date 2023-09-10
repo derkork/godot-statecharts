@@ -29,7 +29,7 @@ const SEGMENT_LENGTH = 150
 
 func _ready():
 	# start the state chart
-	state_chart.send_event("initialized")
+	state_chart.send_event.call_deferred("initialized")
 
 
 ## Called when we are seeking for food and need a new target.

@@ -140,6 +140,10 @@ Now we send a `stop` event to the state chart. The currently active state is now
 
 In deeper state charts, events will be passed to the active states going all the way down until an active leaf state (a state which has no more child states) is reached. Now all transitions of that state will be checked, whether they react to that event. If a transition reacts to that event it will be queued for execution and the event is considered as handled. If no transition handles a given event, the event will bubble up to the parent state until it is consumed or reaches the root state. If the event reaches the root state and is not consumed, it will be ignored.
 
+> ⚠️ **Note:** The initial state of a state chart will only be entered one frame after the state chart's `_ready` function ran. It is done this way to give nodes above the state chart time to run their `_ready` functions before any state chart logic is triggered. 
+> 
+> This means that if you call `send_event` in a `_ready` function it will most likely not work as expected. If you must send an event in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`. 
+
 #### Transitions on entering a state
 
 It is possible to immediately transition elsewhere when a state is entered. This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html). To make a transition execute immediately when a state is entered, leave the _Event_ field empty. Usually you will put a guard on such a transition to make sure it is only taken when a certain condition is met.
