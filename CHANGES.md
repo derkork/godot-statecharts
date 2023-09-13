@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.5] - 2023-09-13
+### Fixed
+- Fixed double jump animation in platformer demo looping endlessly in Godot 4.1 ([#33](https://github.com/derkork/godot-statecharts/issues/33)).
+
 ## [0.4.4] - 2023-09-10
 ### Fixed
 - Fixed the ant hill demo which was broken in the last release ([#31](https://github.com/derkork/godot-statecharts/issues/31)).
