@@ -13,6 +13,9 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var _animation_tree: AnimationTree = $AnimationTree
 @onready var _animation_state_machine: AnimationNodeStateMachinePlayback = _animation_tree.get("parameters/playback")
 
+# Current facing direction (positive one is right, negative one is left)
+var _facing_direction := 1.0
+
 # In all states, move and slide and handle left/right movement and gravity.
 func _physics_process(delta):
 
@@ -40,10 +43,15 @@ func _physics_process(delta):
 	else:
 		_state_chart.send_event("moving")
 
+	# update facing direction only when moving horizontaly
+	if not is_zero_approx(velocity.x):
+		_facing_direction = signf(velocity.x)
+
 	# set the velocity to the animation tree, so it can blend between animations
-	_animation_tree["parameters/Idle/blend_position"] = velocity.x
-	_animation_tree["parameters/Move/blend_position"] = velocity
-	_animation_tree["parameters/DoubleJump/blend_position"] = velocity.x
+	# _facing_direction "nudges" the parameters to avoid unwanted flipping when velocity is zero
+	_animation_tree["parameters/Idle/blend_position"] = velocity.x + _facing_direction
+	_animation_tree["parameters/Move/blend_position"] = velocity + Vector2(_facing_direction, 0.0)
+	_animation_tree["parameters/DoubleJump/blend_position"] = velocity.x + _facing_direction
 
 	
 		
