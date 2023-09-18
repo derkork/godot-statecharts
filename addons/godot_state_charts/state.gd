@@ -18,6 +18,9 @@ signal state_processing(delta:float)
 ## Called when the state is physics processing.
 signal state_physics_processing(delta:float)
 
+## Called when the state chart step function is called.
+signal state_stepped()
+
 ## Called when the state is receiving input.
 signal state_input(event:InputEvent)
 
@@ -218,6 +221,9 @@ func _physics_process(delta:float):
 		return
 	state_physics_processing.emit(delta)
 
+## Called when the state chart step function is called.
+func _state_step():
+	state_stepped.emit()
 
 func _input(event:InputEvent):
 	state_input.emit(event)

@@ -60,6 +60,10 @@ func _state_enter(expect_transition:bool = false):
 		else:
 			push_error("No initial state set for state '" + name + "'.")
 
+func _state_step():
+	super._state_step()
+	if _active_state != null:
+		_active_state._state_step()
 
 func _state_save(saved_state:SavedState, child_levels:int = -1):
 	super._state_save(saved_state, child_levels)
