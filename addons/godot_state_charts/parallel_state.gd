@@ -73,7 +73,11 @@ func _state_exit():
 		child._state_exit()
 	
 	super._state_exit()
-	
+
+func _state_step():
+	super._state_step()
+	for child in _sub_states:
+		child._state_step()
 
 func _state_event(event:StringName) -> bool:
 	if not active:

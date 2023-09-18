@@ -137,6 +137,10 @@ func _warn_not_active(transition:Transition, source:State):
 func set_expression_property(name:StringName, value) -> void:
 	_expression_properties[name] = value
 
+## Calls the `step` function in all active states. Used for situations where `state_processing` and 
+## `state_physics_processing` don't make sense (e.g. turn-based games, or games with a fixed timestep).
+func step():
+	_state._state_step()
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = []
