@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dp24fnhnuxju4"
-path="res://.godot/imported/hit.png-919da7226dbc2e4531f214016ebcd5cb.ctex"
+uid="uid://bgswg1pgd01d1"
+path="res://.godot/imported/full.png-a85a82780a54dfe88e1678c76076d884.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://godot_state_charts_examples/platformer/ninja_frog/hit.png"
-dest_files=["res://.godot/imported/hit.png-919da7226dbc2e4531f214016ebcd5cb.ctex"]
+source_file="res://godot_state_charts_examples/platformer/ninja_frog/full.png"
+dest_files=["res://.godot/imported/full.png-a85a82780a54dfe88e1678c76076d884.ctex"]
 
 [params]
 
