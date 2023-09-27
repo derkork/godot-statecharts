@@ -9,6 +9,7 @@ const JUMP_VELOCITY = -400.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
+@onready var _sprite: Sprite2D = $Sprite
 @onready var _state_chart: StateChart = $StateChart
 @onready var _animation_tree: AnimationTree = $AnimationTree
 @onready var _animation_state_machine: AnimationNodeStateMachinePlayback = _animation_tree.get("parameters/playback")
@@ -22,6 +23,11 @@ func _physics_process(delta):
 		velocity.x = direction * SPEED
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
+
+	# flip the sprite. we do this before moving, so it flips
+	# even if we stand at a wall
+	if signf(velocity.x) != 0:
+		_sprite.flip_h = velocity.x < 0
 
 	move_and_slide()
 
@@ -41,10 +47,7 @@ func _physics_process(delta):
 		_state_chart.send_event("moving")
 
 	# set the velocity to the animation tree, so it can blend between animations
-	_animation_tree["parameters/Idle/blend_position"] = velocity.x
-	_animation_tree["parameters/Move/blend_position"] = velocity
-	_animation_tree["parameters/DoubleJump/blend_position"] = velocity.x
-
+	_animation_tree["parameters/Move/blend_position"] = signf(velocity.y)
 	
 		
 ## Called in states that allow jumping, we process jumps only in these.
