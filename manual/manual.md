@@ -68,6 +68,8 @@ States are the building blocks from which you build your state charts. A state c
 - `state_input(input_event)` - called when input is received while the state is active. This is useful to limit input to certain states.
 - `state_unhandled_input(input_event)` - called when unhandled input is received while the state is active. Again this is useful to limit input to certain states.
 
+
+
 #### Atomic states
 
 <img src="../addons/godot_state_charts/atomic_state.svg" width="32" height="32" align="left"> Atomic states are the most basic type of state. They cannot have child states. Atomic states have no additional properties.
@@ -79,6 +81,11 @@ States are the building blocks from which you build your state charts. A state c
 - _Initial state_ - this property determines which child state will be activated when the compound state is entered directly. You can always activate a child state by explicitly transitioning to it. If you do not set an initial state then no child state will be activated and an error will be printed to the console.
 
 <img src="compound_state.png" width="400" alt="Compound state properties">
+
+Compound states have two signals in addition to the signals that all states have, which allow you to run common code whenever a child state of the compound state is entered/exited:
+
+- `child_state_entered()` - called when any child state is entered.
+- `child_state_exited()` - called when any child state is exited. 
 
 #### Parallel states
 
@@ -98,7 +105,7 @@ To use a history state, set up a transition that transitions directly to the his
 
 #### Animation tree states
 
-_Note: this feature is currently experimental and may change or be replaced in the future._
+> ⚠️ **Note**: this feature is currently experimental and may change or be replaced in the future.
 
 <img src="../addons/godot_state_charts/animation_tree_state.svg" width="32" height="32" align="left"> Animation tree states are a variation of atomic states. They can be linked to an animation tree. When an animation tree state is activated it will ask the animation tree to travel to the same state (the animation tree state and the state inside the animation tree should have the same name). This can be used to control animation trees with the same state chart events that you use to control your game logic. Animation tree states have the following properties:
 
@@ -114,7 +121,7 @@ Animation tree states are usually independent of the rest of the states, so it i
 
 #### Animation player states
 
-_Note: this feature is currently experimental and may change or be replaced in the future._
+> ⚠️ **Note**: this feature is currently experimental and may change or be replaced in the future.
 
 <img src="../addons/godot_state_charts/animation_player_state.svg" width="32" height="32" align="left"> Animation player states are similar to animation tree states. They can be linked to an animation player. When an animation player state is activated it will ask the animation player to play the same animation (the animation player state and the animation inside the animation player should have the same name). This can be used to control animation players with the same state chart events that you use to control your game logic. Animation player states have the following properties:
 

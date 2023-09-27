@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.5.0] - 2023-09-27
+### Added
+- Compound states now have two additional signals `on_child_state_entered` and `on_child_state_exited` which allow running common code that should run whenever a child state of the compound state is entered or exited. This is for example useful for resetting some internal state. A big thanks goes out to [Ian Sly](https://github.com/uzkbwza) for sending a PR with this feature.
+
+
 ## [0.4.5] - 2023-09-13
 ### Fixed
 - Fixed double jump animation in platformer demo looping endlessly in Godot 4.1 ([#33](https://github.com/derkork/godot-statecharts/issues/33)).
