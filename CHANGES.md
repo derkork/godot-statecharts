@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2023-09-27
 ### Added
-- Compound states now have two additional signals `on_child_state_entered` and `on_child_state_exited` which allow running common code that should run whenever a child state of the compound state is entered or exited. This is for example useful for resetting some internal state. A big thanks goes out to [Ian Sly](https://github.com/uzkbwza) for sending a PR with this feature.
+- Compound states now have two additional signals `child_state_entered` and `child_state_exited` which allow running common code that should run whenever a child state of the compound state is entered or exited. This is for example useful for resetting some internal state. A big thanks goes out to [Ian Sly](https://github.com/uzkbwza) for sending a PR with this feature.
+- You can now use the new stepping mode to run code depending on the currently active states in a turn-based game. A new demo was added to show how this works. It is located at `godot_state_charts_examples/stepping`. There is also a section explaining this mode in the [documentation](manual/manual.md#stepping-mode). Another big thanks goes out to [Ian Sly](https://github.com/uzkbwza) for sending a PR with this feature.
+
+### Fixed
+- In the platformer demo the player now keeps its orientation (left or right) when standing still. Before it would always face right when standing still. In addition the handling of animations was greatly simplified. A big thanks goes out to [Renato Rotenberg](https://github.com/Brawmario) for sending a PR and giving some great advice on how to improve the handling of animations in the platformer demo.
+
 
 
 ## [0.4.5] - 2023-09-13

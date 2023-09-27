@@ -50,6 +50,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 - `history_states` - an example that shows how you can use history states to implement a state machine that can remember the last active state of a compound state. 
 - `performance_test` - this example is a small test harness to evaluate how larger amounts of state charts will perform. It contains a state chart in `state_chart.tscn` which you can adapt to match your desired scenario. The actual performance will depend on what callback signals you will use so you should adapt the state chart in `state_chart.tscn` to match your scenario. Then there are scenes named `ten_state_charts.tscn`, `hundred_state_charts.tscn` and `thousand_state_charts.tscn` which each contain 10, 100 or 1000 instances of the state chart from `state_chart.tscn`. You can run these scenes to see how many instances of the state chart  you can run on your machine. Use the profiler to see how much time is spent in the state chart code. 
 - `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
+- `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
 
 ### The _State Chart_ node
 
@@ -65,9 +66,9 @@ States are the building blocks from which you build your state charts. A state c
 - `event_received(event)` - this signal is emitted when an event is received by the state while the state is active. The event is passed as a parameter.
 - `state_processing(delta)` - this signal is emitted every frame while the state is active. The delta time is passed as a parameter. The signal will obey pause mode of the tree, so if the node is paused, this signal will not be emitted.
 - `state_physics_processing(delta)` - this signal is emitted every physics frame while the state is active. The delta time is passed as a parameter. The signal will obey pause mode of the tree, so if the node is paused, this signal will not be emitted.
+- `state_stepped()` - called whenever the `step` method of the state chart is called. See [stepping mode](#stepping-mode) for more information on stepping mode.
 - `state_input(input_event)` - called when input is received while the state is active. This is useful to limit input to certain states.
 - `state_unhandled_input(input_event)` - called when unhandled input is received while the state is active. Again this is useful to limit input to certain states.
-
 
 
 #### Atomic states
@@ -228,6 +229,20 @@ debugger.add_history_entry("Player died")
 The debugger will only track state changes of the currently watched state chart. If you connect the debugger to a different state chart, it will start tracking the state changes of the new state chart.
 
 If you want to disable the history tracking, you can unset the _Auto Track State Changes_ checkbox in the editor UI.
+
+## Stepping mode
+
+If you have a turn based game where you want to execute code depending on which state you are in but you don't want to run this code every frame in `_process` or `_physics_process` but rather every turn, you can use stepping mode. In this case, you will connect your state handling code not to the `state_processing` or `state_physics_processing` signals, but rather to the `state_stepped` signal. 
+
+Then you call the `step` function of the state chart whenever want to calculate the "next round".  
+
+```gdscript
+func _on_next_round_button_pressed():
+    state_chart.step() # calculate the next round based on the current state
+```
+
+This will emit the `state_stepped` signal for all states which are currently active. You can connect your code to this signal to execute it every time the state chart is stepped.
+
 
 ## Tips & tricks
 

@@ -1,0 +1,103 @@
+[gd_scene load_steps=8 format=3 uid="uid://iewxecs0uwss"]
+
+[ext_resource type="Script" path="res://godot_state_charts_examples/stepping/stepping.gd" id="1_8d8ax"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="1_u4aev"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_7ehwm"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="4_ohpt6"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="5_xbwwa"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="6_n6kwq"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_78ppn"]
+
+[node name="SteppingExample" type="Node2D"]
+script = ExtResource("1_8d8ax")
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("1_u4aev")]
+offset_left = 353.0
+offset_top = 5.0
+offset_right = 635.0
+offset_bottom = 326.0
+initial_node_to_watch = NodePath("../StateChart")
+
+[node name="NextRoundButton" type="Button" parent="."]
+offset_left = 500.0
+offset_top = 421.0
+offset_right = 611.0
+offset_bottom = 454.0
+text = "Next Round"
+
+[node name="AddCoalToDrillButton" type="Button" parent="."]
+unique_name_in_owner = true
+offset_left = 371.0
+offset_top = 422.0
+offset_right = 482.0
+offset_bottom = 455.0
+text = "Add Coal"
+
+[node name="StateChart" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_7ehwm")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("4_ohpt6")
+
+[node name="Drill" type="Node" parent="StateChart/Root"]
+script = ExtResource("5_xbwwa")
+initial_state = NodePath("Drill Has No Coal")
+
+[node name="Drill Has Coal" type="Node" parent="StateChart/Root/Drill"]
+editor_description = "When in this state, the drill has coal and will produce two more coal per round."
+script = ExtResource("6_n6kwq")
+
+[node name="On Coal Depleted" type="Node" parent="StateChart/Root/Drill/Drill Has Coal"]
+script = ExtResource("7_78ppn")
+to = NodePath("../../Drill Has No Coal")
+event = &"coal_depleted"
+
+[node name="Drill Has No Coal" type="Node" parent="StateChart/Root/Drill"]
+editor_description = "When in this state, the drill will do nothing."
+script = ExtResource("6_n6kwq")
+
+[node name="On Coal Available" type="Node" parent="StateChart/Root/Drill/Drill Has No Coal"]
+script = ExtResource("7_78ppn")
+to = NodePath("../../Drill Has Coal")
+event = &"coal_available"
+
+[node name="GridContainer" type="GridContainer" parent="."]
+offset_left = 366.0
+offset_top = 333.0
+offset_right = 518.0
+offset_bottom = 389.0
+columns = 2
+
+[node name="Label" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Coal mined: "
+
+[node name="CoalAvailableLabel" type="Label" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+
+[node name="Label2" type="Label" parent="GridContainer"]
+layout_mode = 2
+text = "Coal in drill:"
+
+[node name="CoalInDrillLabel" type="Label" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+
+[node name="Info" type="Label" parent="."]
+offset_left = 13.0
+offset_top = 22.0
+offset_right = 322.0
+offset_bottom = 254.0
+text = "This is a super-simple example on how to use the \"step\" function to use a state chart in a turn-based game. 
+
+This simulates a coal-driven mining drill which  consumes one coal per round and produces two coal per round when running. You can press the \"Add Coal\" button to add coal into the mining drill.  Press \"Next Round\" to simulate the next round. This will call the \"step\" method and then execute code depending on which state the mining drill is currently in (e.g. either mine 2 coal or do nothing if the drill is off because it has no more coal)."
+autowrap_mode = 2
+
+[connection signal="pressed" from="NextRoundButton" to="." method="_on_next_round_button_pressed"]
+[connection signal="pressed" from="AddCoalToDrillButton" to="." method="_on_add_coal_to_drill_button_pressed"]
+[connection signal="state_stepped" from="StateChart/Root/Drill/Drill Has Coal" to="." method="_on_drill_has_coal_state_stepped"]
+[connection signal="state_stepped" from="StateChart/Root/Drill/Drill Has No Coal" to="." method="_on_drill_has_no_coal_state_stepped"]
