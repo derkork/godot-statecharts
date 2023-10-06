@@ -1,6 +1,9 @@
 @tool
 extends Control
 
+## Emitted when the user requests to toggle the sidebar.
+signal sidebar_toggle_requested()
+
 ## The currently selected node or null
 var _selected_node:Node
 ## The editor interface
@@ -99,3 +102,6 @@ func _on_animation_tree_state_pressed():
 func _on_animation_player_state_pressed():
 	_create_node(AnimationPlayerState, "AnimationPlayerState")
 
+
+func _on_toggle_sidebar_button_pressed():
+	sidebar_toggle_requested.emit()
