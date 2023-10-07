@@ -51,6 +51,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 - `performance_test` - this example is a small test harness to evaluate how larger amounts of state charts will perform. It contains a state chart in `state_chart.tscn` which you can adapt to match your desired scenario. The actual performance will depend on what callback signals you will use so you should adapt the state chart in `state_chart.tscn` to match your scenario. Then there are scenes named `ten_state_charts.tscn`, `hundred_state_charts.tscn` and `thousand_state_charts.tscn` which each contain 10, 100 or 1000 instances of the state chart from `state_chart.tscn`. You can run these scenes to see how many instances of the state chart  you can run on your machine. Use the profiler to see how much time is spent in the state chart code. 
 - `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
 - `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
+- `cooldown` - an example on how to drive UI elements with the `transition_pending` signal. See also the section on [delayed transitions](#delayed-transitions) for more information.
 
 ### The _State Chart_ node
 
@@ -69,6 +70,7 @@ States are the building blocks from which you build your state charts. A state c
 - `state_stepped()` - called whenever the `step` method of the state chart is called. See [stepping mode](#stepping-mode) for more information on stepping mode.
 - `state_input(input_event)` - called when input is received while the state is active. This is useful to limit input to certain states.
 - `state_unhandled_input(input_event)` - called when unhandled input is received while the state is active. Again this is useful to limit input to certain states.
+- `transition_pending(initial_delay, remaining_delay)` - called every frame while a [delayed transition](#delayed-transitions) is pending for this state. The initial and remaining delay of the transition in seconds are passed as parameters. This can be used to drive progress bars or cooldown indicators or trigger additional effects at certain time indices during the transition. An example of this can be found in the `cooldown` demo. Note, that this is never called for transitions without a delay.
 
 
 #### Atomic states

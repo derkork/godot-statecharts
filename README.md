@@ -46,3 +46,5 @@ Godot State Charts is an extension for Godot Engine 4 or later that allows you t
 ### Attribution
 
 The demo projects use the very nice [Pixel Adventure](https://pixelfrog-assets.itch.io/pixel-adventure-1) assets by [Pixel Frog](https://pixelfrog-assets.itch.io/). Thanks for making them available in the public domain!
+
+The demo projects also use some icons made by [J. W. Bjerk (eleazzaar)](https://www.jwbjerk.com/art), licensed under CC by DEED 3.0. Thanks for making them available!

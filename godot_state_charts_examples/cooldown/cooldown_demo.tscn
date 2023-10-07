@@ -1,0 +1,139 @@
+[gd_scene load_steps=11 format=3 uid="uid://cnqh7qot0estd"]
+
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="1_oec6f"]
+[ext_resource type="PackedScene" uid="uid://ch1pukkyc07qo" path="res://godot_state_charts_examples/cooldown/skill_button/skill_button.tscn" id="2_aahy2"]
+[ext_resource type="Texture2D" uid="uid://bphe0g2d306fe" path="res://godot_state_charts_examples/cooldown/icons/enchant-red-3.png" id="3_a8h0q"]
+[ext_resource type="Texture2D" uid="uid://bjmc4abduaxww" path="res://godot_state_charts_examples/cooldown/icons/fireball-eerie-2.png" id="4_jhd8u"]
+[ext_resource type="Texture2D" uid="uid://b87nmomi1l48x" path="res://godot_state_charts_examples/cooldown/icons/heal-jade-2.png" id="5_xxunm"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="6_d3pqh"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="7_l6ahs"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="8_pvst5"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="9_h41ei"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="10_5fig4"]
+
+[node name="Cooldown Example" type="Node2D"]
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("1_oec6f")]
+offset_left = 290.0
+offset_top = 16.0
+offset_right = 629.0
+offset_bottom = 466.0
+initial_node_to_watch = NodePath("../StateChart")
+
+[node name="InfoLabel" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 277.0
+offset_bottom = 128.0
+text = "This example shows how to connect delayed transitions with game UI to model skill buttons that have cooldowns. Click the buttons to try it."
+autowrap_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 18.0
+offset_top = 164.0
+offset_right = 278.0
+offset_bottom = 435.0
+theme_override_constants/separation = 15
+
+[node name="AttackSkillButton" parent="VBoxContainer" instance=ExtResource("2_aahy2")]
+editor_description = "This is the attack skill button. When you press it, it will send the \"attack\" event to the state chart."
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("3_a8h0q")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="MagicSkillButton" parent="VBoxContainer/HBoxContainer" instance=ExtResource("2_aahy2")]
+editor_description = "This is the magic skill button. When you press it, it will send the \"magic\" event to the state chart."
+layout_mode = 2
+texture = ExtResource("4_jhd8u")
+
+[node name="HealSkillButton" parent="VBoxContainer/HBoxContainer" instance=ExtResource("2_aahy2")]
+editor_description = "This is the heal skill button. When you press it, it will send the \"heal\" event to the state chart."
+layout_mode = 2
+texture = ExtResource("5_xxunm")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("6_d3pqh")
+
+[node name="Root" type="Node" parent="StateChart"]
+editor_description = "Since all three skills can be used independently of each other we use a parallel state as the root here."
+script = ExtResource("7_l6ahs")
+
+[node name="AttackSkill" type="Node" parent="StateChart/Root"]
+script = ExtResource("8_pvst5")
+initial_state = NodePath("Available")
+
+[node name="Available" type="Node" parent="StateChart/Root/AttackSkill"]
+editor_description = "State indicating that attack is available. Entering this state will reset the cooldown on the attack skill button."
+script = ExtResource("9_h41ei")
+
+[node name="On Attack To Cooldown" type="Node" parent="StateChart/Root/AttackSkill/Available"]
+script = ExtResource("10_5fig4")
+to = NodePath("../../Cooldown")
+event = &"attack"
+
+[node name="Cooldown" type="Node" parent="StateChart/Root/AttackSkill"]
+editor_description = "Cooldown state for the attack skill. While the delayed transition is pending, this state will send status updates on the pending transition to the attack skill button. The attack skill button will then update itself and show the remaining cooldown."
+script = ExtResource("9_h41ei")
+
+[node name="Back to Available" type="Node" parent="StateChart/Root/AttackSkill/Cooldown"]
+script = ExtResource("10_5fig4")
+to = NodePath("../../Available")
+delay_seconds = 1.0
+
+[node name="MagicSkill" type="Node" parent="StateChart/Root"]
+script = ExtResource("8_pvst5")
+initial_state = NodePath("Available")
+
+[node name="Available" type="Node" parent="StateChart/Root/MagicSkill"]
+editor_description = "State indicating that the magic skill is available. Entering this state will reset the cooldown on the magic  skill button."
+script = ExtResource("9_h41ei")
+
+[node name="On Magic To Cooldown" type="Node" parent="StateChart/Root/MagicSkill/Available"]
+script = ExtResource("10_5fig4")
+to = NodePath("../../Cooldown")
+event = &"magic"
+
+[node name="Cooldown" type="Node" parent="StateChart/Root/MagicSkill"]
+editor_description = "Cooldown state for the magic skill. While the delayed transition is pending, this state will send status updates on the pending transition to the magic skill button. The magic  skill button will then update itself and show the remaining cooldown."
+script = ExtResource("9_h41ei")
+
+[node name="Back to Available" type="Node" parent="StateChart/Root/MagicSkill/Cooldown"]
+script = ExtResource("10_5fig4")
+to = NodePath("../../Available")
+delay_seconds = 3.0
+
+[node name="HealSkill" type="Node" parent="StateChart/Root"]
+script = ExtResource("8_pvst5")
+initial_state = NodePath("Available")
+
+[node name="Available" type="Node" parent="StateChart/Root/HealSkill"]
+editor_description = "State indicating that the heal skill is available. Entering this state will reset the cooldown on the heal skill button."
+script = ExtResource("9_h41ei")
+
+[node name="On Heal To Cooldown" type="Node" parent="StateChart/Root/HealSkill/Available"]
+script = ExtResource("10_5fig4")
+to = NodePath("../../Cooldown")
+event = &"heal"
+
+[node name="Cooldown" type="Node" parent="StateChart/Root/HealSkill"]
+editor_description = "Cooldown state for the heal skill. While the delayed transition is pending, this state will send status updates on the pending transition to the heal skill button. The heal skill button will then update itself and show the remaining cooldown."
+script = ExtResource("9_h41ei")
+
+[node name="Back to Available" type="Node" parent="StateChart/Root/HealSkill/Cooldown"]
+script = ExtResource("10_5fig4")
+to = NodePath("../../Available")
+delay_seconds = 10.0
+
+[connection signal="pressed" from="VBoxContainer/AttackSkillButton" to="StateChart" method="send_event" binds= ["attack"]]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/MagicSkillButton" to="StateChart" method="send_event" binds= ["magic"]]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/HealSkillButton" to="StateChart" method="send_event" binds= ["heal"]]
+[connection signal="state_entered" from="StateChart/Root/AttackSkill/Available" to="VBoxContainer/AttackSkillButton" method="clear_cooldown"]
+[connection signal="transition_pending" from="StateChart/Root/AttackSkill/Cooldown" to="VBoxContainer/AttackSkillButton" method="set_cooldown"]
+[connection signal="state_entered" from="StateChart/Root/MagicSkill/Available" to="VBoxContainer/HBoxContainer/MagicSkillButton" method="clear_cooldown"]
+[connection signal="transition_pending" from="StateChart/Root/MagicSkill/Cooldown" to="VBoxContainer/HBoxContainer/MagicSkillButton" method="set_cooldown"]
+[connection signal="state_entered" from="StateChart/Root/HealSkill/Available" to="VBoxContainer/HBoxContainer/HealSkillButton" method="clear_cooldown"]
+[connection signal="transition_pending" from="StateChart/Root/HealSkill/Cooldown" to="VBoxContainer/HBoxContainer/HealSkillButton" method="set_cooldown"]

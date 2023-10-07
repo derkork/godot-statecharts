@@ -27,6 +27,10 @@ signal state_input(event:InputEvent)
 ## Called when the state is receiving unhandled input.
 signal state_unhandled_input(event:InputEvent)
 
+## Called every frame while a delayed transition is pending for this state.
+## Returns the initial delay and the remaining delay of the transition.
+signal transition_pending(initial_delay:float, remaining_delay:float)
+
 
 ## Whether the state is currently active (internal flag, use active).
 var _state_active = false
@@ -201,6 +205,10 @@ func _process(delta:float):
 	# check if there is a pending transition
 	if _pending_transition != null:
 		_pending_transition_time -= delta
+		
+		# Notify interested parties that currently a transition is pending.
+		transition_pending.emit(_pending_transition.delay_seconds, max(0, _pending_transition_time))
+		
 		# if the transition is ready, trigger it
 		# and clear it.
 		if _pending_transition_time <= 0:

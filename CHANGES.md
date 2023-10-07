@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.7.0] - 2023-10-07
+### Added
+- States now have a new `transition_pending` signal which is emitted every frame while a delayed transition is pending. The signal includes the original delay of the transition and the remaining time until it will be triggered. This is useful for driving progress bars or cooldown indicators. A new demo was added to show how this works. It is located at `godot_state_charts_examples/cooldown` ([#46](https://github.com/derkork/godot-statecharts/issues/46)). 
+
+
+
 ## [0.6.0] - 2023-10-06
 ### Added
 - You can now move the sidebar for quickly adding new states to the other side of the editor. This is useful if you have your node tree on the right side of the editor. The location will be saved with the editor layout ([#47](https://github.com/derkork/godot-statecharts/issues/47)).
