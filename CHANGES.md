@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.0] - 2023-10-29
 ### Added
-- A new set of wrapper classes were added to make it easier to use state charts in C#. The new classes are located in `addons/godot-statecharts/cs`. A new demo was added to show how to use the new classes. It is located at `godot_state_charts_examples/csharp`. ([#50](https://github.com/derkork/godot-statecharts/issues/50)). Please note that the new API is currently experimental and might change in the future, depending on feedback from the community.
+- A new set of wrapper classes were added to make it easier to use state charts in C#. The new classes are located in `addons/godot-statecharts/csharp`. A new demo was added to show how to use the new classes. It is located at `godot_state_charts_examples/csharp`. ([#50](https://github.com/derkork/godot-statecharts/issues/50)). Please note that the new API is currently experimental and might change in the future, depending on feedback from the community.
 
 
 ## [0.7.1] - 2023-10-08
