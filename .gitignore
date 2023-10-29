@@ -17,3 +17,5 @@ mono_crash.*.json
 # Apple ignores
 .DS_Store
 
+# Rider ignores
+.idea/

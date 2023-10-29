@@ -1,0 +1,105 @@
+[gd_scene load_steps=9 format=3 uid="uid://dlxg641x8w8tn"]
+
+[ext_resource type="Script" path="res://godot_state_charts_examples/csharp/CSharpExample.cs" id="1_fkf0f"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_b878w"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="3_ck7cw"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="4_ovkn7"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="5_um7g8"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="6_ecpvf"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="7_yrwaw"]
+
+[sub_resource type="Resource" id="Resource_j6fet"]
+script = ExtResource("6_ecpvf")
+expression = "poison_count <= 0"
+
+[node name="csharp_example" type="Node2D"]
+script = ExtResource("1_fkf0f")
+
+[node name="InfoLabel" type="Label" parent="."]
+offset_left = 19.0
+offset_top = 33.0
+offset_right = 293.0
+offset_bottom = 111.0
+text = "This is a demo on how to use Godot State Charts with C#. 
+We have a turn-based game here. You can click \"Drink Poison\" to ingest  3 poison. \"Drink Cure\" will clear all poison. Wait will just wait a round. At the end of each round poison is subtracted from health or health regenerates if no poison is in the system. Print Debug prints out whether we are currently poisoned."
+autowrap_mode = 2
+
+[node name="FeelLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 23.0
+offset_top = 367.0
+offset_right = 63.0
+offset_bottom = 390.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_left = 90.0
+offset_top = 407.0
+offset_right = 540.0
+offset_bottom = 447.0
+
+[node name="DrinkPoisonButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Drink Poison"
+
+[node name="DrinkCureButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Drink Cure"
+
+[node name="WaitButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Wait"
+
+[node name="PrintDebugButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Print Debug"
+
+[node name="StateChart" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_b878w")
+
+[node name="Root" type="Node" parent="StateChart"]
+script = ExtResource("3_ck7cw")
+initial_state = NodePath("Normal")
+
+[node name="Normal" type="Node" parent="StateChart/Root"]
+script = ExtResource("4_ovkn7")
+
+[node name="To Poisoned" type="Node" parent="StateChart/Root/Normal"]
+script = ExtResource("5_um7g8")
+to = NodePath("../../Poisoned")
+event = &"poisoned"
+
+[node name="Poisoned" type="Node" parent="StateChart/Root"]
+unique_name_in_owner = true
+script = ExtResource("4_ovkn7")
+
+[node name="To Normal On Wear Off" type="Node" parent="StateChart/Root/Poisoned"]
+editor_description = "This transition checks at the beginning of the round i the poison count is 0 and if so transitions back to normal state."
+script = ExtResource("5_um7g8")
+to = NodePath("../../Normal")
+event = &"next_round"
+guard = SubResource("Resource_j6fet")
+
+[node name="To Normal On Cure" type="Node" parent="StateChart/Root/Poisoned"]
+editor_description = "This transition immediately goes back to normal state when the cure is taken."
+script = ExtResource("5_um7g8")
+to = NodePath("../../Normal")
+event = &"cured"
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("7_yrwaw")]
+offset_left = 309.0
+offset_top = 4.0
+offset_right = 636.0
+offset_bottom = 370.0
+initial_node_to_watch = NodePath("../StateChart")
+
+[connection signal="pressed" from="HBoxContainer/DrinkPoisonButton" to="." method="OnDrinkPoisonButtonPressed"]
+[connection signal="pressed" from="HBoxContainer/DrinkCureButton" to="." method="OnDrinkCureButtonPressed"]
+[connection signal="pressed" from="HBoxContainer/WaitButton" to="." method="OnWaitButtonPressed"]
+[connection signal="pressed" from="HBoxContainer/PrintDebugButton" to="." method="OnDebugButtonPressed"]
+[connection signal="state_stepped" from="StateChart/Root/Normal" to="." method="OnNormalStateStepped"]
+[connection signal="state_stepped" from="StateChart/Root/Poisoned" to="." method="OnPoisonedStateStepped"]

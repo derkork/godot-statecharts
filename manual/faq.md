@@ -10,17 +10,4 @@ I'm afraid not. While it technically would be totally possible to do so, I don't
 
 ## Can I use this library with C#?
 
-Yes, but you'll need to call the methods on the `StateChart` node through `Call`, as it is not a C# class. If you get an instance of the StateChart node, you can call the functions like this:
-
-```csharp
-var stateChart = GetNode<Node>("StateChart");
-
-// Send an event to the state chart
-stateChart.Call("send_event", "some_event");
-
-// Set an expression guard properties
-stateChart.Call("set_expression_property", "health", 27);
-stateChart.Call("set_expression_property", "shields", 48); 
-```
-
-The rest of the library works on Godot's signals, so you can nicely connect them to C# methods using the `Connect` method or the editor UI. Since there are no interfaces to implement or classes to derive from, you can use the library in a C# project without any problems.
+Yes, you can. The library is written in GDScript, but it provides a wrapper API for C# as well. Please check the [manual](manual.md) for more information.

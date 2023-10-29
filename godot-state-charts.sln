@@ -1,0 +1,19 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "godot-state-charts", "godot-state-charts.csproj", "{172834FB-8A76-4889-B193-32B98F5FDCE4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+	Debug|Any CPU = Debug|Any CPU
+	ExportDebug|Any CPU = ExportDebug|Any CPU
+	ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{172834FB-8A76-4889-B193-32B98F5FDCE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172834FB-8A76-4889-B193-32B98F5FDCE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172834FB-8A76-4889-B193-32B98F5FDCE4}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{172834FB-8A76-4889-B193-32B98F5FDCE4}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{172834FB-8A76-4889-B193-32B98F5FDCE4}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{172834FB-8A76-4889-B193-32B98F5FDCE4}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+EndGlobal

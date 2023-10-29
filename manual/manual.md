@@ -23,6 +23,17 @@ After you installed it, make sure you enable the plugin in the project settings:
 
 ![Enabling the plugin in the project settings](enable_plugin.png)
 
+
+### Installation with C#
+
+If you want to use this library with C#, make sure you are using the .NET version of Godot 4. This can be downloaded from the [Godot download page](https://godotengine.org/download). The standard version of Godot 4 does not support C#. If you got Godot from Steam, you have the standard version and need to download the .NET version separately from the Godot website. There are additional installation steps for the Godot .NET version, so make sure you follow the instructions on the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
+
+After you installed the plugin as described above, you may need to initialize your C# project if you haven't already done so. You can do this by going to the menu _Project_ -> _Tools_ -> _C#_ -> _Create C# solution_.
+
+![Create C# solution](create_csharp_solution.png)
+
+> ⚠️ **Note**: the C# API is currently experimental and may change in the future. Please give it a try and let me know if you encounter any issues.
+
 ## Usage
 
 The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with. 
@@ -52,6 +63,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 - `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
 - `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
 - `cooldown` - an example on how to drive UI elements with the `transition_pending` signal. See also the section on [delayed transitions](#delayed-transitions) for more information.
+- `csharp` - an example on how to use the API from C#. Note that you need to use the .NET version of Godot 4 for this example to work. See also the section on [installation with C#](#installation-with-c) for more information.
 
 ### The _State Chart_ node
 
@@ -72,6 +84,44 @@ States are the building blocks from which you build your state charts. A state c
 - `state_unhandled_input(input_event)` - called when unhandled input is received while the state is active. Again this is useful to limit input to certain states.
 - `transition_pending(initial_delay, remaining_delay)` - called every frame while a [delayed transition](#delayed-transitions) is pending for this state. The initial and remaining delay of the transition in seconds are passed as parameters. This can be used to drive progress bars or cooldown indicators or trigger additional effects at certain time indices during the transition. An example of this can be found in the `cooldown` demo. Note, that this is never called for transitions without a delay.
 
+#### Connecting to state signals from code
+
+Most of the time you will want to connect signals directly from the editor UI, as this is where you edit your state chart. However, if you wish, you can of course also connect to the signals from code by using the `connect` function like with any other Node in Godot. For example, to connect to the `state_entered` signal you can do the following:
+
+```gdscript
+
+func _ready():
+    var state: State = %ActiveState
+    state.state_entered.connect(_on_state_entered)
+
+func _on_state_entered():
+    # do something
+``` 
+
+If you want to connect to signals in C#, you will need to use the C# `State` wrapper class. It provides a set of `SignalName` constants which you can use if you want to connect to the signals from C# code without having to rely on hard-coded strings. This is similar to how all other nodes in Godot do this. For example you can connect to the `state_entered` signal like this:
+
+```csharp
+using Godot;
+using GodotStateCharts;
+
+public class MyNode : Node
+{
+
+    private void _Ready() {
+        // get the active state node
+        var state = State.Of(GetNode("%ActiveState"));
+        // connect to the state_entered signal
+        state.Connect(State.SignalName.StateEntered, Callable.From(OnStateEntered));
+    }
+
+    private void OnStateEntered()
+    {
+        // do something
+    }
+}
+```
+
+If you want to connect signals from the editor UI you can just do it like you would do it for any other node. There is no difference whether you use C# or GDScript.
 
 #### Atomic states
 
@@ -140,7 +190,50 @@ Similar to animation tree states, animation player states are usually independen
 
 ### Events and transitions
 
-<img src="../addons/godot_state_charts/transition.svg" width="32" height="32" align="left"> Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. These events then trigger one or more transitions.  You can send events to the state chart by calling the `send_event(event)` method. For example, if we have a compound state with two child states _Idle_ and _Walking_ and we have set up two transitions, one reacting to the event `move` and one reacting to the event `stop`. The _Idle_ state is the initial state.
+<img src="../addons/godot_state_charts/transition.svg" width="32" height="32" align="left"> Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. You can send events to the state chart by calling the `send_event(event)` method. To send an event you first need to get hold of the state chart node. A simple way to do this is to use the `get_node` function:
+
+```gdscript
+# my_node.gd
+
+# Get the state chart node.
+@onready var state_chart: StateChart = get_node("StateChart")
+
+func _when_something_happened():
+    # Call the send_event function to send an event to the state chart.
+    state_chart.send_event("some_event")
+```
+
+For C# you cannot easily call the state chart node directly because the underlying functionality is written in GDScript. Therefore this library provides a wrapper class `StateChart` which you can use to interact with the state chart node. You can get an instance of this class by calling the `StateChart.Of` function: 
+
+```csharp
+using Godot;
+using GodotStateCharts;
+
+public class MyNode : Node
+{
+    private StateChart stateChart;
+
+    public override void _Ready()
+    {
+        // first get the state chart node, same as it is done in GDScript
+        var stateChartNode = GetNode("StateChart");
+        // then use the StateChart.Of function to create a type-safe wrapper.
+        stateChart = StateChart.Of(stateChartNode);
+
+        // alternatively you can use the following one-liner:
+        // stateChart = StateChart.Of(GetNode("StateChart"));
+    }
+
+    private void WhenSomethingHappened()
+    {
+        // now you can use the wrapper to send events to the state chart, the calls 
+        // will be properly translated to the underlying GDScript functions.
+        stateChart.SendEvent("some_event");
+    }
+}
+```
+
+When you send an event, it can trigger one or more transitions. For example, if we have a compound state with two child states _Idle_ and _Walking_ and we have set up two transitions, one reacting to the event `move` and one reacting to the event `stop`. The _Idle_ state is the initial state.
 
 ![Transition in a compound state](compound_transition.gif)
 
@@ -184,9 +277,31 @@ func _ready():
     # Set an expression property called "player_health" with the value 100
     state_chart.set_expression_property("player_health", 100)
 ```
-These properties can then be used in your expressions. The following example shows how to use expression guards to check whether the player's health is below 50%:
+
+In C# this is done very similarly, again using the type-safe wrapper:
+
+
+```csharp
+using Godot;
+using GodotStateCharts;
+
+public class MyNode : Node
+{
+    private StateChart stateChart;
+
+    public override void _Ready()
+    {
+        stateChart = StateChart.Of(GetNode("StateChart"));
+        stateChart.SetExpressionProperty("player_health", 100);
+    }
+}
+```
+
+These expression properties can then be used in your expressions. The following example shows how to use expression guards to check whether the player's health is below 50%: 
 
 ![Example of an expression guard for transitioning into berserk mode when player's health sinks below 50%](expression_guard.png)
+
+> **Note:** all expressions for the expression guards are written in GDScript even if you use C# to interact with the StateChart.
 
 ### Debugging
 
@@ -209,6 +324,30 @@ func _on_unit_clicked(unit):
     debugger.debug_node(unit)
 ```
 
+In C# there is another wrapper class `StateChartDebugger` which you can use to interact with the debugger. You can get an instance of this class by calling the `StateChartDebugger.Of` function: 
+
+```csharp
+using Godot;    
+using GodotStateCharts;
+
+public class MyNode : Node
+{
+    private StateChartDebugger debugger;
+
+    public override void _Ready()
+    {
+        // get the debugger node and wrap it in a type-safe wrapper
+        debugger = StateChartDebugger.Of(GetNode("StateChartDebugger"));
+    }
+
+    private void OnUnitClicked(Node unit)
+    {
+        // change the node that is being watched by the debugger
+        debugger.DebugNode(unit);
+    }
+}
+```
+
 Another option is to directly use built-in signals and set the node to debug in the editor UI. This is how it was done in the example projects:
 
 ![Setting the node to debug with the editor UI.](debugger_with_signals.png)
@@ -228,6 +367,12 @@ You can add custom lines into the history by calling the `add_history_entry` fun
 debugger.add_history_entry("Player died")
 ```
 
+The C# wrapper also provides a `AddHistoryEntry` function which you can use to add custom entries to the history.
+
+```csharp
+debugger.AddHistoryEntry("Player died");
+```
+
 The debugger will only track state changes of the currently watched state chart. If you connect the debugger to a different state chart, it will start tracking the state changes of the new state chart.
 
 If you want to disable the history tracking, you can unset the _Auto Track State Changes_ checkbox in the editor UI.
@@ -241,6 +386,15 @@ Then you call the `step` function of the state chart whenever want to calculate 
 ```gdscript
 func _on_next_round_button_pressed():
     state_chart.step() # calculate the next round based on the current state
+```
+
+In C# you can use the `Step` function of the `StateChart` wrapper class:
+
+```csharp
+private void OnNextRoundButtonPressed()
+{
+    stateChart.Step();
+}
 ```
 
 This will emit the `state_stepped` signal for all states which are currently active. You can connect your code to this signal to execute it every time the state chart is stepped.
@@ -268,6 +422,19 @@ func _on_jump_enabled_state_physics_processing(_delta):
 	if Input.is_action_just_pressed("ui_accept"):
 		velocity.y = JUMP_VELOCITY
 		_state_chart.send_event("jump")
+```
+
+Or in C#:
+
+```csharp
+private void OnJumpEnabledStatePhysicsProcessing(float delta)
+{
+    if (Input.IsActionJustPressed("ui_accept"))
+    {
+        velocity.y = JUMP_VELOCITY;
+        stateChart.SendEvent("jump");
+    }
+}
 ```
 
 ### Remember that events bubble up in the chart tree
