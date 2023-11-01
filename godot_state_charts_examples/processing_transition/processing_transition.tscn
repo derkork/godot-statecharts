@@ -1,0 +1,150 @@
+[gd_scene load_steps=14 format=3 uid="uid://dt5obygoxyycf"]
+
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="1_aj6em"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/processing_transition/processing_transition.gd" id="1_yjg5t"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_eeyrv"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="3_xo1cc"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="4_2ram8"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_67nbb"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_ya03x"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_is_active_guard.gd" id="7_m3r0w"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="7_xdaif"]
+
+[sub_resource type="Resource" id="Resource_lqvja"]
+script = ExtResource("7_xdaif")
+expression = "b_property > 5"
+
+[sub_resource type="Resource" id="Resource_m5iyf"]
+script = ExtResource("7_m3r0w")
+state = NodePath("../../../MetaState/A")
+
+[sub_resource type="Resource" id="Resource_1qaf8"]
+script = ExtResource("7_m3r0w")
+state = NodePath("../../../MetaState/B")
+
+[sub_resource type="Resource" id="Resource_cikco"]
+script = ExtResource("7_m3r0w")
+state = NodePath("../../../MetaState/C")
+
+[node name="processing_transition" type="Node2D"]
+script = ExtResource("1_yjg5t")
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("2_eeyrv")
+
+[node name="ParallelState" type="Node" parent="StateChart"]
+script = ExtResource("3_xo1cc")
+
+[node name="ScriptControlledStates" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("4_2ram8")
+initial_state = NodePath("A")
+
+[node name="A" type="Node" parent="StateChart/ParallelState/ScriptControlledStates"]
+script = ExtResource("5_67nbb")
+
+[node name="B pressed" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/A"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../B")
+event = &"b_button_pressed"
+
+[node name="B" type="Node" parent="StateChart/ParallelState/ScriptControlledStates"]
+script = ExtResource("5_67nbb")
+
+[node name="b_property bigger than 5" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/B"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../C")
+guard = SubResource("Resource_lqvja")
+processing_enabled = true
+
+[node name="C pressed" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/B"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../C")
+event = &"c_button_pressed"
+
+[node name="C" type="Node" parent="StateChart/ParallelState/ScriptControlledStates"]
+script = ExtResource("5_67nbb")
+
+[node name="A pressed" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/C"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../A")
+event = &"a_button_pressed"
+
+[node name="StateChartControlledStates" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("4_2ram8")
+initial_state = NodePath("Waiting for B state")
+
+[node name="Waiting for A state" type="Node" parent="StateChart/ParallelState/StateChartControlledStates"]
+script = ExtResource("5_67nbb")
+
+[node name="is A active" type="Node" parent="StateChart/ParallelState/StateChartControlledStates/Waiting for A state"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../Waiting for B state")
+guard = SubResource("Resource_m5iyf")
+processing_enabled = true
+
+[node name="Waiting for B state" type="Node" parent="StateChart/ParallelState/StateChartControlledStates"]
+script = ExtResource("5_67nbb")
+
+[node name="is B active" type="Node" parent="StateChart/ParallelState/StateChartControlledStates/Waiting for B state"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../Waiting for C state")
+guard = SubResource("Resource_1qaf8")
+processing_enabled = true
+
+[node name="Waiting for C state" type="Node" parent="StateChart/ParallelState/StateChartControlledStates"]
+script = ExtResource("5_67nbb")
+
+[node name="is C active" type="Node" parent="StateChart/ParallelState/StateChartControlledStates/Waiting for C state"]
+script = ExtResource("6_ya03x")
+to = NodePath("../../Waiting for A state")
+guard = SubResource("Resource_cikco")
+processing_enabled = true
+
+[node name="HBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 13.0
+offset_top = 9.0
+offset_right = 211.0
+offset_bottom = 474.0
+
+[node name="Press A" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Press A"
+
+[node name="Press B" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Press B"
+
+[node name="Press C" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Press C"
+
+[node name="Control" type="Control" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "This demo shows how  guards with transitions that are continiously processed are working together. The flow in this demo is A -> B -> C in  ScriptControlledStates. The StateChart-ControlledStates are affected by changing ScriptControlledStates."
+autowrap_mode = 3
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("1_aj6em")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 220.0
+offset_right = 637.0
+offset_bottom = 476.0
+grow_horizontal = 1
+grow_vertical = 1
+size_flags_horizontal = 4
+size_flags_vertical = 4
+initial_node_to_watch = NodePath("../StateChart")
+
+[connection signal="state_entered" from="StateChart/ParallelState/ScriptControlledStates/B" to="." method="_on_b_state_entered"]
+[connection signal="state_exited" from="StateChart/ParallelState/ScriptControlledStates/B" to="." method="_on_b_state_exited"]
+[connection signal="pressed" from="HBoxContainer/Press A" to="StateChart" method="send_event" binds= ["a_button_pressed"]]
+[connection signal="pressed" from="HBoxContainer/Press B" to="StateChart" method="send_event" binds= ["b_button_pressed"]]
+[connection signal="pressed" from="HBoxContainer/Press C" to="StateChart" method="send_event" binds= ["c_button_pressed"]]

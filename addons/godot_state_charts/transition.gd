@@ -31,6 +31,12 @@ extends Node
 		delay_seconds = value
 		update_configuration_warnings()
 
+@export var processing_enabled:bool = false:
+	set(value):
+		processing_enabled = value
+		update_configuration_warnings()
+	get:
+		return processing_enabled
 
 ## Read-only property that returns true if the transition has an event specified.
 var has_event:bool:
