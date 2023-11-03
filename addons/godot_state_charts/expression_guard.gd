@@ -16,6 +16,10 @@ func is_satisfied(context_transition:Transition, context_state:State) -> bool:
 	if not is_instance_valid(root):
 		push_error("Could not find root state chart node, cannot evaluate expression")
 		return false
+	
+	# if we have no expression properties in the root state chart and a not empty expression we can say the transition is not satisfied
+	if root._expression_properties.size() <= 0 and not expression.strip_edges(true,true).is_empty():
+		return false
 
 	var the_expression := Expression.new()
 	var input_names = root._expression_properties.keys()
