@@ -303,6 +303,11 @@ These expression properties can then be used in your expressions. The following 
 
 > **Note:** all expressions for the expression guards are written in GDScript even if you use C# to interact with the StateChart.
 
+#### Monitored  transitions
+A monitored transition will be evaluated every frame to allow the check of it's guards at any time.
+![Create C# solution](monitored_transition.png)
+
+
 ### Debugging
 
 <img src="../addons/godot_state_charts/utilities/state_chart_debugger.svg" width="32" height="32" align="left"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add it to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":

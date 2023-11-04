@@ -12,19 +12,19 @@
 
 [sub_resource type="Resource" id="Resource_lqvja"]
 script = ExtResource("7_xdaif")
-expression = "b_property > 5"
+expression = "b_property > 3"
 
-[sub_resource type="Resource" id="Resource_m5iyf"]
+[sub_resource type="Resource" id="Resource_wusav"]
 script = ExtResource("7_m3r0w")
-state = NodePath("../../../MetaState/A")
+state = NodePath("../../../ScriptControlledStates/A")
 
 [sub_resource type="Resource" id="Resource_1qaf8"]
 script = ExtResource("7_m3r0w")
-state = NodePath("../../../MetaState/B")
+state = NodePath("../../../ScriptControlledStates/B")
 
 [sub_resource type="Resource" id="Resource_cikco"]
 script = ExtResource("7_m3r0w")
-state = NodePath("../../../MetaState/C")
+state = NodePath("../../../ScriptControlledStates/C")
 
 [node name="processing_transition" type="Node2D"]
 script = ExtResource("1_yjg5t")
@@ -50,11 +50,11 @@ event = &"b_button_pressed"
 [node name="B" type="Node" parent="StateChart/ParallelState/ScriptControlledStates"]
 script = ExtResource("5_67nbb")
 
-[node name="b_property bigger than 5" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/B"]
+[node name="b_property bigger than 3" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/B"]
 script = ExtResource("6_ya03x")
 to = NodePath("../../C")
 guard = SubResource("Resource_lqvja")
-processing_enabled = true
+monitored = true
 
 [node name="C pressed" type="Node" parent="StateChart/ParallelState/ScriptControlledStates/B"]
 script = ExtResource("6_ya03x")
@@ -79,8 +79,8 @@ script = ExtResource("5_67nbb")
 [node name="is A active" type="Node" parent="StateChart/ParallelState/StateChartControlledStates/Waiting for A state"]
 script = ExtResource("6_ya03x")
 to = NodePath("../../Waiting for B state")
-guard = SubResource("Resource_m5iyf")
-processing_enabled = true
+guard = SubResource("Resource_wusav")
+monitored = true
 
 [node name="Waiting for B state" type="Node" parent="StateChart/ParallelState/StateChartControlledStates"]
 script = ExtResource("5_67nbb")
@@ -89,7 +89,7 @@ script = ExtResource("5_67nbb")
 script = ExtResource("6_ya03x")
 to = NodePath("../../Waiting for C state")
 guard = SubResource("Resource_1qaf8")
-processing_enabled = true
+monitored = true
 
 [node name="Waiting for C state" type="Node" parent="StateChart/ParallelState/StateChartControlledStates"]
 script = ExtResource("5_67nbb")
@@ -98,7 +98,7 @@ script = ExtResource("5_67nbb")
 script = ExtResource("6_ya03x")
 to = NodePath("../../Waiting for A state")
 guard = SubResource("Resource_cikco")
-processing_enabled = true
+monitored = true
 
 [node name="HBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 13.0

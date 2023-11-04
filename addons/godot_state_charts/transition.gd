@@ -31,12 +31,13 @@ extends Node
 		delay_seconds = value
 		update_configuration_warnings()
 
-@export var processing_enabled:bool = false:
+## Check if the transition should evaluated every frame
+@export var monitored:bool = false:
 	set(value):
-		processing_enabled = value
+		monitored = value
 		update_configuration_warnings()
 	get:
-		return processing_enabled
+		return monitored
 
 ## Read-only property that returns true if the transition has an event specified.
 var has_event:bool:

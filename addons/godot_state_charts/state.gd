@@ -218,9 +218,9 @@ func _process(delta:float):
 			# print("requesting transition from " + name + " to " + transition_to_send.to.get_concatenated_names() + " now")
 			_chart._run_transition(transition_to_send, self)
 			
-	# check processing transitions
+	# evaluate monitored transitions
 	for transition in _transitions:
-		if transition.processing_enabled and transition.evaluate_guard():
+		if transition.monitored and transition.evaluate_guard():
 			# first match wins
 			_run_transition(transition)
 
@@ -291,7 +291,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _toggle_processing(active:bool):
-	set_process(active and (_has_connections(state_processing) or _has_processing_transition()))
+	set_process(active and (_has_connections(state_processing) or _has_monitored_transition()))
 	set_physics_process(active and _has_connections(state_physics_processing))
 	set_process_input(active and _has_connections(state_input))
 	set_process_unhandled_input(active and _has_connections(state_unhandled_input))
@@ -300,8 +300,9 @@ func _toggle_processing(active:bool):
 func _has_connections(sgnl:Signal) -> bool:
 	return sgnl.get_connections().size() > 0
 
-func _has_processing_transition():
+## Checks if at least one transsition is monitored
+func _has_monitored_transition():
 	for transition in _transitions:
-		if transition.processing_enabled:
+		if transition.monitored:
 			return true
 	return false
