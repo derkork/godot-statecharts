@@ -1,7 +1,5 @@
 # Godot State Charts
 
-_This library is still quite new and has not seen much use yet. While it works reasonably well, there may still be bugs and missing features. Please report any issues you find._
-
 <!--suppress HtmlDeprecatedAttribute -->
 <p align="center"><img height="128" src="icon.svg" width="128"/></p>
 
