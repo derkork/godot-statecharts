@@ -104,6 +104,8 @@ func _state_enter(expect_transition:bool = false):
 		if not transition.has_event and transition.evaluate_guard():
 			# first match wins
 			_run_transition(transition)
+			
+	StateChartDebuggerMessage.state_updated(self)
 
 ## Called when the state is exited.
 func _state_exit():
@@ -118,6 +120,8 @@ func _state_exit():
 	
 	# emit the signal
 	state_exited.emit()
+	
+	StateChartDebuggerMessage.state_updated(self)
 
 ## Called when the state should be saved. The parameter is is the SavedState object
 ## of the parent state. The state is expected to add a child to the SavedState object
@@ -199,6 +203,8 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 func _process(delta:float):
 	if Engine.is_editor_hint():
 		return
+		
+	StateChartDebuggerMessage.state_updated(self)
 		
 	# emit the processing signal
 	state_processing.emit(delta)
