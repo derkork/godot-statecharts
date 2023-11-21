@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://donfbhh5giyfy"]
+
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/editor_debugger/editor_debugger.gd" id="1_ia1de"]
+
+[node name="State Charts" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ia1de")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 300
+
+[node name="AllStateChartsTree" type="Tree" parent="HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CurrentStateChartTree" type="Tree" parent="HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="item_selected" from="HSplitContainer/AllStateChartsTree" to="." method="_on_all_state_charts_tree_item_selected"]

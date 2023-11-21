@@ -156,3 +156,11 @@ func _get_configuration_warnings() -> PackedStringArray:
 		if not child is State:
 			warnings.append("StateChart's child must be a State")
 	return warnings
+
+
+func _notification(what):
+	if what == NOTIFICATION_POST_ENTER_TREE:
+		StateChartDebuggerMessage.state_chart_added(self)
+		
+	if what == NOTIFICATION_EXIT_TREE:
+		StateChartDebuggerMessage.state_chart_removed(self)

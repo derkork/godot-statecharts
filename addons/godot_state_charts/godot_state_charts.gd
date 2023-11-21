@@ -9,6 +9,7 @@ var _ui_sidebar_spatial:Control
 ## Scene holding the sidebar
 var _sidebar_ui:PackedScene = preload("utilities/editor_sidebar.tscn")
 
+var _debugger_plugin:EditorDebuggerPlugin
 
 enum SidebarLocation {
 	LEFT = 1,
@@ -27,11 +28,17 @@ func _enter_tree():
 	_ui_sidebar_spatial = _sidebar_ui.instantiate()
 	_ui_sidebar_spatial.sidebar_toggle_requested.connect(_toggle_sidebar)
 	_ui_sidebar_spatial.hide()
+	
+	
 	# and add it to the right place in the editor ui
 	_add_sidebars()
 	# get notified when selection changes so we can 
 	# update the sidebar contents accordingly
 	get_editor_interface().get_selection().selection_changed.connect(_on_selection_changed)
+
+	# Add the debugger plugin
+	_debugger_plugin = preload("utilities/editor_debugger/debugger_plugin.gd").new()
+	add_debugger_plugin(_debugger_plugin)
 
 
 func _set_window_layout(configuration):
@@ -77,6 +84,9 @@ func _ready():
 
 
 func _exit_tree():
+	# remove the debugger plugin
+	remove_debugger_plugin(_debugger_plugin)
+	
 	# remove the side bars
 	_remove_sidebars()
 	if is_instance_valid(_ui_sidebar_canvas):
