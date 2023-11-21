@@ -2,17 +2,17 @@
 @icon("parallel_state.svg")
 ## A parallel state is a state which can have sub-states, all of which are active
 ## when the parallel state is active.
-class_name ParallelState
-extends State
+class_name GDSParallelState
+extends GDSState
 
 # all children of the state
-var _sub_states:Array[State] = []
+var _sub_states:Array[GDSState] = []
 
 func _state_init():
 	super._state_init()
 	# find all children of this state which are states
 	for child in get_children():
-		if child is State:
+		if child is GDSState:
 			_sub_states.append(child)
 			child._state_init()
 
@@ -20,10 +20,10 @@ func _state_init():
 	# subscribe to events from our children
 
 
-func _handle_transition(transition:Transition, source:State):
+func _handle_transition(transition:GDSTransition, source:GDSState):
 	# resolve the target state
 	var target = transition.resolve_target()
-	if not target is State:
+	if not target is GDSState:
 		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
 		return
 	

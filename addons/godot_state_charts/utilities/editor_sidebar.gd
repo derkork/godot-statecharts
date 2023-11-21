@@ -30,13 +30,13 @@ func _repaint():
 	# we can add states to all composite states and to the 
 	# root if the root has no child state yet.
 	var can_add_states = \
-		( _selected_node is StateChart and _selected_node.get_child_count() == 0 ) \
-		or _selected_node is ParallelState \
-		or _selected_node is CompoundState
+		( _selected_node is GDSStateChart and _selected_node.get_child_count() == 0 ) \
+		or _selected_node is GDSParallelState \
+		or _selected_node is GDSCompoundState
 		
 	# we can add transitions to all states
 	var can_add_transitions = \
-		_selected_node is State
+		_selected_node is GDSState
 		
 	_add_section.visible = can_add_states or can_add_transitions
 	_no_options_label.visible = not (can_add_states or can_add_transitions)
@@ -76,31 +76,31 @@ func _create_node(type, name:StringName):
 
 
 func _on_atomic_state_pressed():
-	_create_node(AtomicState, "AtomicState")
+	_create_node(GDSAtomicState, "AtomicState")
 
 
 func _on_compound_state_pressed():
-	_create_node(CompoundState, "CompoundState")
+	_create_node(GDSCompoundState, "CompoundState")
 
 
 func _on_parallel_state_pressed():
-	_create_node(ParallelState, "ParallelState")
+	_create_node(GDSParallelState, "ParallelState")
 
 
 func _on_history_state_pressed():
-	_create_node(HistoryState, "HistoryState")
+	_create_node(GDSHistoryState, "HistoryState")
 
 
 func _on_transition_pressed():
-	_create_node(Transition, "Transition")
+	_create_node(GDSTransition, "Transition")
 
 
 func _on_animation_tree_state_pressed():
-	_create_node(AnimationTreeState, "AnimationTreeState")
+	_create_node(GDSAnimationTreeState, "AnimationTreeState")
 
 
 func _on_animation_player_state_pressed():
-	_create_node(AnimationPlayerState, "AnimationPlayerState")
+	_create_node(GDSAnimationPlayerState, "AnimationPlayerState")
 
 
 func _on_toggle_sidebar_button_pressed():

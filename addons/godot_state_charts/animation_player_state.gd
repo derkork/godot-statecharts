@@ -1,7 +1,7 @@
 @tool
 @icon("animation_player_state.svg")
-class_name AnimationPlayerState
-extends AtomicState
+class_name GDSAnimationPlayerState
+extends GDSAtomicState
 
 ## Animation player that this state will use.
 @export_node_path("AnimationPlayer") var animation_player: NodePath:

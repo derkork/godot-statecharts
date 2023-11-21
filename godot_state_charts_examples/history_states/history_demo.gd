@@ -1,6 +1,6 @@
 extends Node
 
-@onready var state_chart:StateChart = $StateChart
+@onready var state_chart:GDSStateChart = $GDSStateChart
 
 func _on_area_2d_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):
 	if event is InputEventMouseButton:

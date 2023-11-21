@@ -45,11 +45,11 @@ var _buffer = null
 var _dirty = false
 
 # the state chart we track
-var _state_chart:StateChart
+var _state_chart:GDSStateChart
 var _root:Node
 
 # the states we are currently connected to
-var _connected_states:Array[State] = []
+var _connected_states:Array[GDSState] = []
 
 func _ready():
 	# always run, even if the game is paused
@@ -112,7 +112,7 @@ func _debug_node(root:Node) -> bool:
 	if not is_instance_valid(root):
 		return false
 
-	if root is StateChart:
+	if root is GDSStateChart:
 		_state_chart = root
 		return true
 
@@ -157,18 +157,18 @@ func _connect_all_signals():
 
 	# find all state nodes below the state chart and connect their signals
 	for child in _state_chart.get_children():
-		if child is State:
+		if child is GDSState:
 			_connect_signals(child)
 
 
-func _connect_signals(state:State):
+func _connect_signals(state:GDSState):
 	state.state_entered.connect(_on_state_entered.bind(state))
 	state.state_exited.connect(_on_state_exited.bind(state))
 	_connected_states.append(state)
 
 	# recurse into children
 	for child in state.get_children():
-		if child is State:
+		if child is GDSState:
 			_connect_signals(child)
 
 
@@ -206,7 +206,7 @@ func _process(delta):
 
 func _collect_active_states(root:Node, parent:TreeItem):
 	for child in root.get_children():
-		if child is State:
+		if child is GDSState:
 			if child.active:
 				var state_item = _tree.create_item(parent)
 				state_item.set_text(0, child.name)
@@ -223,7 +223,7 @@ func _clear_history():
 	_buffer.clear()
 	_dirty = false
 
-func _on_before_transition(transition:Transition, source:State):
+func _on_before_transition(transition:GDSTransition, source:GDSState):
 	if ignore_transitions:
 		return
 	
@@ -237,14 +237,14 @@ func _on_event_received(event:StringName):
 	add_history_entry("Event received: %s" % event)
 
 	
-func _on_state_entered(state:State):
+func _on_state_entered(state:GDSState):
 	if ignore_state_changes:
 		return
 		
 	add_history_entry("Enter: %s" % state.name)
 
 
-func _on_state_exited(state:State):
+func _on_state_exited(state:GDSState):
 	if ignore_state_changes:
 		return
 		

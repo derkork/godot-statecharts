@@ -1,6 +1,6 @@
 @tool
 ## This class represents a state that can be either active or inactive.
-class_name State
+class_name GDSState
 extends Node
 
 ## Called when the state is entered.
@@ -41,13 +41,13 @@ var active:bool:
 	
 
 ## The currently active pending transition.
-var _pending_transition:Transition = null
+var _pending_transition:GDSTransition = null
 
 ## Remaining time in seconds until the pending transition is triggered.
 var _pending_transition_time:float = 0
 
 ## The transitions of this state.
-var _transitions:Array[Transition] = []
+var _transitions:Array[GDSTransition] = []
 
 
 ## The state chart that owns this state.
@@ -55,14 +55,14 @@ var _transitions:Array[Transition] = []
 
 ## Finds the owning state chart by moving upwards.
 func _find_chart(parent:Node):
-	if parent is StateChart:
+	if parent is GDSStateChart:
 		return parent
 	
 	return _find_chart(parent.get_parent())	
 
 ## Runs a transition either immediately or delayed depending on the 
 ## transition settings.
-func _run_transition(transition:Transition):
+func _run_transition(transition:GDSTransition):
 	if transition.delay_seconds > 0:
 		_queue_transition(transition)
 	else:
@@ -80,7 +80,7 @@ func _state_init():
 	# load transitions
 	_transitions.clear()
 	for child in get_children():
-		if child is Transition:
+		if child is GDSTransition:
 			_transitions.append(child)
 	
 ## Called when the state is entered. The parameter indicates whether the state
@@ -119,8 +119,8 @@ func _state_exit():
 	# emit the signal
 	state_exited.emit()
 
-## Called when the state should be saved. The parameter is is the SavedState object
-## of the parent state. The state is expected to add a child to the SavedState object
+## Called when the state should be saved. The parameter is is the GDSSavedState object
+## of the parent state. The state is expected to add a child to the GDSSavedState object
 ## under its own name. 
 ## 
 ## The child_levels parameter indicates how many levels of children should be saved.
@@ -128,13 +128,13 @@ func _state_exit():
 ##
 ## This method will only be called if the state is active and should only be called on
 ## active children if children should be saved.
-func _state_save(saved_state:SavedState, child_levels:int = -1):
+func _state_save(saved_state:GDSSavedState, child_levels:int = -1):
 	if not active:
 		push_error("_state_save should only be called if the state is active.")
 		return
 	
-	# create a new SavedState object for this state
-	var our_saved_state := SavedState.new()
+	# create a new GDSSavedState object for this state
+	var our_saved_state := GDSSavedState.new()
 	our_saved_state.pending_transition_name = _pending_transition.name if _pending_transition != null else ""
 	our_saved_state.pending_transition_time = _pending_transition_time
 	# add it to the parent
@@ -148,20 +148,20 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 
 	# save all children
 	for child in get_children():
-		if child is State and child.active:
+		if child is GDSState and child.active:
 			child._state_save(our_saved_state, sub_child_levels)
 
 
-## Called when the state should be restored. The parameter is the SavedState object
-## of the parent state. The state is expected to retrieve the SavedState object
+## Called when the state should be restored. The parameter is the GDSSavedState object
+## of the parent state. The state is expected to retrieve the GDSSavedState object
 ## for itself from the parent and restore its state from it. 
 ##
 ## The child_levels parameter indicates how many levels of children should be restored.
 ## If set to -1 (default), all children should be restored. If set to 0, no children should be restored.
 ##
 ## If the state was not active when it was saved, this method still will be called
-## but the given SavedState object will not contain any data for this state.
-func _state_restore(saved_state:SavedState, child_levels:int = -1):
+## but the given GDSSavedState object will not contain any data for this state.
+func _state_restore(saved_state:GDSSavedState, child_levels:int = -1):
 	# print("restoring state " + name)
 	var our_saved_state = saved_state.get_substate_or_null(self)
 	if our_saved_state == null:
@@ -175,7 +175,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 	if not active:
 		_state_enter()
 	# and restore any pending transition
-	_pending_transition = get_node_or_null(our_saved_state.pending_transition_name) as Transition
+	_pending_transition = get_node_or_null(our_saved_state.pending_transition_name) as GDSTransition
 	_pending_transition_time = our_saved_state.pending_transition_time
 	
 	# if _pending_transition != null:
@@ -191,7 +191,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 
 	# restore all children
 	for child in get_children():
-		if child is State:
+		if child is GDSState:
 			child._state_restore(our_saved_state, sub_child_levels)
 
 
@@ -220,8 +220,8 @@ func _process(delta:float):
 
 
 
-func _handle_transition(transition:Transition, source:State):
-	push_error("State " + name + " cannot handle transitions.")
+func _handle_transition(transition:GDSTransition, source:GDSState):
+	push_error("GDSState " + name + " cannot handle transitions.")
 	
 
 func _physics_process(delta:float):
@@ -259,7 +259,7 @@ func _state_event(event:StringName) -> bool:
 
 ## Queues the transition to be triggered after the delay.
 ## Executes the transition immediately if the delay is 0.
-func _queue_transition(transition:Transition):
+func _queue_transition(transition:GDSTransition):
 	# print("transitioning from " + name + " to " + transition.to.get_concatenated_names() + " in " + str(transition.delay_seconds) + " seconds" )
 	# queue the transition for the delay time (0 means next frame)
 	_pending_transition = transition
@@ -271,17 +271,17 @@ func _queue_transition(transition:Transition):
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var result = []
-	# if not at least one of our ancestors is a StateChart add a warning
+	# if not at least one of our ancestors is a GDSStateChart add a warning
 	var parent = get_parent()
 	var found = false
 	while is_instance_valid(parent):
-		if parent is StateChart:
+		if parent is GDSStateChart:
 			found = true
 			break
 		parent = parent.get_parent()
 	
 	if not found:
-		result.append("State is not a child of a StateChart. This will not work.")
+		result.append("GDSState is not a child of a GDSStateChart. This will not work.")
 
 	return result		
 

@@ -2,8 +2,8 @@
 @icon("compound_state.svg")
 ## A compound state is a state that has multiple sub-states of which exactly one can
 ## be active at any given time.
-class_name CompoundState
-extends State
+class_name GDSCompoundState
+extends GDSState
 
 ## Called when a child state is entered.
 signal child_state_entered()
@@ -12,7 +12,7 @@ signal child_state_entered()
 signal child_state_exited()
 
 ## The initial state which should be activated when this state is activated.
-@export_node_path("State") var initial_state:NodePath:
+@export_node_path("GDSState") var initial_state:NodePath:
 	get:
 		return initial_state
 	set(value):
@@ -21,13 +21,13 @@ signal child_state_exited()
 
 
 ## The currently active substate.
-var _active_state:State = null
+var _active_state:GDSState = null
 
 ## The initial state
-@onready var _initial_state:State = get_node_or_null(initial_state)
+@onready var _initial_state:GDSState = get_node_or_null(initial_state)
 
 ## The history states of this compound state.
-var _history_states:Array[HistoryState] = []
+var _history_states:Array[GDSHistoryState] = []
 ## Whether any of the history states needs a deep history.
 var _needs_deep_history = false
 
@@ -36,16 +36,16 @@ func _state_init():
 
 	# check if we have any history states
 	for child in get_children():
-		if child is HistoryState:
-			var child_as_history_state:HistoryState = child as HistoryState
+		if child is GDSHistoryState:
+			var child_as_history_state:GDSHistoryState = child as GDSHistoryState
 			_history_states.append(child_as_history_state)
 			# remember if any of the history states needs a deep history
 			_needs_deep_history = _needs_deep_history or child_as_history_state.deep
 
-	# initialize all substates. find all children of type State and call _state_init on them.
+	# initialize all substates. find all children of type GDSState and call _state_init on them.
 	for child in get_children():
-		if child is State:
-			var child_as_state:State = child as State
+		if child is GDSState:
+			var child_as_state:GDSState = child as GDSState
 			child_as_state._state_init()
 			child_as_state.state_entered.connect(func(): child_state_entered.emit())
 			child_as_state.state_exited.connect(func(): child_state_exited.emit())
@@ -65,7 +65,7 @@ func _state_step():
 	if _active_state != null:
 		_active_state._state_step()
 
-func _state_save(saved_state:SavedState, child_levels:int = -1):
+func _state_save(saved_state:GDSSavedState, child_levels:int = -1):
 	super._state_save(saved_state, child_levels)
 
 	# in addition save all history states, as they are never active and normally would not be saved
@@ -77,21 +77,21 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 	for history_state in _history_states:
 		history_state._state_save(parent, child_levels)
 
-func _state_restore(saved_state:SavedState, child_levels:int = -1):
+func _state_restore(saved_state:GDSSavedState, child_levels:int = -1):
 	super._state_restore(saved_state, child_levels)
 
 	# in addition check if we are now active and if so determine the current active state
 	if active:
 		# find the currently active child
 		for child in get_children():
-			if child is State and child.active:
+			if child is GDSState and child.active:
 				_active_state = child
 				break
 
 func _state_exit():
 	# if we have any history states, we need to save the current active state
 	if _history_states.size() > 0:
-		var saved_state = SavedState.new()
+		var saved_state = GDSSavedState.new()
 		# we save the entire hierarchy if any of the history states needs a deep history
 		# otherwise we only save this level. This way we can save memory and processing time
 		_state_save(saved_state, -1 if _needs_deep_history else 1)
@@ -127,11 +127,11 @@ func _state_event(event:StringName) -> bool:
 	return super._state_event(event)
 
 
-func _handle_transition(transition:Transition, source:State):
-	# print("CompoundState._handle_transition: " + name + " from " + source.name + " to " + str(transition.to))
+func _handle_transition(transition:GDSTransition, source:GDSState):
+	# print("GDSCompoundState._handle_transition: " + name + " from " + source.name + " to " + str(transition.to))
 	# resolve the target state
 	var target = transition.resolve_target()
-	if not target is State:
+	if not target is GDSState:
 		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
 		return
 	
@@ -159,7 +159,7 @@ func _handle_transition(transition:Transition, source:State):
 		
 		# now check if the target is a history state, if this is the 
 		# case, we need to restore the saved state
-		if target is HistoryState:
+		if target is GDSHistoryState:
 			# print("Target is history state, restoring saved state.")
 			var saved_state = target.history
 			if saved_state != null:

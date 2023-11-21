@@ -1,7 +1,7 @@
 @tool
 @icon("history_state.svg")
-class_name HistoryState
-extends State
+class_name GDSHistoryState
+extends GDSState
 
 ## Whether this state is a deep history state. A deep history state
 ## will remember all nested states, while a shallow history state will
@@ -9,24 +9,24 @@ extends State
 @export var deep:bool = false
 
 ## The default state to transition to if no history is available.
-@export_node_path("State") var default_state:NodePath:
+@export_node_path("GDSState") var default_state:NodePath:
 	set(value):
 		default_state = value
 		update_configuration_warnings()
 
 
 ## The stored history, if any.
-var history:SavedState = null
+var history:GDSSavedState = null
 
 
-func _state_save(saved_state:SavedState, child_levels:int = -1) -> void:
+func _state_save(saved_state:GDSSavedState, child_levels:int = -1) -> void:
 	# History states are pseudo states, so they only save remembered history if any
-	var our_state = SavedState.new()
+	var our_state = GDSSavedState.new()
 	our_state.history = history
 	saved_state.add_substate(self, our_state)
 
 
-func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
+func _state_restore(saved_state:GDSSavedState, child_levels:int = -1) -> void:
 	# History states are pseudo states, so they only restore remembered history if any
 	var our_state = saved_state.get_substate_or_null(self)
 	if our_state != null:
@@ -38,12 +38,12 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	# a history state must be a child of a compound state otherwise it is useless
 	var parent_state = get_parent()
-	if not parent_state is CompoundState:
+	if not parent_state is GDSCompoundState:
 		warnings.append("A history state must be a child of a compound state.")
 
 	# the default state must be a state
 	var default_state_node = get_node_or_null(default_state)
-	if not default_state_node is State:
+	if not default_state_node is GDSState:
 		warnings.append("The default state is not set or is not a state.")
 	else:
 		# the default state must be a child of the parent state

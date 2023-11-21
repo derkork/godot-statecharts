@@ -3,7 +3,7 @@ extends StaticBody2D
 signal clicked(node)
 
 @export var health:int = 3
-@onready var _state_chart:StateChart = $StateChart
+@onready var _state_chart:GDSStateChart = $GDSStateChart
 @onready var _label:Label = $Label
 
 func _ready():

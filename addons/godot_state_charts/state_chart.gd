@@ -2,7 +2,7 @@
 @tool
 ## This is statechart. It contains a root state (commonly a compound or parallel state) and is the entry point for 
 ## the state machine.
-class_name StateChart 
+class_name GDSStateChart 
 extends Node
 
 ## Emitted when a transition is about to happen. Note that this
@@ -10,7 +10,7 @@ extends Node
 ## not recommended to use this in your game code, which should 
 ## be unaware of transitions (see also the tips and tricks in the
 ## manual).
-signal _before_transition(transition:Transition, source:State)
+signal _before_transition(transition:GDSTransition, source:GDSState)
 
 ## Emitted when the state chart receives an event. This will be 
 ## emitted no matter which state is currently active and can be 
@@ -25,7 +25,7 @@ signal _before_transition(transition:Transition, source:State)
 signal event_received(event:StringName)
 
 ## The root state of the state chart.
-var _state:State = null
+var _state:GDSState = null
 
 ## This dictonary contains known properties used in expression guards. Use the 
 ## [method set_expression_property] to add properties to this dictionary.
@@ -52,17 +52,17 @@ func _ready() -> void:
 
 	# check if we have exactly one child that is a state
 	if get_child_count() != 1:
-		push_error("StateChart must have exactly one child")
+		push_error("GDSStateChart must have exactly one child")
 		return
 
 	# check if the child is a state
 	var child = get_child(0)
-	if not child is State:
-		push_error("StateMachine's child must be a State")
+	if not child is GDSState:
+		push_error("GDSStateChart's child must be a GDSState")
 		return
 
 	# initialize the state machine
-	_state = child as State
+	_state = child as GDSState
 	_state._state_init()
 
 	# enter the state
@@ -75,7 +75,7 @@ func _ready() -> void:
 ## event will be fully processed when this method returns.
 func send_event(event:StringName) -> void:
 	if not is_instance_valid(_state):
-		push_error("StateMachine is not initialized")
+		push_error("State Chart is not initialized")
 		return
 		
 	if _event_processing_active:
@@ -101,7 +101,7 @@ func send_event(event:StringName) -> void:
 	_event_processing_active = false
 
 
-func _run_transition(transition:Transition, source:State):
+func _run_transition(transition:GDSTransition, source:GDSState):
 	
 	# if we are currently inside of a transition, queue it up
 	if _transitions_processing_active:
@@ -128,7 +128,7 @@ func _run_transition(transition:Transition, source:State):
 		else:
 			_warn_not_active(transition, source)
 	
-func _warn_not_active(transition:Transition, source:State):
+func _warn_not_active(transition:GDSTransition, source:GDSState):
 	push_warning("Ignoring request for transitioning from ", source.name, " to ", transition.to, " as the source state is no longer active. Check whether your trigger multiple state changes within a single frame.")
 
 ## Sets a property that can be used in expression guards. The property will be available as a global variable
@@ -145,9 +145,9 @@ func step():
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = []
 	if get_child_count() != 1:
-		warnings.append("StateChart must have exactly one child")
+		warnings.append("GDSStateChart must have exactly one child")
 	else:
 		var child = get_child(0)
-		if not child is State:
-			warnings.append("StateChart's child must be a State")
+		if not child is GDSState:
+			warnings.append("GDSStateChart's child must be a GDSState")
 	return warnings

@@ -1,10 +1,10 @@
 @tool
 @icon("transition.svg")
-class_name Transition
+class_name GDSTransition
 extends Node
 
 ## The target state to which the transition should switch
-@export_node_path("State") var to:NodePath:
+@export_node_path("GDSState") var to:NodePath:
 	set(value):
 		to = value
 		update_configuration_warnings()
@@ -18,7 +18,7 @@ extends Node
 
 ## An expression that must evaluate to true for the transition to be taken. Can be
 ## empty in which case the transition will always be taken
-@export var guard:Guard:
+@export var guard:GDSGuard:
 	set(value):
 		guard = value
 		update_configuration_warnings()
@@ -44,7 +44,7 @@ func evaluate_guard() -> bool:
 		return true
 
 	var parent_state = get_parent()
-	if parent_state == null or not (parent_state is State):
+	if parent_state == null or not (parent_state is GDSState):
 		push_error("Transitions must be children of states.")
 		return false	
 		
@@ -52,12 +52,12 @@ func evaluate_guard() -> bool:
 
 ## Resolves the target state and returns it. If the target state is not found,
 ## this function will return null.
-func resolve_target() -> State:
+func resolve_target() -> GDSState:
 	if to == null or to.is_empty():
 		return null
 
 	var result = get_node_or_null(to) 
-	if result is State:
+	if result is GDSState:
 		return result
 
 	return null
@@ -73,7 +73,7 @@ func _get_configuration_warnings():
 	elif resolve_target() == null:
 		warnings.append("The target state " + str(to) + " could not be found")
 
-	if not (get_parent() is State):
+	if not (get_parent() is GDSState):
 		warnings.append("Transitions must be children of states.")
 	
 	return warnings

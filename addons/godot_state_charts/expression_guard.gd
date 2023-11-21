@@ -1,16 +1,16 @@
 @tool
 @icon("expression_guard.svg")
 class_name ExpressionGuard
-extends Guard
+extends GDSGuard
 
 var expression:String = ""
 
 
-func is_satisfied(context_transition:Transition, context_state:State) -> bool:
+func is_satisfied(context_transition:GDSTransition, context_state:GDSState) -> bool:
 	# walk up the tree to find the root state chart node
 	var root = context_state
 
-	while is_instance_valid(root) and not root is StateChart:
+	while is_instance_valid(root) and not root is GDSStateChart:
 		root = root.get_parent()
 	
 	if not is_instance_valid(root):

@@ -4,7 +4,7 @@ extends Node2D
 @onready var _add_coal_to_drill_button:Button = %AddCoalToDrillButton
 @onready var _coal_available_label:Label = %CoalAvailableLabel
 @onready var _coal_in_drill_label:Label = %CoalInDrillLabel
-@onready var _state_chart:StateChart = %StateChart
+@onready var _state_chart:GDSStateChart = %StateChart
 
 
 var _coal_available:int = 0:

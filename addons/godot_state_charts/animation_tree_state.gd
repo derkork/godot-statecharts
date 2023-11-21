@@ -1,7 +1,7 @@
 @tool
 @icon("animation_tree_state.svg")
-class_name AnimationTreeState
-extends AtomicState
+class_name GDSAnimationTreeState
+extends GDSAtomicState
 
 
 ## Animation tree that this state will use.

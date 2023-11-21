@@ -9,7 +9,7 @@ signal activated(checkpoint:Node2D)
 ## emitted when this checkpoint is deactivated
 signal deactivated(checkpoint:Node2D)
 
-@onready var _state_chart:StateChart = get_node("StateChart")
+@onready var _state_chart:GDSStateChart = get_node("StateChart")
 
 
 func _on_area_2d_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):

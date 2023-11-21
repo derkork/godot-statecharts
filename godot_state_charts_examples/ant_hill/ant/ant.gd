@@ -8,7 +8,7 @@ signal clicked(node:Node2D)
 @onready var navigation_agent:NavigationAgent2D = $NavigationAgent2D
 
 ## The state chart
-@onready var state_chart:StateChart = $StateChart
+@onready var state_chart:GDSStateChart = $GDSStateChart
 
 ## Set of close food markers
 var food_markers:Dictionary = {}

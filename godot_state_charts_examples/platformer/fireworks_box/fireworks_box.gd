@@ -2,7 +2,7 @@ extends Node2D
 
 signal clicked(node:Node2D)
 
-@onready var _state_chart:StateChart = $StateChart as StateChart
+@onready var _state_chart:GDSStateChart = $StateChart as GDSStateChart
 var _counter = 0
 
 func count_up():

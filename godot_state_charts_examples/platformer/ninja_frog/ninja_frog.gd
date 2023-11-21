@@ -10,7 +10,7 @@ const JUMP_VELOCITY = -400.0
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @onready var _sprite: Sprite2D = $Sprite
-@onready var _state_chart: StateChart = $StateChart
+@onready var _state_chart: GDSStateChart = $StateChart
 @onready var _animation_tree: AnimationTree = $AnimationTree
 @onready var _animation_state_machine: AnimationNodeStateMachinePlayback = _animation_tree.get("parameters/playback")
 
