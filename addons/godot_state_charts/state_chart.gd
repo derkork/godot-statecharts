@@ -100,9 +100,10 @@ func send_event(event:StringName) -> void:
 		
 	_event_processing_active = false
 
-
+## Allows states to queue a transition for running. This will eventually run the transition
+## once all currently running transitions have finished. States should call this method
+## when they want to transition away from themselves. 
 func _run_transition(transition:Transition, source:State):
-	
 	# if we are currently inside of a transition, queue it up
 	if _transitions_processing_active:
 		_queued_transitions.append({transition : source})
@@ -110,24 +111,28 @@ func _run_transition(transition:Transition, source:State):
 
 	# we can only transition away from a currently active state
 	# if for some reason the state no longer is active, ignore the transition	
-	if source.active:
-		# run the transition	
-		_before_transition.emit(transition, source)
-		source._handle_transition(transition, source)
-	else:
-		_warn_not_active(transition, source)
+	_do_run_transition(transition, source)
 	
 	# if we still have transitions
 	while _queued_transitions.size() > 0:
 		var next_transition_entry = _queued_transitions.pop_front()
 		var next_transition = next_transition_entry.keys()[0]
 		var next_transition_source = next_transition_entry[next_transition]
-		if next_transition_source.active:
-			_before_transition.emit(next_transition, next_transition_source)
-			next_transition_source._handle_transition(next_transition, next_transition_source)
-		else:
-			_warn_not_active(transition, source)
-	
+		_do_run_transition(next_transition, next_transition_source)
+
+
+## Runs the transition. Used internally by the state chart, do not call this directly.	
+func _do_run_transition(transition:Transition, source:State):
+	if source.active:
+		# run the transition	
+		_before_transition.emit(transition, source)
+		# Notify interested parties that the transition is about to be taken
+		transition.taken.emit()
+		source._handle_transition(transition, source)
+	else:
+		_warn_not_active(transition, source)	
+
+
 func _warn_not_active(transition:Transition, source:State):
 	push_warning("Ignoring request for transitioning from ", source.name, " to ", transition.to, " as the source state is no longer active. Check whether your trigger multiple state changes within a single frame.")
 

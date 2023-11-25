@@ -3,6 +3,12 @@
 class_name Transition
 extends Node
 
+## Fired when this transition is taken. For delayed transitions, this signal
+## will be fired when the transition is actually executed (e.g. when its delay
+## has elapsed and the transition has not been arborted before). The signal will
+## always be fired before the state is exited.
+signal taken()
+
 ## The target state to which the transition should switch
 @export_node_path("State") var to:NodePath:
 	set(value):
