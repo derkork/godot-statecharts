@@ -1,7 +1,7 @@
 @icon("state_chart_debugger.svg")
 extends Control
 
-var RingBuffer = preload("ring_buffer.gd")
+const DebuggerHistory = preload("debugger_history.gd")
 
 ## Whether or not the debugger is enabled.
 @export var enabled:bool = true:
@@ -38,12 +38,6 @@ var RingBuffer = preload("ring_buffer.gd")
 ## The text field with the history.
 @onready var _history_edit:TextEdit = %HistoryEdit
 
-# We store history in a ring buffer
-var _buffer = null
-# Flag indicating if we have stuff in the ring buffer that needs to 
-# go into the text field
-var _dirty = false
-
 # the state chart we track
 var _state_chart:StateChart
 var _root:Node
@@ -51,12 +45,15 @@ var _root:Node
 # the states we are currently connected to
 var _connected_states:Array[State] = []
 
+# the debugger history in text form
+var _history:DebuggerHistory = null
+
 func _ready():
 	# always run, even if the game is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS	
 	
 	# initialize the buffer
-	_buffer = RingBuffer.new(maximum_lines)
+	_history = DebuggerHistory.new(maximum_lines)
 
 	%CopyToClipboardButton.pressed.connect(func (): DisplayServer.clipboard_set(_history_edit.text))
 	%ClearButton.pressed.connect(_clear_history)
@@ -74,8 +71,7 @@ func _ready():
 
 ## Adds an item to the history list.
 func add_history_entry(text:String):
-	_buffer.append("[%s]: %s \n" % [Engine.get_process_frames(), text])
-	_dirty = true
+	_history.add_history_entry(text)
 
 ## Sets up the debugger to track the given state chart. If the given node is not 
 ## a state chart, it will search the children for a state chart. If no state chart
@@ -220,46 +216,45 @@ func _collect_active_states(root:Node, parent:TreeItem):
 
 func _clear_history():
 	_history_edit.text = ""
-	_buffer.clear()
-	_dirty = false
+	_history.clear()
 
 func _on_before_transition(transition:Transition, source:State):
 	if ignore_transitions:
 		return
-	
-	add_history_entry("Transition: %s from %s to %s" % [transition.name, _state_chart.get_path_to(source), _state_chart.get_path_to(transition.resolve_target())])
+
+	_history.add_transition(transition.name, _state_chart.get_path_to(source), _state_chart.get_path_to(transition.resolve_target()))
 
 
 func _on_event_received(event:StringName):
 	if ignore_events:
 		return
-		
-	add_history_entry("Event received: %s" % event)
+
+	_history.add_event(event)	
 
 	
 func _on_state_entered(state:State):
 	if ignore_state_changes:
 		return
 		
-	add_history_entry("Enter: %s" % state.name)
+	_history.add_state_entered(state.name)
 
 
 func _on_state_exited(state:State):
 	if ignore_state_changes:
 		return
 		
-	add_history_entry("exiT : %s" % state.name)
+	_history.add_state_exited(state.name)
 
 
 func _on_timer_timeout():
 	# ignore the timer if the history edit isn't visible
-	if not _history_edit.visible or not _dirty:
+	if not _history_edit.visible or not _history.dirty:
 		return 
 	
 	# fill the history field
-	_history_edit.text = _buffer.join()
+	print("update history")
+	_history_edit.text = _history.get_history_text()
 	_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
-	_dirty = false
 
 
 func _on_ignore_events_checkbox_toggled(button_pressed):

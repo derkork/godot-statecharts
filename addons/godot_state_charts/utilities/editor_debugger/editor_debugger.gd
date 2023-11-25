@@ -2,6 +2,7 @@
 @tool
 extends Node
 const DebuggerStateInfo = preload("debugger_state_info.gd")
+const DebuggerHistory = preload("../debugger_history.gd")
 
 ## The tree that shows all state charts
 @onready var _all_state_charts_tree = %AllStateChartsTree
@@ -64,6 +65,14 @@ func update_state(state_info:Array):
 	_state_infos[chart][path] = state_info
 	if chart == _current_chart:
 		_repaint_states(_current_chart)
+
+func state_entered(chart:NodePath, state:NodePath):
+	if not _state_infos.has(chart):
+		return
+	
+	var state_info = _state_infos[chart][state]
+	DebuggerStateInfo.set_active(state_info, true)
+	_repaint_states(chart)
 
 ## Repaints the tree of all state charts.
 func _repaint_charts():

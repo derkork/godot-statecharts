@@ -4,6 +4,9 @@ const MESSAGE_PREFIX = "godot_state_charts"
 const STATE_CHART_ADDED_MESSAGE = MESSAGE_PREFIX + ":state_chart_added"
 const STATE_CHART_REMOVED_MESSAGE = MESSAGE_PREFIX + ":state_chart_removed"
 const STATE_UPDATED_MESSAGE = MESSAGE_PREFIX + ":state_updated"
+const STATE_ENTERED_MESSAGE = MESSAGE_PREFIX + ":state_entered"
+const STATE_EXITED_MESSAGE = MESSAGE_PREFIX + ":state_exited"
+const TRANSITION_FIRED_MESSAGE = MESSAGE_PREFIX + ":transition_fired"
 
 const DebuggerStateInfo = preload("debugger_state_info.gd")
 
@@ -46,3 +49,24 @@ static func state_updated(state:State):
 		state)
 	)
 	
+
+## Sends a state_entered message
+static func state_entered(state:State):
+	if not _can_send():
+		return
+		
+	EngineDebugger.send_message(STATE_ENTERED_MESSAGE,[state._chart.get_path(), state.get_path()])
+
+## Sends a state_exited message
+static func state_exited(state:State):
+	if not _can_send():
+		return
+		
+	EngineDebugger.send_message(STATE_EXITED_MESSAGE,[state._chart.get_path(), state.get_path()])
+
+## Sends a transition_fired message
+static func transition_fired(transition:Transition):
+	if not _can_send():
+		return
+		
+	EngineDebugger.send_message(TRANSITION_FIRED_MESSAGE,[transition._chart.get_path(), transition.get_path()])
