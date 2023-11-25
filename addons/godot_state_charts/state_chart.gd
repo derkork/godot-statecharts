@@ -24,6 +24,10 @@ signal _before_transition(transition:Transition, source:State)
 ## while another is still processing, it will be enqueued.
 signal event_received(event:StringName)
 
+## Flag indicating if this state chart should be tracked by the 
+## state chart debugger in the editor.
+@export var track_in_editor:bool = false
+
 ## The root state of the state chart.
 var _state:State = null
 
@@ -43,6 +47,7 @@ var _event_processing_active:bool = false
 
 var _queued_transitions:Array[Dictionary] = []
 var _transitions_processing_active:bool = false
+
 
 
 
@@ -159,6 +164,9 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _notification(what):
+	if not track_in_editor:
+		return
+		
 	if what == NOTIFICATION_POST_ENTER_TREE:
 		StateChartDebuggerMessage.state_chart_added(self)
 		
