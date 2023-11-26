@@ -36,7 +36,7 @@ Godot State Charts is an extension for Godot Engine 4 or later that allows you t
 - Declarative transitions with guards allow you to express complex logic in a simple way without writing any code.
 - Transitions can be time-delayed to easily build things like cooldowns.
 - Comprehensive in-editor error checking and warnings will help you avoid common mistakes.
-- Built-in debug view allows you to inspect your state charts in game while they are running.
+- Built-in debug view allows you to inspect your state charts in the game while they are running.
 - Inactive states will not update every frame for improved performance.
 - All states adhere to the pause mode, so state charts will pause when the game is paused.
 - Comprehensive documentation with a proper [manual](manual/manual.md) and annotated examples. 
