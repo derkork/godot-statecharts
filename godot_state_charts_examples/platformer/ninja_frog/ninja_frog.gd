@@ -57,15 +57,14 @@ func _on_jump_enabled_state_physics_processing(_delta):
 		_state_chart.send_event("jump")
 
 
-
-func _on_double_jump_state_event_received(event:StringName):
-	# if we get an event "jump" while in the double jump state we play the double jump animation
-	if event == "jump":
-		# print("playing double jump")
-		_animation_state_machine.travel("DoubleJump")
+## Called when the jump transition is taken in the double-jump
+## state. Only used to play the double jump animation.
+func _on_double_jump_jump():
+	_animation_state_machine.travel("DoubleJump")
 
 
 func _on_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):
 	# if the left mouse button is up emit the clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
 			clicked.emit(self)
+

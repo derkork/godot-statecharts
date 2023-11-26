@@ -247,6 +247,12 @@ In deeper state charts, events will be passed to the active states going all the
 > 
 > This means that if you call `send_event` in a `_ready` function it will most likely not work as expected. If you must send an event in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`. 
 
+#### Transition taken signal
+
+Each transition provides a `taken` signal which is fired when the transition is taken. This is useful if you need to determine how you left a state, which you cannot do with the `state_exited` signal alone. You can use this signal run side effects when a specific transition is taken. For example the platformer demo uses the signal to run the double-jump animation when the player leaves the _Double Jump_ state through the _On Jump_ transition. 
+
+The signal is only emitted when the transition is taken, not when it is pending. This means that if you have a transition with a delay, the signal will only be emitted when the transition is actually executed. If the transition is discarded for any reason, the signal will not be emitted.
+
 #### Transitions on entering a state
 
 It is possible to immediately transition elsewhere when a state is entered. This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html). To make a transition execute immediately when a state is entered, leave the _Event_ field empty. Usually you will put a guard on such a transition to make sure it is only taken when a certain condition is met.
