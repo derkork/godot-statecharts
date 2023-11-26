@@ -256,7 +256,9 @@ editor_description = "This state is active while the player is in the air and ha
 script = ExtResource("6_vmkuk")
 
 [node name="On Jump" type="Node" parent="StateChart/Root/Movement/Airborne/DoubleJumpEnabled"]
-editor_description = "When jumping in double jump state, move to a state where no more jumps are possible."
+editor_description = "When jumping in double jump state, move to a state where no more jumps are possible.
+
+Triggers the double-jump animation as a side effect."
 script = ExtResource("9_wswdv")
 to = NodePath("../../CannotJump")
 event = &"jump"
@@ -293,5 +295,5 @@ event = &"idle"
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="." method="_on_jump_enabled_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne/CoyoteJumpEnabled" to="." method="_on_jump_enabled_state_physics_processing"]
-[connection signal="event_received" from="StateChart/Root/Movement/Airborne/DoubleJumpEnabled" to="." method="_on_double_jump_state_event_received"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Airborne/DoubleJumpEnabled" to="." method="_on_jump_enabled_state_physics_processing"]
+[connection signal="taken" from="StateChart/Root/Movement/Airborne/DoubleJumpEnabled/On Jump" to="." method="_on_double_jump_jump"]
