@@ -1,6 +1,6 @@
-
 namespace GodotStateCharts
 {
+    using Godot;
 
     /// <summary>
     /// A transition between two states. This class only exists to make the 

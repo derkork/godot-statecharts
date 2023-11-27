@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2023-11-27
+### Fixed
+- Added missing import `Transition.cs`.
+
 ## [0.9.0] - 2023-11-26
 ### Added
 - Transitions now provide a `taken` signal which is called when the transition is taken. This is useful for running side effects only when a specific transition is taken, e.g. play a specific sound or animation ([#58](https://github.com/derkork/godot-statecharts/issues/58)). 
