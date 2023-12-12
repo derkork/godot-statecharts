@@ -18,6 +18,12 @@ func _init(size:int = 300):
 	_content.resize(size)
 	
 	
+## Sets the maximum number of lines to store. This clears the buffer.	
+func set_maximum_lines(lines:int):
+	_size = lines
+	_content.resize(lines)
+	clear()
+
 ## Adds an item to the ring buffer
 func append(value:String):
 	_content[_index] = value

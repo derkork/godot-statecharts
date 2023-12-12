@@ -374,6 +374,7 @@ shape = SubResource("RectangleShape2D_jbwph")
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("2_atynw")
+track_in_editor = true
 
 [node name="ParallelState" type="Node" parent="StateChart"]
 script = ExtResource("4_4y463")

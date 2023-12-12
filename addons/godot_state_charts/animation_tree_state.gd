@@ -19,6 +19,11 @@ extends AtomicState
 var _animation_tree_state_machine:AnimationNodeStateMachinePlayback
 
 func _ready():
+	if Engine.is_editor_hint():
+		return
+		
+	super._ready()
+	
 	_animation_tree_state_machine = null
 	var the_tree = get_node_or_null(animation_tree)
 

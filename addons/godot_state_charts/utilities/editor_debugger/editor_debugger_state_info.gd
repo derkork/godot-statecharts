@@ -30,10 +30,10 @@ static func make_array( \
 ) -> Array:
 	return [ \
 		chart, \
-		_strip_common_prefix(path, chart), \
+		path, \
 		active, \
 		transition_pending, \
-		_strip_common_prefix(transition_path, chart), \
+		transition_path, \
 		transition_time, \
 		type_for_state(state) ]
 
@@ -88,22 +88,17 @@ static func get_state_icon(array:Array) -> Texture2D:
 	else:
 		return null
 
-## Strips the common prefix from the given path.	
-static func _strip_common_prefix(input:NodePath, other:NodePath) -> NodePath:
-	var input_segments = input.get_name_count()
-	var other_segments = other.get_name_count()
-	
-	var common_segments = 0
-	for i in range(0, min(input_segments, other_segments)):
-		if input.get_name(i) == other.get_name(i):
-			common_segments += 1
-		else:
-			break
-			
-	var output = ""
-	for i in range(common_segments, input_segments):
-		output += input.get_name(i)
-		if i + 1 < input_segments:
-			output += "/"
-		
-	return NodePath(output)
+
+static func set_active(array:Array, active:bool) -> void:
+	array[2] = active
+	# if no longer active, clear the pending transition
+	if not active:
+		array[3] = false
+		array[4] = null
+		array[5] = 0.0
+
+
+static func set_transition_pending(array:Array, transition:NodePath, pending_time:float) -> void:
+	array[3] = true
+	array[4] = transition
+	array[5] = pending_time

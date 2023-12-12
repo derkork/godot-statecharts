@@ -12,6 +12,7 @@
 [node name="StateChart" type="Node" parent="."]
 editor_description = "This is just an example state chart to complement the documentation. See the section \"order of events\" in the manual for details."
 script = ExtResource("1_67wci")
+track_in_editor = true
 
 [node name="A" type="Node" parent="StateChart"]
 script = ExtResource("2_oks48")
