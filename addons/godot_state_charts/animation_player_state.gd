@@ -27,6 +27,10 @@ extends AtomicState
 var _animation_player: AnimationPlayer
 
 func _ready():
+	if Engine.is_editor_hint():
+		return
+		
+	super._ready()
 	_animation_player = get_node_or_null(animation_player)
 
 	if not is_instance_valid(_animation_player):

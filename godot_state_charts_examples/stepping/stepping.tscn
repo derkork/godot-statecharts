@@ -36,6 +36,7 @@ text = "Add Coal"
 [node name="StateChart" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("2_7ehwm")
+track_in_editor = true
 
 [node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("4_ohpt6")

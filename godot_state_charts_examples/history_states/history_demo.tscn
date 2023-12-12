@@ -37,6 +37,7 @@ shape = SubResource("RectangleShape2D_kl3ga")
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("2_pqmip")
+track_in_editor = true
 
 [node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("3_nsw2j")

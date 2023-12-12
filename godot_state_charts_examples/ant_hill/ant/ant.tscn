@@ -483,7 +483,7 @@ rotation = 1.5708
 scale = Vector2(0.05, 0.05)
 sprite_frames = SubResource("SpriteFrames_kcoy1")
 animation = &"walk"
-frame_progress = 0.300231
+frame_progress = 0.938219
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 editor_description = "This navigation agent sends the \"navigation_finished\" event to the state chart whenever the navigation is done."
@@ -502,6 +502,7 @@ shape = SubResource("CircleShape2D_htg24")
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("3_lard5")
+track_in_editor = true
 
 [node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("4_ejp2e")

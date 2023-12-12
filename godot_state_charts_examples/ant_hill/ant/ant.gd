@@ -169,7 +169,7 @@ func _on_travelling_state_physics_processing(_delta):
 func _on_input_event(_viewport, event, _shape_idx):
 	# if the left mouse button is up emit the clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
-		print("clicked")
+		# print("clicked")
 		clicked.emit(self)
 
 

@@ -14,30 +14,36 @@ func _init(maximum_lines:int = 500):
 	_dirty = false
 
 
+## Sets the maximum number of lines to store in the history.
+## This will clear the history.
+func set_maximum_lines(maximum_lines:int):
+	_buffer.set_maximum_lines(maximum_lines)
+
+
 ## Adds an item to the history list.
-func add_history_entry(text:String):
-	_buffer.append("[%s]: %s \n" % [Engine.get_process_frames(), text])
+func add_history_entry(frame:int, text:String):
+	_buffer.append("[%s]: %s \n" % [frame, text])
 	_dirty = true
 
 
 ## Adds a transition to the history list.
-func add_transition(name:String, from:String, to:String):
-	add_history_entry("Transition: %s from %s to %s" % [name, from, to])
+func add_transition(frame:int, name:String, from:String, to:String):
+	add_history_entry(frame, "Transition: %s from %s to %s" % [name, from, to])
 
 
 ## Adds an event to the history list.
-func add_event(event:StringName):
-	add_history_entry("Event received: %s" % event)
+func add_event(frame:int, event:StringName):
+	add_history_entry(frame, "Event received: %s" % event)
 
 
 ## Adds a state entered event to the history list.
-func add_state_entered(name:StringName):
-	add_history_entry("Enter: %s" % name)
+func add_state_entered(frame:int, name:StringName):
+	add_history_entry(frame, "Enter: %s" % name)
 
 
 ## Adds a state exited event to the history list.
-func add_state_exited(name:StringName):
-	add_history_entry("exiT: %s" % name)
+func add_state_exited(frame:int, name:StringName):
+	add_history_entry(frame, "exiT: %s" % name)
 
 
 ## Clears the history.

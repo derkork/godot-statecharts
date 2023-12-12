@@ -175,6 +175,7 @@ texture = ExtResource("1_aido8")
 [node name="StateChart" type="Node" parent="."]
 editor_description = "A state chart controlling the rattling and explosion of a box. You can probably use a simple script to achieve the same behaviour but it shows how to use expression guards."
 script = ExtResource("2_ahjdl")
+track_in_editor = true
 
 [node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("3_b1cau")

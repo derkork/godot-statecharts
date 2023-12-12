@@ -37,7 +37,8 @@ func _enter_tree():
 	get_editor_interface().get_selection().selection_changed.connect(_on_selection_changed)
 
 	# Add the debugger plugin
-	_debugger_plugin = preload("utilities/editor_debugger/debugger_plugin.gd").new()
+	_debugger_plugin = preload("utilities/editor_debugger/editor_debugger_plugin.gd").new()
+	_debugger_plugin.initialize(get_editor_interface().get_editor_settings())
 	add_debugger_plugin(_debugger_plugin)
 
 

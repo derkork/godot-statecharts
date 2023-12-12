@@ -247,6 +247,7 @@ shape = SubResource("CapsuleShape2D_06im6")
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("5_a58ma")
+track_in_editor = true
 
 [node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("6_53g38")

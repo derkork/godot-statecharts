@@ -1,31 +1,111 @@
 ## UI for the in-editor state debugger
 @tool
-extends Node
-const DebuggerStateInfo = preload("debugger_state_info.gd")
+extends Control
+
+## Utility class for holding state info
+const DebuggerStateInfo = preload("editor_debugger_state_info.gd")
+## Debugger history wrapper. Shared with in-game debugger.
 const DebuggerHistory = preload("../debugger_history.gd")
+## The debugger message
+const DebuggerMessage = preload("editor_debugger_message.gd")
+
+## Constants for the settings
+const SETTINGS_ROOT = "godot_state_charts/debugger/"
+const SETTINGS_IGNORE_EVENTS = SETTINGS_ROOT + "ignore_events"
+const SETTINGS_IGNORE_STATE_CHANGES = SETTINGS_ROOT + "ignore_state_changes"
+const SETTINGS_IGNORE_TRANSITIONS = SETTINGS_ROOT + "ignore_transitions"
+const SETTINGS_MAXIMUM_LINES = SETTINGS_ROOT + "maximum_lines"
+const SETTINGS_SPLIT_OFFSET = SETTINGS_ROOT + "split_offset"
+
 
 ## The tree that shows all state charts
-@onready var _all_state_charts_tree = %AllStateChartsTree
+@onready var _all_state_charts_tree:Tree = %AllStateChartsTree
 ## The tree that shows the current state chart
-@onready var _current_state_chart_tree = %CurrentStateChartTree
+@onready var _current_state_chart_tree:Tree = %CurrentStateChartTree
+## The history edit
+@onready var _history_edit:TextEdit = %HistoryEdit
+## The settings UI
+@onready var _ignore_events_checkbox:CheckBox = %IgnoreEventsCheckbox
+@onready var _ignore_state_changes_checkbox:CheckBox = %IgnoreStateChangesCheckbox
+@onready var _ignore_transitions_checkbox:CheckBox = %IgnoreTransitionsCheckbox
+@onready var _maximum_lines_spin_box:SpinBox = %MaximumLinesSpinBox
+@onready var _split_container:HSplitContainer = %SplitContainer
+
+## The actual settings
+var _ignore_events:bool = true
+var _ignore_state_changes:bool = false
+var _ignore_transitions:bool = true
+
+
+## The editor settings for storing all the settings across sessions
+var _settings:EditorSettings = null
+
+## The current session
+var _session:EditorDebuggerSession = null
 
 ## Dictionary of all state charts and their states. Key is the path to the
 ## state chart, value is a dictionary of states. Key is the path to the state,
 ## value is the state info (an array).
 var _state_infos:Dictionary = {}
-
+## Dictionary of all state charts and their histories. Key is the path to the
+## state chart, value is the history.
+var _chart_histories:Dictionary = {}
 ## Path to the currently selected state chart.
 var _current_chart:NodePath = ""
 
-func _ready():
+## Helper variable for debouncing the maximum lines setting. When
+## the value is -1, the setting hasn't been changed yet. When it's
+## >= 0, the setting has been changed and the timer is waiting for
+## the next timeout to update the setting. The debouncing is done
+## in the same function that updates the text edit.
+var _debounced_maximum_lines:int = -1
+
+## Initializes the debugger UI using the editor settings.
+func initialize(settings:EditorSettings, session:EditorDebuggerSession):
 	clear()
+	_settings = settings
+	_session = session
+	
+	# restore editor settings
+	_ignore_events = _get_setting_or_default(SETTINGS_IGNORE_EVENTS, true)
+	_ignore_state_changes = _get_setting_or_default(SETTINGS_IGNORE_STATE_CHANGES, false)
+	_ignore_transitions = _get_setting_or_default(SETTINGS_IGNORE_TRANSITIONS, true)
+
+	# initialize UI elements, so they match the settings
+	_ignore_events_checkbox.set_pressed_no_signal(_ignore_events)
+	_ignore_state_changes_checkbox.set_pressed_no_signal(_ignore_state_changes)
+	_ignore_transitions_checkbox.set_pressed_no_signal(_ignore_transitions)
+	_maximum_lines_spin_box.value = _get_setting_or_default(SETTINGS_MAXIMUM_LINES, 300)
+	_split_container.split_offset =  _get_setting_or_default(SETTINGS_SPLIT_OFFSET, 0)
+	
+## Returns the given setting or the default value if the setting is not set.
+## No clue, why this isn't a built-in function.
+func _get_setting_or_default(key, default):
+	if _settings == null:
+		return default
+	
+	if not _settings.has_setting(key):
+		return default
+	
+	return _settings.get_setting(key)
+
+## Sets the given setting and marks it as changed.
+func _set_setting(key, value):
+	if _settings == null:
+		return
+	_settings.set_setting(key, value)
+	_settings.mark_setting_changed(key)
+
 
 ## Clears all state charts and state trees.
 func clear():
 	_clear_all()
 	
+
 ## Clears all state charts and state trees.
 func _clear_all():
+	_state_infos.clear()
+	_chart_histories.clear()
 	_all_state_charts_tree.clear()
 	
 	var root = _all_state_charts_tree.create_item()
@@ -34,9 +114,11 @@ func _clear_all():
 	
 	_clear_current()
 
-## Clears the tree holding the states of the currently selected state chart.	
+## Clears all data about the current chart from the ui	
 func _clear_current():
+	_current_chart = ""
 	_current_state_chart_tree.clear()
+	_history_edit.clear()
 	var root = _current_state_chart_tree.create_item()
 	root.set_text(0, "States")
 	root.set_selectable(0, false)
@@ -44,7 +126,11 @@ func _clear_current():
 ## Adds a new state chart to the debugger.
 func add_chart(path:NodePath):
 	_state_infos[path] = {}
+	_chart_histories[path] = DebuggerHistory.new()
 	_repaint_charts()
+
+	# push the settings to the new chart remote
+	DebuggerMessage.settings_updated(_session, path, _ignore_events, _ignore_transitions)
 	
 ## Removes a state chart from the debugger.
 func remove_chart(path:NodePath):
@@ -54,25 +140,56 @@ func remove_chart(path:NodePath):
 	_repaint_charts()
 	
 ## Updates state information for a state chart.
-func update_state(state_info:Array):
+func update_state(frame:int, state_info:Array):
 	var chart = DebuggerStateInfo.get_chart(state_info)
 	var path = DebuggerStateInfo.get_state(state_info)
 	
-	# probably received out of order.
 	if not _state_infos.has(chart):
+		push_error("Probable bug: Received state info for unknown chart %s" % [chart])
 		return
 	
 	_state_infos[chart][path] = state_info
-	if chart == _current_chart:
-		_repaint_states(_current_chart)
 
-func state_entered(chart:NodePath, state:NodePath):
+## Called when a state is entered.
+func state_entered(frame:int, chart:NodePath, state:NodePath):
 	if not _state_infos.has(chart):
 		return
-	
+
+	if not _ignore_state_changes:
+		var history:DebuggerHistory = _chart_histories[chart]
+		history.add_state_entered(frame, _get_node_name(state))
+
 	var state_info = _state_infos[chart][state]
 	DebuggerStateInfo.set_active(state_info, true)
-	_repaint_states(chart)
+
+## Called when a state is exited.
+func state_exited(frame:int, chart:NodePath, state:NodePath):
+	if not _state_infos.has(chart):
+		return
+
+	if not _ignore_state_changes:
+		var history:DebuggerHistory = _chart_histories[chart]
+		history.add_state_exited(frame, _get_node_name(state))
+
+	var state_info = _state_infos[chart][state]
+	DebuggerStateInfo.set_active(state_info, false)
+
+
+## Called when an event is received.
+func event_received(frame:int, chart:NodePath, event:StringName):
+	var history:DebuggerHistory = _chart_histories.get(chart, null)
+	history.add_event(frame, event)
+
+## Called when a transition is pending
+func transition_pending(frame:int, chart:NodePath, state:NodePath, transition:NodePath, pending_time:float):
+	var state_info = _state_infos[chart][state]
+	DebuggerStateInfo.set_transition_pending(state_info, transition, pending_time)
+
+
+func transition_taken(frame:int, chart:NodePath, transition:NodePath, source:NodePath, destination:NodePath):
+	var history:DebuggerHistory = _chart_histories.get(chart, null)
+	history.add_transition(frame, _get_node_name(transition), _get_node_name(source), _get_node_name(destination))
+
 
 ## Repaints the tree of all state charts.
 func _repaint_charts():
@@ -82,14 +199,23 @@ func _repaint_charts():
 
 
 ## Repaints the tree of the currently selected state chart.
-func _repaint_states(chart:NodePath):
+func _repaint_current_chart():
+	if _current_chart.is_empty():
+		return
+
+	# get the history for this chart and update the history text edit
+	var history = _chart_histories[_current_chart]
+	_history_edit.text = history.get_history_text()
+	_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
+	
+	# update the tree
 	for state_info in _state_infos[_current_chart].values():
 		if DebuggerStateInfo.get_active(state_info):
 			_add_to_tree(_current_state_chart_tree, DebuggerStateInfo.get_state(state_info), DebuggerStateInfo.get_state_icon(state_info))
 		if DebuggerStateInfo.get_transition_pending(state_info):
 			var transition_path = DebuggerStateInfo.get_transition_path(state_info)
 			var transition_time = DebuggerStateInfo.get_transition_time(state_info)
-			var name = transition_path.get_name(transition_path.get_name_count() - 1)
+			var name = _get_node_name(transition_path)
 			_add_to_tree(_current_state_chart_tree, DebuggerStateInfo.get_transition_path(state_info), preload("../../transition.svg"), "%s (%.1fs)" % [name, transition_time])	
 	_clear_unused_items(_current_state_chart_tree.get_root())
 
@@ -107,6 +233,7 @@ func _clear_unused_items(root:TreeItem):
 		else:
 			child.remove_meta("__in_use")
 			_clear_unused_items(child)
+
 
 ## Frees this tree item and all its children
 func _free_all(root:TreeItem):
@@ -152,6 +279,7 @@ func _add_to_tree(tree:Tree, path:NodePath, icon:Texture2D, text:String = ""):
 	ref.set_icon(0, icon)
 	ref.set_selectable(0, true)
 
+
 ## Called when a state chart is selected in the tree.
 func _on_all_state_charts_tree_item_selected():
 	var item = _all_state_charts_tree.get_selected()
@@ -163,6 +291,79 @@ func _on_all_state_charts_tree_item_selected():
 		
 	var path = item.get_meta("__path")
 	_current_chart = path
-	_repaint_states(_current_chart)
+	_repaint_current_chart()
+
+
+## Called every 0.5 seconds to update the history text edit and the maximum lines setting.	
+func _on_timer_timeout():
+	# update the maximum lines setting if it has changed
+	if _debounced_maximum_lines >= 0:
+		_set_setting(SETTINGS_MAXIMUM_LINES, _debounced_maximum_lines)
+		
+		# walk over all histories and update their maximum lines
+		for history in _chart_histories.values():
+			history.set_maximum_lines(_debounced_maximum_lines)
+		
+		# and reset the debounced value
+		_debounced_maximum_lines = -1
+
+	# repaint the current chart
+	_repaint_current_chart()
+
+	var chart_history = _chart_histories.get(_current_chart, null)
+
+	# ignore the timer if the history edit isn't visible
+	if not _history_edit.visible or chart_history == null or not chart_history.dirty:
+		var dirty = false if chart_history == null else chart_history.dirty
+		return 
 	
-	
+	# fill the history field
+	_history_edit.text = chart_history.get_history_text()
+	_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
+
+## Called when the ignore events checkbox is toggled.
+func _on_ignore_events_checkbox_toggled(button_pressed:bool):
+	_ignore_events = button_pressed
+	_set_setting(SETTINGS_IGNORE_EVENTS, button_pressed)
+
+	# push the new setting to all remote charts
+	for chart in _state_infos.keys():
+		DebuggerMessage.settings_updated(_session, chart, _ignore_events, _ignore_transitions)
+
+## Called when the ignore state changes checkbox is toggled.
+func _on_ignore_state_changes_checkbox_toggled(button_pressed:bool):
+	_ignore_state_changes = button_pressed
+	_set_setting(SETTINGS_IGNORE_STATE_CHANGES, button_pressed)
+
+## Called when the ignore transitions checkbox is toggled.
+func _on_ignore_transitions_checkbox_toggled(button_pressed:bool):
+	_ignore_transitions = button_pressed
+	_set_setting(SETTINGS_IGNORE_TRANSITIONS, button_pressed)
+
+	# push the new setting to all remote charts
+	for chart in _state_infos.keys():
+		DebuggerMessage.settings_updated(_session, chart, _ignore_events, _ignore_transitions)
+
+## Called when the maximum lines spin box value is changed.
+func _on_maximum_lines_spin_box_value_changed(value:int):
+	_debounced_maximum_lines = value
+
+## Called when the split container is dragged.
+func _on_split_container_dragged(offset:int):
+	_set_setting(SETTINGS_SPLIT_OFFSET, offset)
+
+
+## Helper to get the last element of a node path
+func _get_node_name(path:NodePath):
+	return path.get_name(path.get_name_count() - 1)
+
+## Called when the clear button is pressed.
+func _on_clear_button_pressed():
+	_history_edit.text = ""
+	if _chart_histories.has(_current_chart):
+		var history:DebuggerHistory = _chart_histories[_current_chart]
+		history.clear()
+
+## Called when the copy to clipboard button is pressed.
+func _on_copy_to_clipboard_button_pressed():
+	DisplayServer.clipboard_set(_history_edit.text)

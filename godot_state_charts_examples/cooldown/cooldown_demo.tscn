@@ -57,6 +57,7 @@ texture = ExtResource("5_xxunm")
 
 [node name="StateChart" type="Node" parent="."]
 script = ExtResource("6_d3pqh")
+track_in_editor = true
 
 [node name="Root" type="Node" parent="StateChart"]
 editor_description = "Since all three skills can be used independently of each other we use a parallel state as the root here."
