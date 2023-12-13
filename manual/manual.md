@@ -311,6 +311,8 @@ These expression properties can then be used in your expressions. The following 
 
 ### Debugging
 
+#### Debugging in-game with the state chart debugger
+
 <img src="../addons/godot_state_charts/utilities/state_chart_debugger.svg" width="32" height="32" align="left"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add it to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":
 
 ![Adding the state chart debugger](add_statechart_debugger.gif)
@@ -382,6 +384,28 @@ debugger.AddHistoryEntry("Player died");
 The debugger will only track state changes of the currently watched state chart. If you connect the debugger to a different state chart, it will start tracking the state changes of the new state chart.
 
 If you want to disable the history tracking, you can unset the _Auto Track State Changes_ checkbox in the editor UI.
+
+#### Debugging in the editor 
+
+> ⚠️ **Note**: this feature is currently in preview and may still have some rough edges. Please report any issues you encounter.
+
+Starting with version 0.10.0 the plugin contains an in-editor debugger, which shows the current state of any tracked state chart in the currently running game.  
+
+![The in-editor debugger](in_editor_debugger.png)
+
+This feature is opt-in, so for a state chart to appear in the debugger, you need to set the _Track in Editor_ property of the state chart to `true`.
+
+![Track the current state chart in the editor](track_in_editor.png)
+
+Once this is set, the state chart will appear in the in-editor debugger when the game is running. From there you can select a state chart in the tree on the left and see its current state and history on the right. As with the in-game debugger you have flags to toggle whether events, state changes and transitions should appear in the history. 
+
+The in-editor debugger has some limitations compared to the in-game debugger:
+
+- In general the in-editor debugger requires debug information sent from the game to the editor via a network connection. This takes longer and has a higher overhead than the in-game debugger which can directly access and display the state chart data. This means that the in-editor debugger will always slightly lag behind. It also limits how much information can be shown in the editor before the network connection gets overloaded.
+- If you have a large amount of tracked state charts (eg. more than a few dozen) you will get warnings that the network connection is overloaded and the data displayed in the in-editor debugger will be incomplete or outdated. This is a fundamental limitation of the debugging process and unlikely to change in the future - there is only so much data a connection can handle.
+- The feature is completely disabled when the game is not running from the editor. This means you cannot use it to remote-debug an exported game. 
+- You cannot see the expression properties as they would need to be serialized and sent over the network whenever they change, which adds a lot of overhead. Also some of the data may not be serializable at all.
+- You cannot inject custom history entries into the history as the remote debugger has no public API. This feature would require a unified API for both the in-game and in-editor debugger which is currently not available and would introduce breaking changes. 
 
 ## Stepping mode
 

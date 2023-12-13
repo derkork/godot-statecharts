@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2023-12-13
+### Added
+- **Preview**: In-editor state chart debugger ([#48](https://github.com/derkork/godot-statecharts/issues/48)). The state chart debugger is now also available in the editor itself. When you start a game the debugger will show all marked state charts and you can inspect them from the editor. This is useful for quickly debugging multiple state charts while playing the game without having UI obstructing the game view. Please give it a try and report any issues you find.
+
+- The demos are all opted-in to the new in-editor debugger so you can try it out right away.
+
+### Removed
+- The internal `_before_transition` on the `StateChart` class has been removed. It was used only by the state chart debugger which has received some internal re-writes and no longer needs this. As this was an internal signal, this change should not affect any user code. If your code used this signal, you can now use the `taken` signal on any transition to know when a certain transition was taken.
+
+### Fixed
+- Some code that should not run in the editor was actually running in the editor. This has been fixed. The change should not affect any user code but fixes a few stray warnings that occasionally popped up in the editor.
+
+
 ## [0.9.1] - 2023-11-27
 ### Fixed
 - Added missing import `Transition.cs`.
