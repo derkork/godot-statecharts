@@ -32,6 +32,10 @@ signal state_unhandled_input(event:InputEvent)
 signal transition_pending(initial_delay:float, remaining_delay:float)
 
 
+##used to identify as state from code
+const is_statechart_state:bool=true
+
+
 ## Whether the state is currently active (internal flag, use active).
 var _state_active = false
 

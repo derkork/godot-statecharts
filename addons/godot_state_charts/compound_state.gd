@@ -19,7 +19,6 @@ signal child_state_exited()
 		initial_state = value
 		update_configuration_warnings() 
 
-
 ## The currently active substate.
 var _active_state:State = null
 
@@ -219,5 +218,12 @@ func _get_configuration_warnings() -> PackedStringArray:
 		
 	elif the_initial_state.get_parent() != self:
 		warnings.append("Initial state must be a direct child of this compound state.")
-	
 	return warnings
+
+#override the base so we can detect new states being added
+#prevents any non-state nodes from being added as children to the statechart
+#if it doesn't have a set initial state yet, it will default to the added state
+func add_child(node:Node,force_readable_name:bool=false,internal:InternalMode=0):
+	if node.get("is_statechart_state")!=true:return
+	super.add_child(node)
+	if initial_state==NodePath(""):initial_state=self.get_path_to(node)
