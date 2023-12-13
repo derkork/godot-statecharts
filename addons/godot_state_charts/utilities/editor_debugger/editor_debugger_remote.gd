@@ -99,7 +99,7 @@ func _on_state_entered(state:State):
 func _on_state_exited(state:State):
 	DebuggerMessage.state_exited(_state_chart, state)
 
-func _on_transition_pending(num1, num2, state:State):
-	DebuggerMessage.state_updated(_state_chart, state)
+func _on_transition_pending(num1, remaining, state:State):
+	DebuggerMessage.transition_pending(_state_chart, state, state._pending_transition, remaining)
 		
 
