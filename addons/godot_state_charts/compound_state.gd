@@ -207,6 +207,20 @@ func _handle_transition(transition:Transition, source:State):
 	get_parent()._handle_transition(transition, source)
 
 
+func add_child(node:Node, force_readable_name:bool = false, internal:InternalMode = INTERNAL_MODE_DISABLED) -> void:
+	super.add_child(node, force_readable_name, internal)
+	# when a child is added in the editor and the child is a state
+	# and we don't have an initial state yet, set the initial state 
+	# to the newly added child
+	if Engine.is_editor_hint() and node is State:
+		if initial_state.is_empty():
+			# the newly added node may have a random name now, 
+			# so we need to defer the call to build a node path
+			# to the next frame, so the editor has time to rename
+			# the node to its final name
+			(func(): initial_state = get_path_to(node)).call_deferred()
+			
+
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = super._get_configuration_warnings()
 	

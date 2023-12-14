@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.11.0] - 2023-12-14
+### Added
+- When adding the first child state to a compound state in the editor, this will now automatically be set as the initial state of the compound state. A big thanks goes out to [Roger](https://github.com/RogerRandomDev) for submitting a PR with this feature.
+
+### Fixed
+- Some of the node warnings have been clarified to make it easier to understand what is going on.
+- Some fringe errors that may happen when you add unrelated nodes below state or transition nodes have been addressed.
+
 
 ## [0.10.0] - 2023-12-13
 ### Added
