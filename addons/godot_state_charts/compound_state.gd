@@ -185,7 +185,7 @@ func _handle_transition(transition:Transition, source:State):
 	if self.is_ancestor_of(target):
 		# find the child which is the ancestor of the new target.
 		for child in get_children():
-			if child.is_ancestor_of(target):
+			if child is State and child.is_ancestor_of(target):
 				# found it. 
 				# change active state if necessary
 				if _active_state != child:
@@ -209,7 +209,14 @@ func _handle_transition(transition:Transition, source:State):
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = super._get_configuration_warnings()
-	if get_child_count() == 0:
+	
+	# count the amount of child states
+	var child_count = 0
+	for child in get_children():
+		if child is State:
+			child_count += 1
+
+	if child_count == 0:
 		warnings.append("Compound states should have at least one child state.")
 		
 	var the_initial_state = get_node_or_null(initial_state)
