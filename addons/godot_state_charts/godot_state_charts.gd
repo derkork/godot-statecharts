@@ -19,8 +19,32 @@ enum SidebarLocation {
 ## The current location of the sidebar. Default is left.
 var _current_sidebar_location:SidebarLocation = SidebarLocation.LEFT
 
+#custom properties for the editor
+const _state_chart_settings:Array[Dictionary] = [
+	{
+		"name": "state_chart/mark_not_state_nodes_as_warning_on_run",
+		"initial_value":false,
+		"type": TYPE_BOOL,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string":"Non-state nodes in the state chart will now return a warning in the editor when the application is run/statechart is added to the scene."
+	},
+	{
+		"name": "state_chart/mark_not_state_nodes_as_warning_in_editor",
+		"initial_value":false,
+		"type": TYPE_BOOL,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string":"Non-state nodes in the state chart will now return a warning in the editor."
+	}
+]
+
 
 func _enter_tree():
+	# attach all custom setting properties to the project
+	for _custom_setting in _state_chart_settings:
+		if ProjectSettings.has_setting(_custom_setting.name):continue
+		ProjectSettings.set(_custom_setting.name,_custom_setting.initial_value)
+		ProjectSettings.add_property_info(_custom_setting)
+	
 	# prepare a copy of the sidebar for both 2D and 3D.
 	_ui_sidebar_canvas = _sidebar_ui.instantiate()
 	_ui_sidebar_canvas.sidebar_toggle_requested.connect(_toggle_sidebar)

@@ -75,6 +75,13 @@ func _ready() -> void:
 	if track_in_editor and OS.has_feature("editor"):
 		_debugger_remote = DebuggerRemote.new(self)
 
+	# if mark non-states as a warning is true, this should
+	# traverse the chart once and return a warning for each
+	if !ProjectSettings.get_setting("state_chart/mark_not_state_nodes_as_warning_on_run"):return
+	_state.warn_non_states()
+	
+	
+
 
 ## Sends an event to this state chart. The event will be passed to the innermost active state first and
 ## is then moving up in the tree until it is consumed. Events will trigger transitions and actions via emitted
@@ -162,4 +169,13 @@ func _get_configuration_warnings() -> PackedStringArray:
 		var child = get_child(0)
 		if not child is State:
 			warnings.append("StateChart's child must be a State")
+	
+	# check if it is in the editor and for any non-statechart component children
+	# only if you enabled marking it as a warning in the project settings
+	if ProjectSettings.get_setting("state_chart/mark_not_state_nodes_as_warning_in_editor"):
+		for _sub_state in get_children():
+			if not _sub_state is State:
+				warnings.append("State contains non-state children. Hide this by unchecking the mark as warning in editor from project settings under StateChart.")
+	
+	
 	return warnings

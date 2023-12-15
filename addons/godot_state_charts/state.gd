@@ -289,7 +289,14 @@ func _get_configuration_warnings() -> PackedStringArray:
 	if not found:
 		result.append("State is not a child of a StateChart. This will not work.")
 
-	return result		
+	# check if it is in the editor and for any non-statechart component children
+	# only if you enabled marking it as a warning in the project settings
+	if ProjectSettings.get_setting("state_chart/mark_not_state_nodes_as_warning_in_editor"):
+		for _sub_state in get_children():
+			if not check_statechart_component(_sub_state):
+				result.append("State contains non-state children. Hide this by unchecking the mark as warning in editor from project settings under StateChart.")
+
+	return result	
 
 
 func _toggle_processing(active:bool):
@@ -301,3 +308,35 @@ func _toggle_processing(active:bool):
 ## Checks whether the given signal has connections. 
 func _has_connections(sgnl:Signal) -> bool:
 	return sgnl.get_connections().size() > 0
+
+
+## overriding the default add_child to warn when the added child is not
+## an intended statechart component, if the project setting is active
+func add_child(node:Node, force_readable_name:bool = false, internal:InternalMode = INTERNAL_MODE_DISABLED) -> void:
+	super.add_child(node, force_readable_name, internal)
+	
+	if not check_statechart_component(node) and can_submit_warning():
+		push_warning("Non-State node in StateChart, Parent State: %s"%name)
+
+## Checks a given node is an intended statechart component
+## returns true or false
+func check_statechart_component(node:Node)->bool:
+	return node is State or node is Transition
+
+## Checks all sub states for being a state node
+func warn_non_states() -> void:
+	for _sub_state in get_children():
+		# traverse down every state until they have no children
+		if _sub_state is State:_sub_state.warn_non_states()
+		# warn that a given _sub_state is not referenced to state or transition
+		# transition included just in case
+		elif not _sub_state is Transition:push_warning("Non-State node in StateChart, Parent State: %s"%name)
+
+## exists solely to reduce length of the if statements using a push_warning for non-state nodes
+func can_submit_warning() -> bool:
+	return (
+		Engine.is_editor_hint()&&ProjectSettings.get_setting("state_chart/mark_not_state_nodes_as_warning_in_editor")||
+		!Engine.is_editor_hint()&&ProjectSettings.get_setting("state_chart/mark_not_state_nodes_as_warning_on_run")
+		)
+
+
