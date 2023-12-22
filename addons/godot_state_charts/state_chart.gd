@@ -103,7 +103,7 @@ func send_event(event:StringName) -> void:
 	# process them in order now
 	while _queued_events.size() > 0:
 		var next_event = _queued_events.pop_front()
-		event_received.emit(event)
+		event_received.emit(next_event)
 		_state._state_event(next_event)
 		
 	_event_processing_active = false

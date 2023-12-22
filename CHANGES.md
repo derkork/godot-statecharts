@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.11.1] - 2023-12-22
+### Fixed
+- The state chart now sends an `event_received` with the correct event name, when an event is sent to it while another event is still being processed ([#64](https://github.com/derkork/godot-statecharts/issues/64)).
+
 ## [0.11.0] - 2023-12-14
 ### Added
 - When adding the first child state to a compound state in the editor, this will now automatically be set as the initial state of the compound state. A big thanks goes out to [Roger](https://github.com/RogerRandomDev) for submitting a PR with this feature.
