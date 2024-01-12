@@ -1,4 +1,12 @@
 # Godot State Charts Manual
+<style type="text/css">
+img {
+    align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
 
 **__If you prefer to learn in video form, there is also a [video tutorial available on YouTube](https://www.youtube.com/watch?v=E9h9VnbPGuw) to get you started.__**
 
@@ -247,7 +255,19 @@ In deeper state charts, events will be passed to the active states going all the
 > 
 > This means that if you call `send_event` in a `_ready` function it will most likely not work as expected. If you must send an event in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`. 
 
-#### Transition taken signal
+##### Event selection and management
+
+Starting with version 0.12.0 the plugin provides a dropdown for events in the editor UI. This dropdown allows you to quickly select an event from a list of all events that are currently used in the state chart. This helps to avoid typos and makes it easier to find the event you are looking for.
+
+![Event dropdown](event_dropdown.png)
+
+The dropdown also has "Manage..." entry which allows you to rename events that are used in the state chart. This is useful if you want to rename an event that is used in multiple transitions. 
+
+![Renaming an event](event_rename.png)
+
+In the dialog, select the event you want to rename and enter the new name. All transitions in the current state chart that use the event will be updated automatically. You can undo the renaming by pressing `Ctrl+Z`. Also note, that renaming an event will not rename the event in your code, so you will have to update the event name in your code manually.
+
+##### Transition taken signal
 
 Each transition provides a `taken` signal which is fired when the transition is taken. This is useful if you need to determine how you left a state, which you cannot do with the `state_exited` signal alone. You can use this signal run side effects when a specific transition is taken. For example the platformer demo uses the signal to run the double-jump animation when the player leaves the _Double Jump_ state through the _On Jump_ transition. 
 

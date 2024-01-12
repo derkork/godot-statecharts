@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2024-01-12
+### Added
+- The inspector for transitions now provides a list of all events currently used in the state chart from which an event can be selected. This minimizes the risk of typos when entering event names ([#72](https://github.com/derkork/godot-statecharts/issues/72)).
+- Events can now be renamed in the inspector. This will rename all occurrences of the event in the state chart. This can help for larger state charts where an event is used in multiple locations and finding and renaming all occurrences is cumbersome and error-prone. Note that this will not change the name of the event in your code. ([#72](https://github.com/derkork/godot-statecharts/issues/72)).
+
 ## [0.11.1] - 2023-12-22
 ### Fixed
 - The state chart now sends an `event_received` with the correct event name, when an event is sent to it while another event is still being processed ([#64](https://github.com/derkork/godot-statecharts/issues/64)).
