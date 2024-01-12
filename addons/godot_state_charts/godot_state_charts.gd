@@ -10,6 +10,7 @@ var _ui_sidebar_spatial:Control
 var _sidebar_ui:PackedScene = preload("utilities/editor_sidebar.tscn")
 
 var _debugger_plugin:EditorDebuggerPlugin
+var _inspector_plugin:EditorInspectorPlugin
 
 enum SidebarLocation {
 	LEFT = 1,
@@ -40,6 +41,10 @@ func _enter_tree():
 	_debugger_plugin = preload("utilities/editor_debugger/editor_debugger_plugin.gd").new()
 	_debugger_plugin.initialize(get_editor_interface().get_editor_settings())
 	add_debugger_plugin(_debugger_plugin)
+	
+	# add the inspector plugin for events
+	_inspector_plugin = preload("utilities/event_editor/event_inspector_plugin.gd").new()
+	add_inspector_plugin(_inspector_plugin)
 
 
 func _set_window_layout(configuration):
@@ -82,11 +87,16 @@ func _ready():
 	# inititalize the side bars
 	_ui_sidebar_canvas.setup(get_editor_interface(), get_undo_redo())
 	_ui_sidebar_spatial.setup(get_editor_interface(), get_undo_redo())
+	_inspector_plugin.setup(get_undo_redo())
+	
 
 
 func _exit_tree():
 	# remove the debugger plugin
 	remove_debugger_plugin(_debugger_plugin)
+	
+	# remove the inspector plugin
+	remove_inspector_plugin(_inspector_plugin)
 	
 	# remove the side bars
 	_remove_sidebars()
