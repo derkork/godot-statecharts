@@ -88,6 +88,8 @@ static func transition_pending(chart:StateChart, source:State, transition:Transi
 	EngineDebugger.send_message(TRANSITION_PENDING_MESSAGE, [Engine.get_process_frames(), chart.get_path(), chart.get_path_to(source),  chart.get_path_to(transition), pending_transition_time])
 
 ## Sends a settings updated message
-static func settings_updated(session:EditorDebuggerSession, chart:NodePath, ignore_events:bool, ignore_transitions:bool) -> void:
+## session is an EditorDebuggerSession but this does not exist after export
+## so its not statically typed here. This code won't run after export anyways.
+static func settings_updated(session, chart:NodePath, ignore_events:bool, ignore_transitions:bool) -> void:
 	# print("Sending settings updated message: ", SETTINGS_UPDATED_MESSAGE + str(chart) + ":updated")
 	session.send_message(SETTINGS_UPDATED_MESSAGE + str(chart) + ":updated", [ignore_events, ignore_transitions])

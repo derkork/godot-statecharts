@@ -40,8 +40,10 @@ var _ignore_transitions:bool = true
 ## The editor settings for storing all the settings across sessions
 var _settings:EditorSettings = null
 
-## The current session
-var _session:EditorDebuggerSession = null
+## The current session (EditorDebuggerSession)
+## this does not exist in exported games, so this is deliberately not 
+## typed, to avoid compile errors after exporting
+var _session = null
 
 ## Dictionary of all state charts and their states. Key is the path to the
 ## state chart, value is a dictionary of states. Key is the path to the state,
