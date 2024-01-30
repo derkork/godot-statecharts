@@ -46,8 +46,6 @@ func _on_settings_updated(key:String, data:Array) -> bool:
 
 ## Connects all signals from the currently processing state chart
 func _prepare():
-	_state_chart.tree_entered.connect(_on_tree_entered)
-	_state_chart.tree_exited.connect(_on_tree_exited)
 	_state_chart.event_received.connect(_on_event_received)
 
 	# find all state nodes below the state chart and connect their signals
@@ -72,14 +70,15 @@ func _prepare_state(state:State):
 			child.taken.connect(_on_transition_taken.bind(state, child))
 
 
-func _on_tree_entered():
-	DebuggerMessage.state_chart_added(_state_chart)
-	_register_settings_updates()
-
-
-func _on_tree_exited():
-	DebuggerMessage.state_chart_removed(_state_chart)
-	_unregister_settings_updates()
+func _notification(what):
+	match(what):
+		Node.NOTIFICATION_ENTER_TREE:
+			DebuggerMessage.state_chart_added(_state_chart)
+			_register_settings_updates()
+		Node.NOTIFICATION_UNPARENTED:
+			DebuggerMessage.state_chart_removed(_state_chart)
+			_unregister_settings_updates()
+				
 
 
 func _on_transition_taken(source:State, transition:Transition):
