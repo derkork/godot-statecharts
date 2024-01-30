@@ -64,14 +64,15 @@ The new UI supports undo/redo, so you can undo the addition of a node or transit
 
 The plugin comes with a few examples. You can find them in the `godot_state_charts_examples` folder. To run an example, open and run it's main scene. The examples are:
 
-- `platformer` - a simple platformer game with a state chart for the player character that handles movement, jumping, falling, double jumps, coyote jumps and animation control. This example shows how state charts can massively simplify the code needed to implement a full player character controller. The character controller code is less than 70 lines of code.
 - `ant_hill` - a rudimentary ant hill simulation. The ants are controlled by a state chart that handles the different states of the ants such as searching for food, carrying food, returning to the nest, etc. This example shows how state charts can simplify a lot of the if-else logic that is often needed to implement AI.
-- `history_states` - an example that shows how you can use history states to implement a state machine that can remember the last active state of a compound state. 
-- `performance_test` - this example is a small test harness to evaluate how larger amounts of state charts will perform. It contains a state chart in `state_chart.tscn` which you can adapt to match your desired scenario. The actual performance will depend on what callback signals you will use so you should adapt the state chart in `state_chart.tscn` to match your scenario. Then there are scenes named `ten_state_charts.tscn`, `hundred_state_charts.tscn` and `thousand_state_charts.tscn` which each contain 10, 100 or 1000 instances of the state chart from `state_chart.tscn`. You can run these scenes to see how many instances of the state chart  you can run on your machine. Use the profiler to see how much time is spent in the state chart code. 
-- `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
-- `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
+- `automatic_transitions` - an example that shows how to use automatic transitions that react to changes in expression properties.
 - `cooldown` - an example on how to drive UI elements with the `transition_pending` signal. See also the section on [delayed transitions](#delayed-transitions) for more information.
 - `csharp` - an example on how to use the API from C#. Note that you need to use the .NET version of Godot 4 for this example to work. See also the section on [installation with C#](#installation-with-c) for more information.
+- `history_states` - an example that shows how you can use history states to implement a state machine that can remember the last active state of a compound state. 
+- `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
+- `performance_test` - this example is a small test harness to evaluate how larger amounts of state charts will perform. It contains a state chart in `state_chart.tscn` which you can adapt to match your desired scenario. The actual performance will depend on what callback signals you will use so you should adapt the state chart in `state_chart.tscn` to match your scenario. Then there are scenes named `ten_state_charts.tscn`, `hundred_state_charts.tscn` and `thousand_state_charts.tscn` which each contain 10, 100 or 1000 instances of the state chart from `state_chart.tscn`. You can run these scenes to see how many instances of the state chart  you can run on your machine. Use the profiler to see how much time is spent in the state chart code. 
+- `platformer` - a simple platformer game with a state chart for the player character that handles movement, jumping, falling, double jumps, coyote jumps and animation control. This example shows how state charts can massively simplify the code needed to implement a full player character controller. The character controller code is less than 70 lines of code.
+- `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
 
 ### The _State Chart_ node
 
@@ -255,6 +256,9 @@ In deeper state charts, events will be passed to the active states going all the
 > 
 > This means that if you call `send_event` in a `_ready` function it will most likely not work as expected. If you must send an event in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`. 
 
+##### Multiple transitions on the same state
+A single state can have multiple transitions. If this is the case, all transitions will be checked from top to bottom and the first transition that reacts to the event will be executed. If you want to have multiple transitions that react to the same event, you can use [guards](#transition-guards) to determine which transition should be taken.
+
 ##### Event selection and management
 
 Starting with version 0.12.0 the plugin provides a dropdown for events in the editor UI. This dropdown allows you to quickly select an event from a list of all events that are currently used in the state chart. This helps to avoid typos and makes it easier to find the event you are looking for.
@@ -273,15 +277,19 @@ Each transition provides a `taken` signal which is fired when the transition is 
 
 The signal is only emitted when the transition is taken, not when it is pending. This means that if you have a transition with a delay, the signal will only be emitted when the transition is actually executed. If the transition is discarded for any reason, the signal will not be emitted.
 
-#### Transitions on entering a state
+#### Automatic transitions
 
-It is possible to immediately transition elsewhere when a state is entered. This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html). To make a transition execute immediately when a state is entered, leave the _Event_ field empty. Usually you will put a guard on such a transition to make sure it is only taken when a certain condition is met.
+It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you enter a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met. 
 
 ![Alt text](immediate_transition.png)
+
+Note that automatic transitions will still only be evaluated for currently active states.
 
 #### Delayed transitions
 
 Transitions can execute immediately or after a certain time has elapsed. If a transition has no time delay it will be executed immediately (within the same frame). If a transition has a time delay, it will be marked as pending and executed after the time delay has elapsed but only if the state to which the transition belongs is still active at this time and was not left temporarily. Only one transition can ever be active or pending for any given state. So if another transition is executed for a state while one is pending, the pending transition will be discarded. A pending transition is also cancelled when the state is left through other means (e.g. because a parent state got deactivated). There is one exception to this rule, when you are using history states. When you leave a state and re-enter it through a history state, then any pending transition will be resumed as if you had never left the state.
+
+When you have a transition that is both delayed and automatic, the transition will be marked as pending when it's condition is met. If subsequently the condition is no longer met, it will still be executed unless another transition is marked as pending in the meantime or the state is left through other means.
 
 #### Transition guards
 

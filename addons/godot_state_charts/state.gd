@@ -45,8 +45,9 @@ var _pending_transition:Transition = null
 ## Remaining time in seconds until the pending transition is triggered.
 var _pending_transition_time:float = 0
 
-## The transitions of this state.
+## Transitions in this state that react on events. 
 var _transitions:Array[Transition] = []
+
 
 ## The state chart that owns this state.
 var _chart:StateChart
@@ -83,11 +84,12 @@ func _state_init():
 	_state_active = false
 	_toggle_processing(false)
 	
-	# load transitions
+	# load transitions 
 	_transitions.clear()
 	for child in get_children():
 		if child is Transition:
 			_transitions.append(child)
+	
 	
 ## Called when the state is entered. The parameter indicates whether the state
 ## is expected to immediately handle a transition after it has been entered.
@@ -105,7 +107,7 @@ func _state_enter(expect_transition:bool = false):
 	
 	# emit the signal
 	state_entered.emit()
-	# check all transitions which have no event
+	# run all automatic transitions
 	for transition in _transitions:
 		if not transition.has_event and transition.evaluate_guard():
 			# first match wins
@@ -246,21 +248,31 @@ func _input(event:InputEvent):
 func _unhandled_input(event:InputEvent):
 	state_unhandled_input.emit(event)
 
-## Handles the given event. Returns true if the event was consumed, false otherwise.
-func _state_event(event:StringName) -> bool:
+## Processes all transitions. If the property_change parameter is true
+## then only transitions which have no event are processed (eventless transitions/automatic transitions)
+func _process_transitions(event:StringName, property_change:bool = false) -> bool:
 	if not active:
 		return false
 
-	# emit the event received signal
-	event_received.emit(event)
+	# emit an event received signal if this is not a property change
+	if not property_change:
+		event_received.emit(event)
 
-	# check all transitions which have the event
+	# Walk over all transitions
 	for transition in _transitions:
-		if transition.event == event and transition.evaluate_guard():
-			# print(name +  ": consuming event " + event)
-			# first match wins
-			_run_transition(transition)
-			return true
+		# the currently pending transition is not replaced by itself
+		if transition != _pending_transition \
+			# automatic transitions are always evaluated
+			# non-automatic only if this evaluation was not triggered
+			# by property change AND their event matches their current event
+			and (not transition.has_event or (not property_change and transition.event == event)) \
+			# and in every case the guard needs to match
+			and transition.evaluate_guard():
+				# print(name +  ": consuming event " + event)
+				# first match wins
+				_run_transition(transition)
+				return true
+
 	return false
 
 ## Queues the transition to be triggered after the delay.

@@ -10,5 +10,6 @@ func is_satisfied(context_transition:Transition, context_state:State) -> bool:
 	var actual_state = context_transition.get_node_or_null(state)
 	
 	if actual_state == null:
+		push_warning("State ", state , " referenced in StateIsActiveGuard below ", context_state.get_path(), " could not be resolved. Verify that the node path is correct.")
 		return false
 	return actual_state.active

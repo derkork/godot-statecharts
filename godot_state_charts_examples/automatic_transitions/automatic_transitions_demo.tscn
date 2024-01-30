@@ -1,0 +1,202 @@
+[gd_scene load_steps=23 format=3 uid="uid://huy14b6x10bh"]
+
+[ext_resource type="Texture2D" uid="uid://bgswg1pgd01d1" path="res://godot_state_charts_examples/platformer/ninja_frog/full.png" id="2_dka03"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="3_7ryss"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/automatic_transitions/the_frog.gd" id="3_q65wd"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="4_64ox6"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_ooc8l"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="5_uojl1"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="6_xggmu"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_v4wmr"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="8_r51oc"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/automatic_transitions/stamina_bar.gd" id="9_rtmjc"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_is_active_guard.gd" id="10_caxti"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/not_guard.gd" id="11_rfa1s"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2fogg"]
+size = Vector2(275, 15)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tsftx"]
+size = Vector2(18.5, 227)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bocu2"]
+radius = 15.0
+height = 32.0
+
+[sub_resource type="Resource" id="Resource_14sa2"]
+script = ExtResource("8_r51oc")
+expression = "stamina <= 0"
+
+[sub_resource type="Resource" id="Resource_m8fyc"]
+script = ExtResource("10_caxti")
+state = NodePath("../../../Walking Control/Needs Rest")
+
+[sub_resource type="Resource" id="Resource_4i0ee"]
+script = ExtResource("10_caxti")
+state = NodePath("../../../Walking Control/Needs Rest")
+
+[sub_resource type="Resource" id="Resource_br5hd"]
+script = ExtResource("11_rfa1s")
+guard = SubResource("Resource_4i0ee")
+
+[sub_resource type="Animation" id="Animation_nb642"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_wtk5r"]
+resource_name = "pulsate"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ghdrh"]
+_data = {
+"RESET": SubResource("Animation_nb642"),
+"pulsate": SubResource("Animation_wtk5r")
+}
+
+[node name="Node2D" type="Node2D"]
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("6_xggmu")]
+offset_left = 293.0
+offset_top = 10.0
+offset_right = 624.0
+offset_bottom = 441.0
+initial_node_to_watch = NodePath("../TheFrog/StateChart")
+
+[node name="Borders" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="Borders"]
+position = Vector2(139.25, 170)
+shape = SubResource("RectangleShape2D_2fogg")
+
+[node name="Bottom" type="CollisionShape2D" parent="Borders"]
+position = Vector2(143.25, 385)
+shape = SubResource("RectangleShape2D_2fogg")
+
+[node name="Left" type="CollisionShape2D" parent="Borders"]
+position = Vector2(11, 280.5)
+shape = SubResource("RectangleShape2D_tsftx")
+
+[node name="Right" type="CollisionShape2D" parent="Borders"]
+position = Vector2(268.25, 276)
+shape = SubResource("RectangleShape2D_tsftx")
+
+[node name="TheFrog" type="CharacterBody2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(65.25, 288)
+script = ExtResource("3_q65wd")
+
+[node name="Icon" type="Sprite2D" parent="TheFrog"]
+texture = ExtResource("2_dka03")
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 32)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TheFrog"]
+shape = SubResource("CapsuleShape2D_bocu2")
+
+[node name="StateChart" type="Node" parent="TheFrog"]
+unique_name_in_owner = true
+script = ExtResource("3_7ryss")
+
+[node name="ParallelState" type="Node" parent="TheFrog/StateChart"]
+script = ExtResource("5_uojl1")
+
+[node name="Walking Control" type="Node" parent="TheFrog/StateChart/ParallelState"]
+script = ExtResource("4_64ox6")
+initial_state = NodePath("Can Walk")
+
+[node name="Can Walk" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control"]
+editor_description = "In this state the frog can move around and will lose stamina. If stamina drops to 0 the frog will automatically transition to \"Needs Rest\"."
+script = ExtResource("5_ooc8l")
+
+[node name="On Zero Stamina To Needs Rest" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control/Can Walk"]
+editor_description = "This is an automatic transition that will transition to \"Needs rest\" if stamina drops to 0. Note that this transition has no \"event\" set, it will be checked every time an expresssion property is set."
+script = ExtResource("7_v4wmr")
+to = NodePath("../../Needs Rest")
+guard = SubResource("Resource_14sa2")
+
+[node name="Needs Rest" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control"]
+editor_description = "In this state the frog cannot move for 3 seconds."
+script = ExtResource("5_ooc8l")
+
+[node name="After 3 seconds To  Can Walk" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control/Needs Rest"]
+editor_description = "This will automatically transition back to \"Can Walk\" after 3 seconds."
+script = ExtResource("7_v4wmr")
+to = NodePath("../../Can Walk")
+delay_seconds = 3.0
+
+[node name="Animation Control" type="Node" parent="TheFrog/StateChart/ParallelState"]
+editor_description = "This controls the pulsating red animation when the frog is exhausted. Note that you could also model this using state_entered and state_exited events on the \"Needs Rest\" state, which is simpler (and more performant). Its only done this way to show automatic events."
+script = ExtResource("4_64ox6")
+initial_state = NodePath("Normal")
+
+[node name="Normal" type="Node" parent="TheFrog/StateChart/ParallelState/Animation Control"]
+script = ExtResource("5_ooc8l")
+
+[node name="On Needs Rest to Pulsating Red" type="Node" parent="TheFrog/StateChart/ParallelState/Animation Control/Normal"]
+editor_description = "This is another example of an automatic transition. When the \"Needs Rest\" state becomes active, this will automatically transition to the \"Pulsating Red\" state."
+script = ExtResource("7_v4wmr")
+to = NodePath("../../Pulsating Red")
+guard = SubResource("Resource_m8fyc")
+
+[node name="Pulsating Red" type="Node" parent="TheFrog/StateChart/ParallelState/Animation Control"]
+script = ExtResource("5_ooc8l")
+
+[node name="On Not Needs Rest to Normal" type="Node" parent="TheFrog/StateChart/ParallelState/Animation Control/Pulsating Red"]
+editor_description = "When the \"Needs Rest\" state becomes inactive, this will automatically transition to the \"Normal\" state."
+script = ExtResource("7_v4wmr")
+to = NodePath("../../Normal")
+guard = SubResource("Resource_br5hd")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TheFrog"]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_ghdrh")
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 19.25
+offset_top = 401.0
+offset_right = 272.25
+offset_bottom = 458.0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Stamina"
+
+[node name="StaminaBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+script = ExtResource("9_rtmjc")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 286.0
+offset_bottom = 156.0
+text = "This example shows automatic transitions. Move the frog with the arrow keys. If the frog loses all stamina, it automatically transitions to a state where it will be unable to move for 3 seconds."
+autowrap_mode = 2
+
+[connection signal="state_physics_processing" from="TheFrog/StateChart/ParallelState/Walking Control/Can Walk" to="TheFrog" method="_on_can_walk_state_physics_processing"]
+[connection signal="state_physics_processing" from="TheFrog/StateChart/ParallelState/Walking Control/Needs Rest" to="TheFrog" method="_on_needs_rest_state_physics_processing"]
+[connection signal="state_entered" from="TheFrog/StateChart/ParallelState/Animation Control/Normal" to="TheFrog" method="_on_normal_state_entered"]
+[connection signal="state_entered" from="TheFrog/StateChart/ParallelState/Animation Control/Pulsating Red" to="TheFrog" method="_on_pulsating_red_state_entered"]

@@ -5,10 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [0.13.0] - 2024-01-30
+### Breaking Change
+- You can now have fully automatic transitions ([#71]((https://github.com/derkork/godot-statecharts/issues/71))). An automatic transition has no event and will be executed when the state is entered, any event is sent or any expression property is modified. Note that a state must be active for its automatic transitions to be considered. 
+
+  This change can potentially break existing state charts which have transitions with no event. Before this change, these transitions were only executed when the state was entered. After this change, there are more situations in which these transitions can be executed, so you might have to add additional guards to your transitions or use the `state_entered` signal to trigger your logic. 
+
+### Added
+- A new demo was added to show how to use automatic transitions. It is located at `godot_state_charts_examples/automatic_transitions`.
+
+### Improved
+- Compound and parallel states will now show a warning when they have less than two child states.
+
 ### Fixed
 - The editor debugger should no longer cause compile errors when the game is exported. These errors were actually harmless but would give the impression that something is broken ([#74](https://github.com/derkork/godot-statecharts/issues/74)).
-
+- The debugger remote now properly handles the case when a state chart leaves the tree and un-registers itself from the in-editor debugger properly instead of printing out errors.
+- Parallel states now properly ignore non-state children when calculating their child state count.
 
 ## [0.12.0] - 2024-01-12
 ### Added

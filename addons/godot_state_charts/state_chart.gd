@@ -97,14 +97,14 @@ func send_event(event:StringName) -> void:
 	
 	# first process this event.
 	event_received.emit(event)
-	_state._state_event(event)
+	_state._process_transitions(event, false)
 	
 	# if other events have accumulated while the event was processing
 	# process them in order now
 	while _queued_events.size() > 0:
 		var next_event = _queued_events.pop_front()
 		event_received.emit(next_event)
-		_state._state_event(next_event)
+		_state._process_transitions(next_event, false)
 		
 	_event_processing_active = false
 
@@ -147,6 +147,8 @@ func _warn_not_active(transition:Transition, source:State):
 ## an expression guard.
 func set_expression_property(name:StringName, value) -> void:
 	_expression_properties[name] = value
+	# run a property change event through the state chart to run automatic transitions
+	_state._process_transitions(&"", true)
 
 
 ## Calls the `step` function in all active states. Used for situations where `state_processing` and 

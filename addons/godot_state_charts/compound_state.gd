@@ -111,20 +111,21 @@ func _state_exit():
 	super._state_exit()
 
 
-func _state_event(event:StringName) -> bool:
+func _process_transitions(event:StringName, property_change:bool = false) -> bool:
 	if not active:
 		return false
 
-	# forward the event to the active state
+	# forward to the active state
 	if is_instance_valid(_active_state):
-		if _active_state._state_event(event):
-			# emit the event_received signal
-			self.event_received.emit(event)
+		if _active_state._process_transitions(event, property_change):
+			# emit the event_received signal, unless this is a property change
+			if not property_change:
+				self.event_received.emit(event)
 			return true
 
 	# if the event was not handled by the active state, we handle it here
 	# base class will also emit the event_received signal
-	return super._state_event(event)
+	return super._process_transitions(event, property_change)
 
 
 func _handle_transition(transition:Transition, source:State):
@@ -230,8 +231,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 		if child is State:
 			child_count += 1
 
-	if child_count == 0:
-		warnings.append("Compound states should have at least one child state.")
+	if child_count < 2:
+		warnings.append("Compound states should have at two child states.")
 		
 	var the_initial_state = get_node_or_null(initial_state)
 	
