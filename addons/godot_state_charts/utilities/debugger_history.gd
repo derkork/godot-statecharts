@@ -43,7 +43,7 @@ func add_state_entered(frame:int, name:StringName):
 
 ## Adds a state exited event to the history list.
 func add_state_exited(frame:int, name:StringName):
-	add_history_entry(frame, "exiT: %s" % name)
+	add_history_entry(frame, "Exit: %s" % name)
 
 
 ## Clears the history.
