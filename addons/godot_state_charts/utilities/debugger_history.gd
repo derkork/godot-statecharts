@@ -28,22 +28,22 @@ func add_history_entry(frame:int, text:String):
 
 ## Adds a transition to the history list.
 func add_transition(frame:int, name:String, from:String, to:String):
-	add_history_entry(frame, "Transition: %s from %s to %s" % [name, from, to])
+	add_history_entry(frame, "↪️ Transition: %s from %s to %s" % [name, from, to])
 
 
 ## Adds an event to the history list.
 func add_event(frame:int, event:StringName):
-	add_history_entry(frame, "Event received: %s" % event)
+	add_history_entry(frame, "⚡ Event received: %s" % event)
 
 
 ## Adds a state entered event to the history list.
 func add_state_entered(frame:int, name:StringName):
-	add_history_entry(frame, "Enter: %s" % name)
+	add_history_entry(frame, "🟢 Enter: %s" % name)
 
 
 ## Adds a state exited event to the history list.
 func add_state_exited(frame:int, name:StringName):
-	add_history_entry(frame, "exiT: %s" % name)
+	add_history_entry(frame, "🔴 Exit: %s" % name)
 
 
 ## Clears the history.
