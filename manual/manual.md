@@ -42,6 +42,19 @@ After you installed the plugin as described above, you may need to initialize yo
 
 > ⚠️ **Note**: the C# API is currently experimental and may change in the future. Please give it a try and let me know if you encounter any issues.
 
+### Updating from an earlier version
+
+The asset library currently has no support for plugin updates, therefore in order to update the plugin, perform the following steps:
+
+- **Be sure you have a backup of your project or have it under version control, so you can go back in case things don't work out as intended.**
+- Check the [CHANGES.md](https://github.com/derkork/godot-statecharts/blob/main/CHANGES.md) for any breaking changes that might impact your project and any special update instructions.
+- Download the version you want to install from the [Release List](https://github.com/derkork/godot-statecharts/releases) (use the _Source Code ZIP_ link).
+- Close Godot. It's important to not have the project opened while running the update.
+- In your project locate the `godot_state_charts` folder within the `addons` folder and delete the `godot_state_charts` folder with all of its contents.
+- Unpack your downloaded ZIP file somewhere. Inside of the unpacked ZIP file structure, locate the `godot_state_charts` folder within the `addons` folder.
+- Move `godot_state_charts` folder you located in the previous step into the `addons` folder of your project.
+- The plugin is now updated. You can now open the project again in Godot and continue working on it.
+
 ## Usage
 
 The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with. 
