@@ -5,12 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Fixed
+- The state chart now issues a better error message when being called while not yet ready ([#81](https://github.com/derkork/godot-statecharts/issues/81)).
 ### Improved
 - The history in the state chart debugger now uses little icons to show the type history entry. This makes it easier to see what happened at a glance. A big thanks goes out to [Alireza Zamani](https://github.com/alitnk) for suggesting this improvement.
 
 ## [0.13.0] - 2024-01-30
 ### Breaking Change
-- You can now have fully automatic transitions ([#71]((https://github.com/derkork/godot-statecharts/issues/71))). An automatic transition has no event and will be executed when the state is entered, any event is sent or any expression property is modified. Note that a state must be active for its automatic transitions to be considered. 
+- You can now have fully automatic transitions ([#71](https://github.com/derkork/godot-statecharts/issues/71)). An automatic transition has no event and will be executed when the state is entered, any event is sent or any expression property is modified. Note that a state must be active for its automatic transitions to be considered. 
 
   This change can potentially break existing state charts which have transitions with no event. Before this change, these transitions were only executed when the state was entered. After this change, there are more situations in which these transitions can be executed, so you might have to add additional guards to your transitions or use the `state_entered` signal to trigger your logic. 
 

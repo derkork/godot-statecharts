@@ -82,8 +82,12 @@ func _ready() -> void:
 ## will process the event as soon as possible but there is no guarantee that the 
 ## event will be fully processed when this method returns.
 func send_event(event:StringName) -> void:
+	if not is_node_ready():
+		push_error("State chart is not yet ready. If you call `send_event` in _ready, please call it deferred, e.g. `state_chart.send_event.call_deferred(\"my_event\").")
+		return
+		
 	if not is_instance_valid(_state):
-		push_error("StateMachine is not initialized")
+		push_error("State chart has no root state. Ignoring call to `send_event`.")
 		return
 		
 	if _event_processing_active:
@@ -146,6 +150,14 @@ func _warn_not_active(transition:Transition, source:State):
 ## with the same name. E.g. if you set the property "foo" to 42, you can use the expression "foo == 42" in
 ## an expression guard.
 func set_expression_property(name:StringName, value) -> void:
+	if not is_node_ready():
+		push_error("State chart is not yet ready. If you call `set_expression_property` in `_ready`, please call it deferred, e.g. `state_chart.set_expression_property.call_deferred(\"my_property\", 5).")
+		return
+		
+	if not is_instance_valid(_state):
+		push_error("State chart has no root state. Ignoring call to `set_expression_property`.")
+		return
+	
 	_expression_properties[name] = value
 	# run a property change event through the state chart to run automatic transitions
 	_state._process_transitions(&"", true)
@@ -154,6 +166,13 @@ func set_expression_property(name:StringName, value) -> void:
 ## Calls the `step` function in all active states. Used for situations where `state_processing` and 
 ## `state_physics_processing` don't make sense (e.g. turn-based games, or games with a fixed timestep).
 func step():
+	if not is_node_ready():
+		push_error("State chart is not yet ready. If you call `step` in `_ready`, please call it deferred, e.g. `state_chart.step.call_deferred()`.")
+		return
+		
+	if not is_instance_valid(_state):
+		push_error("State chart has no root state. Ignoring call to `step`.")
+		return
 	_state._state_step()
 
 func _get_configuration_warnings() -> PackedStringArray:

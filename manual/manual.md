@@ -267,7 +267,7 @@ In deeper state charts, events will be passed to the active states going all the
 
 > ⚠️ **Note:** The initial state of a state chart will only be entered one frame after the state chart's `_ready` function ran. It is done this way to give nodes above the state chart time to run their `_ready` functions before any state chart logic is triggered. 
 > 
-> This means that if you call `send_event` in a `_ready` function it will most likely not work as expected. If you must send an event in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`. 
+> This means that if you call `send_event`, `set_expression_property` or `step` in a `_ready` function things will most likely not work as expected. If you must call any of these functions in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`. 
 
 ##### Multiple transitions on the same state
 A single state can have multiple transitions. If this is the case, all transitions will be checked from top to bottom and the first transition that reacts to the event will be executed. If you want to have multiple transitions that react to the same event, you can use [guards](#transition-guards) to determine which transition should be taken.
