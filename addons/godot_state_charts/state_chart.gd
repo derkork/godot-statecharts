@@ -120,7 +120,10 @@ func _run_transition(transition:Transition, source:State):
 	if _transitions_processing_active:
 		_queued_transitions.append({transition : source})
 		return
-
+	
+	# enable the reentrance lock for transition processing
+	_transitions_processing_active = true
+	
 	# we can only transition away from a currently active state
 	# if for some reason the state no longer is active, ignore the transition	
 	_do_run_transition(transition, source)
@@ -131,6 +134,8 @@ func _run_transition(transition:Transition, source:State):
 		var next_transition = next_transition_entry.keys()[0]
 		var next_transition_source = next_transition_entry[next_transition]
 		_do_run_transition(next_transition, next_transition_source)
+	
+	_transitions_processing_active = false
 
 
 ## Runs the transition. Used internally by the state chart, do not call this directly.	
