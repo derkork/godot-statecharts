@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
+## [0.13.1] - 2024-02-23
 ### Fixed
 - The state chart now issues a better error message when being called while not yet ready ([#81](https://github.com/derkork/godot-statecharts/issues/81)).
+- The state chart now properly handles property changes which happen during state or transition callbacks. These will be queued after the current event or property change is fully processed. This way consistency is maintained and reactions to an event or property change will not see intermediate property changes during their execution ([#82](https://github.com/derkork/godot-statecharts/issues/82)). A big thanks goes to [Matt Idzik](https://github.com/MidZik) who supplied a PR that helped implementing this fix.
+
 ### Improved
 - The history in the state chart debugger now uses little icons to show the type history entry. This makes it easier to see what happened at a glance. A big thanks goes out to [Alireza Zamani](https://github.com/alitnk) for suggesting this improvement.
 
