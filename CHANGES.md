@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.2] - 2024-02-25
+### Fixed
+- The icons introduced in the last release seem to significantly slow down the rendering in the state chart debugger. They have been replaced with ASCII text labels as this problem can only be fixed at engine level ([#84](https://github.com/derkork/godot-statecharts/issues/84)).
+
 ## [0.13.1] - 2024-02-23
 ### Fixed
 - The state chart now issues a better error message when being called while not yet ready ([#81](https://github.com/derkork/godot-statecharts/issues/81)).
