@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2024-02-26
+### Breaking Change
+- The handling of `set_expression_property` has changed such that expression property changes are immediately visible to guards after the call to `set_expression_property` even if `set_expression_property` is called while a transition is currently in progress. For more details check out the discussion on [#82](https://github.com/derkork/godot-statecharts/issues/82). If you relied on the old behaviour, you can call `set_expression_property` deferred, to make the change visible only after the current transition is fully processed.
+
 ## [0.13.2] - 2024-02-25
 ### Fixed
 - The icons introduced in the last release seem to significantly slow down the rendering in the state chart debugger. They have been replaced with ASCII text labels as this problem can only be fixed at engine level ([#84](https://github.com/derkork/godot-statecharts/issues/84)).

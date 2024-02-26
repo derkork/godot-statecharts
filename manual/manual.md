@@ -350,6 +350,12 @@ These expression properties can then be used in your expressions. The following 
 
 > **Note:** all expressions for the expression guards are written in GDScript even if you use C# to interact with the StateChart.
 
+### Event queueing mechanism
+
+It is possible to send events or change expression properties in state callbacks like `state_entered`. This would in turn also trigger transitions. Because at this time we may already be in the process of transitioning to one or more new states, the library will queue up transitions that may result from these changes until after the current transition has finished. This will ensure that one set of transitions is fully executed including all calls to callbacks before the next one happens. If callbacks set expression properties, the changed expression property will be immediately visible, but automatic transitions resulting from this change will only run after the current transition is fully processed. For example if you set an expression property during `state_entered` the new value of this property will already be visible to automatic transitions that run on state enter. If you don't want this, consider calling `set_expression_property` deferred (e.g. `set_expression_property.call_deferred("property_name", value)`).
+
+In general the library tries to preserve order of events as much as possible though there may be some edge cases where this will not be possible. If you encounter such a case, please report it and we'll try to find a solution.
+
 ### Debugging
 
 #### Debugging in-game with the state chart debugger

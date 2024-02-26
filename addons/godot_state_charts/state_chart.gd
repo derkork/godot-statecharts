@@ -32,8 +32,11 @@ var _state:State = null
 var _expression_properties:Dictionary = {
 }
 
-## A list of pending changes
-var _queued_changes:Array[PendingChange] = []
+## A list of pending events 
+var _queued_events:Array[StringName] = []
+
+## Whether or not a property change is pending.
+var _property_change_pending:bool = false
 
 ## Flag indicating if the state chart is currently processing. 
 ## Until a change is fully processed, no further changes can
@@ -87,8 +90,9 @@ func send_event(event:StringName) -> void:
 	if not is_instance_valid(_state):
 		push_error("State chart has no root state. Ignoring call to `send_event`.")
 		return
-		
-	_run_change(PendingEvent.new(event))
+	
+	_queued_events.append(event)
+	_run_changes()
 		
 		
 ## Sets a property that can be used in expression guards. The property will be available as a global variable
@@ -102,49 +106,39 @@ func set_expression_property(name:StringName, value) -> void:
 	if not is_instance_valid(_state):
 		push_error("State chart has no root state. Ignoring call to `set_expression_property`.")
 		return
+	
+	_expression_properties[name] = value
+	_property_change_pending = true
+	_run_changes()
 		
-	_run_change(PendingPropertyChange.new(name, value))
 		
-		
-func _run_change(change:PendingChange):
+func _run_changes() -> void:
 	if _locked_down:
-		# we are currently running changes, so we need to 
-		# queue this.
-		_queued_changes.append(change)
 		return
 		
 	# enable the reentrance lock
 	_locked_down = true
 	
-	_do_run_change(change)
+	while (not _queued_events.is_empty()) or _property_change_pending:
+		# first run any pending property changes, so that we keep the order
+		# in which stuff is processed
+		if _property_change_pending:
+			_property_change_pending = false
+			_state._process_transitions(&"", true)
 	
-	# if other changed have accumulated while this change was processing
-	# process them in order now
-	while _queued_changes.size() > 0:
-		var next_change:PendingChange = _queued_changes.pop_front()
-		_do_run_change(next_change)
-		
+		if not _queued_events.is_empty():
+			# process the next event	
+			var next_event = _queued_events.pop_front()
+			event_received.emit(next_event)
+			_state._process_transitions(next_event, false)
+	
 	_locked_down = false
 
-
-## Actually runs a change through the state chart.
-func _do_run_change(change:PendingChange):
-	if change is PendingEvent:
-		# emit the received signal
-		event_received.emit(change.event_name)
-		_state._process_transitions(change.event_name, false)
-	
-	elif change is PendingPropertyChange:
-		_expression_properties[change.property] = change.value
-		# run a property change event through the state chart to run automatic transitions
-		_state._process_transitions(&"", true)
-
-		
 
 ## Allows states to queue a transition for running. This will eventually run the transition
 ## once all currently running transitions have finished. States should call this method
 ## when they want to transition away from themselves. 
-func _run_transition(transition:Transition, source:State):
+func _run_transition(transition:Transition, source:State) -> void:
 	# if we are currently inside of a transition, queue it up. This can happen
 	# if a state has an automatic transition on enter, in which case we want to
 	# finish the current transition before starting a new one.
@@ -184,7 +178,7 @@ func _warn_not_active(transition:Transition, source:State):
 
 ## Calls the `step` function in all active states. Used for situations where `state_processing` and 
 ## `state_physics_processing` don't make sense (e.g. turn-based games, or games with a fixed timestep).
-func step():
+func step() -> void:
 	if not is_node_ready():
 		push_error("State chart is not yet ready. If you call `step` in `_ready`, please call it deferred, e.g. `state_chart.step.call_deferred()`.")
 		return
@@ -205,22 +199,3 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 
-class PendingChange:
-	extends RefCounted
-
-class PendingEvent:
-	extends PendingChange
-	var event_name:StringName
-	
-	func _init(event_name:StringName):
-		self.event_name = event_name
-	
-class PendingPropertyChange:
-	extends PendingChange
-	var property:StringName
-	var value:Variant
-	
-	func _init(property:StringName, value:Variant):
-		self.property = property
-		self.value = value
-		
