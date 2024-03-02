@@ -10,12 +10,12 @@ func setup(undo_redo:EditorUndoRedoManager):
 	_undo_redo = undo_redo
 
 
-func _can_handle(object):
+func _can_handle(_object):
 	# We support all objects in this example.
 	return true
 
 
-func _parse_property(object, type, name, hint_type, hint_string, usage_flags, wide):
+func _parse_property(object, type, name, _hint_type, _hint_string, _usage_flags, _wide):
 	# We handle properties of type integer.
 	if object is Transition and name == "event" and type == TYPE_STRING_NAME:
 		# Create an instance of the custom property editor and register

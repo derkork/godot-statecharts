@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Fixed
+- The event popup in the transition editor should now appear at the correct position when using multiple monitors ([#86](https://github.com/derkork/godot-statecharts/issues/86)). A big thanks goes out to [cyber-mantis](https://github.com/cyber-mantis) for providing a fix for this issue.
+
+
 ## [0.14.0] - 2024-02-26
 ### Breaking Change
 - The handling of `set_expression_property` has changed such that expression property changes are immediately visible to guards after the call to `set_expression_property` even if `set_expression_property` is called while a transition is currently in progress. For more details check out the discussion on [#82](https://github.com/derkork/godot-statecharts/issues/82). If you relied on the old behaviour, you can call `set_expression_property` deferred, to make the change visible only after the current transition is fully processed.

@@ -32,7 +32,7 @@ func _init(transition:Transition, undo_redo:EditorUndoRedoManager):
 	_dropdown_button.pressed.connect(_show_popup)
 	
 	# build the actual editor
-	var hbox = HBoxContainer.new()
+	var hbox := HBoxContainer.new()
 	hbox.add_child(_property_control)
 	hbox.add_child(_dropdown_button)
 	_property_control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -61,15 +61,15 @@ func _show_popup():
 		_popup_menu.add_item(event)
 	
 	# and show it relative to the dropdown button
-	var gt:Rect2 = _dropdown_button.get_global_rect()
+	var gt := _dropdown_button.get_global_rect()
 	_popup_menu.reset_size()
-	var ms = _popup_menu.get_contents_minimum_size().x
-	var popup_pos = gt.end - Vector2(ms, 0)
+	var ms := _popup_menu.get_contents_minimum_size().x
+	var popup_pos := gt.end - Vector2(ms, 0) + Vector2(DisplayServer.window_get_position())
 	_popup_menu.set_position(popup_pos)
 	_popup_menu.popup()
 
 
-func _on_event_selected(index:int):
+func _on_event_selected(index:int) -> void:
 	# index 1 == "Manage"
 	if index == 1:
 		# open refactor window
@@ -79,7 +79,7 @@ func _on_event_selected(index:int):
 		return
 	
 	# replace content with selection from popup
-	var event = _popup_menu.get_item_text(index) if index > 0 else ""
+	var event := _popup_menu.get_item_text(index) if index > 0 else ""
 	_property_control.text = event
 	_on_text_changed(event)
 	_property_control.grab_focus()
@@ -89,7 +89,7 @@ func _on_text_changed(new_text:String):
 	emit_changed(get_edited_property(), new_text)
 
 
-func _update_property():
+func _update_property() -> void:
 	# Read the current value from the property.
 	var new_value = get_edited_object()[get_edited_property()]
 	
