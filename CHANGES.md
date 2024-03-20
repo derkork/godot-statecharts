@@ -5,9 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Improved
+- The state chart debugger icon is now having the same color as other UI node icons in the editor to reflect that it is a UI node. A big thanks goes out to [mieldepoche](https://github.com/mieldepoche) for suggesting this improvement and providing the icon ([#94](https://github.com/derkork/godot-statecharts/issues/94)).
+- 
 ### Fixed
 - The event popup in the transition editor should now appear at the correct position when using multiple monitors ([#86](https://github.com/derkork/godot-statecharts/issues/86)). A big thanks goes out to [cyber-mantis](https://github.com/cyber-mantis) for providing a fix for this issue.
-
 
 ## [0.14.0] - 2024-02-26
 ### Breaking Change
