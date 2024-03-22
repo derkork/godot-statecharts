@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 ### Fixed
 - The event popup in the transition editor should now appear at the correct position when using multiple monitors ([#86](https://github.com/derkork/godot-statecharts/issues/86)). A big thanks goes out to [cyber-mantis](https://github.com/cyber-mantis) for providing a fix for this issue.
+- Fixed a typo in the error message that was showing for a compound state with only one child state ([#96](https://github.com/derkork/godot-statecharts/issues/96)).
 
 ## [0.14.0] - 2024-02-26
 ### Breaking Change
