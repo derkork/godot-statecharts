@@ -197,6 +197,7 @@ func _do_run_transition(transition:Transition, source:State):
 		# here we can just focus on compound state, as other types need no extra actions
 		if parent_state is CompoundState:
 			# no matter what, the child should be the active state of the parent compound state
+			# if not, current _active_state should exit
 			if parent_state._active_state != null and parent_state._active_state != child_state:
 				parent_state._active_state._state_exit()
 
@@ -207,12 +208,12 @@ func _do_run_transition(transition:Transition, source:State):
 					return
 
 				# otherwise, try enter the default state if it exists
-				var default_state = target.get_node_or_null(target.default_state)
+				var default_state = child_state.get_node_or_null(child_state.default_state)
 				if is_instance_valid(default_state):
 					parent_state.active_state = default_state
 					parent_state.active_state._state_enter()
 				else:
-					push_error("The default state '" + target.default_state + "' of the history state '" + target.name + "' cannot be found.")
+					push_error("The default state '" + child_state.default_state + "' of the history state '" + child_state.name + "' cannot be found.")
 				return
 
 			else:
