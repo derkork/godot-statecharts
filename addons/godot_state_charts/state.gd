@@ -228,8 +228,7 @@ func _process(delta:float):
 
 
 
-func _handle_transition(transition:Transition, source:State):
-	push_error("State " + name + " cannot handle transitions.")
+
 	
 
 func _physics_process(delta:float):

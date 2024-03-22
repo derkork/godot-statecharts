@@ -4,15 +4,7 @@
 class_name AtomicState
 extends State
 
-func _handle_transition(transition:Transition, source:State):
-	# resolve the target state
-	var target = transition.resolve_target()
-	if not target is State:
-		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
-		return
-	# atomic states cannot transition, so we need to ask the parent
-	# ask the parent
-	get_parent()._handle_transition(transition, source)
+
 
 
 func _get_configuration_warnings() -> PackedStringArray :

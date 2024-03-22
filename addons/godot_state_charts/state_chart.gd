@@ -163,12 +163,64 @@ func _run_transition(transition:Transition, source:State) -> void:
 
 ## Runs the transition. Used internally by the state chart, do not call this directly.	
 func _do_run_transition(transition:Transition, source:State):
-	if source.active:
-		# Notify interested parties that the transition is about to be taken
-		transition.taken.emit()
-		source._handle_transition(transition, source)
-	else:
-		_warn_not_active(transition, source)	
+	if not source.active:
+		_warn_not_active(transition, source)
+		return
+
+	var target = transition.resolve_target()
+	if not target is State:
+		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
+		return
+	transition.taken.emit()
+
+	var transition_path:NodePath = source.get_path_to(target)
+
+	# if transition.to is the source state, just let the state exit and re-enter itself
+	if transition_path == ^".":
+		source._state_exit()
+		source._state_enter()
+		return
+
+	# otherwise, we go from source to target along the node path
+	var parent_state := source
+	var child_state:State
+	for idx in transition_path.get_name_count():
+
+		# firstly, find the common ancestor of the source and target if these is a common ancestor
+		if transition_path.get_name(idx) == &"..":
+			parent_state = parent_state.get_parent()
+			continue
+
+		# from the ancestor node, we go through the node path to reach the target
+		child_state = parent_state.get_node(transition_path.get_name(idx) as String)
+
+		# here we can just focus on compound state, as other types need no extra actions
+		if parent_state is CompoundState:
+			# no matter what, the child should be the active state of the parent compound state
+			if parent_state._active_state != null and parent_state._active_state != child_state:
+				parent_state._active_state._state_exit()
+
+			# if target state is history state, we first try to restore its saved state if it exists
+			if child_state is HistoryState:
+				if child_state.history != null:
+					parent_state._state_restore(child_state.history, -1 if child_state.deep else 1)
+					return
+
+				# otherwise, try enter the default state if it exists
+				var default_state = target.get_node_or_null(target.default_state)
+				if is_instance_valid(default_state):
+					parent_state.active_state = default_state
+					parent_state.active_state._state_enter()
+				else:
+					push_error("The default state '" + target.default_state + "' of the history state '" + target.name + "' cannot be found.")
+				return
+
+			else:
+				parent_state._active_state = child_state
+				# we do not expect transition if we do not reach the target yet
+				parent_state._active_state._state_enter(child_state != target)
+
+		parent_state = child_state
 
 
 func _warn_not_active(transition:Transition, source:State):
