@@ -9,7 +9,7 @@ namespace GodotStateCharts
     /// <summary>
     /// Wrapper around the compound state node.
     /// </summary>
-    public class CompoundState : State
+    public class CompoundState : StateChartState
     {
 
         private CompoundState(Node wrapped) : base(wrapped)
@@ -35,7 +35,7 @@ namespace GodotStateCharts
             return new CompoundState(state);
         }
 
-        public new class SignalName : State.SignalName
+        public new class SignalName : StateChartState.SignalName
         {
             /// <summary>
             /// Called when a child state is entered.

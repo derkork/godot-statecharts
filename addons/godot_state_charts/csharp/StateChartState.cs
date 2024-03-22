@@ -8,10 +8,10 @@ namespace GodotStateCharts
     /// <summary>
     /// A wrapper around the state node that allows interacting with it from C#.
     /// </summary>
-    public class State : NodeWrapper
+    public class StateChartState : NodeWrapper
     {
 
-        protected State(Node wrapped) : base(wrapped) { }
+        protected StateChartState(Node wrapped) : base(wrapped) { }
 
         /// <summary>
         /// Creates a wrapper object around the given node and verifies that the node
@@ -21,7 +21,7 @@ namespace GodotStateCharts
         /// <param name="state">the node that is the state</param>
         /// <returns>a State wrapper.</returns>
         /// <throws>ArgumentException if the node is not a state.</throws>
-        public static State Of(Node state)
+        public static StateChartState Of(Node state)
         {
             if (state.GetScript().As<Script>() is not GDScript gdScript ||
                 !gdScript.ResourcePath.EndsWith("state.gd"))
@@ -29,7 +29,7 @@ namespace GodotStateCharts
                 throw new ArgumentException("Given node is not a state.");
             }
 
-            return new State(state);
+            return new StateChartState(state);
         }
 
         /// <summary>

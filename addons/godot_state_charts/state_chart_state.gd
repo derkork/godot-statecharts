@@ -1,6 +1,6 @@
 @tool
 ## This class represents a state that can be either active or inactive.
-class_name State
+class_name StateChartState
 extends Node
 
 ## Called when the state is entered.
@@ -156,7 +156,7 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 
 	# save all children
 	for child in get_children():
-		if child is State and child.active:
+		if child is StateChartState and child.active:
 			child._state_save(our_saved_state, sub_child_levels)
 
 
@@ -199,7 +199,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 
 	# restore all children
 	for child in get_children():
-		if child is State:
+		if child is StateChartState:
 			child._state_restore(our_saved_state, sub_child_levels)
 
 
@@ -228,7 +228,7 @@ func _process(delta:float):
 
 
 
-func _handle_transition(transition:Transition, source:State):
+func _handle_transition(transition:Transition, source:StateChartState):
 	push_error("State " + name + " cannot handle transitions.")
 	
 

@@ -40,7 +40,7 @@
     <Content Include="addons\godot_state_charts\parallel_state.svg.import" />
     <Content Include="addons\godot_state_charts\plugin.cfg" />
     <Content Include="addons\godot_state_charts\saved_state.gd" />
-    <Content Include="addons\godot_state_charts\state.gd" />
+    <Content Include="addons\godot_state_charts\state_chart_state.gd" />
     <Content Include="addons\godot_state_charts\state_chart.gd" />
     <Content Include="addons\godot_state_charts\state_chart.svg" />
     <Content Include="addons\godot_state_charts\state_chart.svg.import" />

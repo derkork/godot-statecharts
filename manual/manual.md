@@ -131,9 +131,9 @@ public class MyNode : Node
 
     private void _Ready() {
         // get the active state node
-        var state = State.Of(GetNode("%ActiveState"));
+        var state = StateChartState.Of(GetNode("%ActiveState"));
         // connect to the state_entered signal
-        state.Connect(State.SignalName.StateEntered, Callable.From(OnStateEntered));
+        state.Connect(StateChartState.SignalName.StateEntered, Callable.From(OnStateEntered));
     }
 
     private void OnStateEntered()

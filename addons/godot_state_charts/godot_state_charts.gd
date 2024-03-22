@@ -114,7 +114,7 @@ func _on_selection_changed() -> void:
 	if selection.size() == 1:
 		var selected_node = selection[0]
 		if selected_node is StateChart \
-			or selected_node is State \
+			or selected_node is StateChartState \
 			or selected_node is Transition:
 			_ui_sidebar_canvas.show()
 			_ui_sidebar_canvas.change_selected_node(selected_node)

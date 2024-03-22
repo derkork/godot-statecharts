@@ -19,10 +19,10 @@ extends Resource
 
 
 ## Adds the given substate to this saved state
-func add_substate(state:State, saved_state:SavedState):
+func add_substate(state:StateChartState, saved_state:SavedState):
 	child_states[state.name] = saved_state
 
 ## Returns the saved state of the given substate, or null if it does not exist
-func get_substate_or_null(state:State) -> SavedState:
+func get_substate_or_null(state:StateChartState) -> SavedState:
 	return child_states.get(state.name)
 

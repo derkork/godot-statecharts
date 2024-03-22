@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Breaking change
+- The class `State` has been renamed to `StateChartState` to avoid conflicts with other libraries that might also have a class or enum named `State`. If you have code that uses the `State` class, you will need to update it to use `StateChartState` instead. This change also affects C# projects as the class name has changed there as well even though C# has namespaces to avoid conflicts ([#97](https://github.com/derkork/godot-statecharts/issues/97)). 
+
 ### Improved
 - The state chart debugger icon is now having the same color as other UI node icons in the editor to reflect that it is a UI node. A big thanks goes out to [mieldepoche](https://github.com/mieldepoche) for suggesting this improvement and providing the icon ([#94](https://github.com/derkork/godot-statecharts/issues/94)).
 - 

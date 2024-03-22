@@ -43,7 +43,7 @@ var _state_chart:StateChart
 var _root:Node
 
 # the states we are currently connected to
-var _connected_states:Array[State] = []
+var _connected_states:Array[StateChartState] = []
 
 # the transitions we are currently connected to
 # key is the transition, value is the callable
@@ -162,18 +162,18 @@ func _connect_all_signals():
 
 	# find all state nodes below the state chart and connect their signals
 	for child in _state_chart.get_children():
-		if child is State:
+		if child is StateChartState:
 			_connect_signals(child)
 
 
-func _connect_signals(state:State):
+func _connect_signals(state:StateChartState):
 	state.state_entered.connect(_on_state_entered.bind(state))
 	state.state_exited.connect(_on_state_exited.bind(state))
 	_connected_states.append(state)
 
 	# recurse into children
 	for child in state.get_children():
-		if child is State:
+		if child is StateChartState:
 			_connect_signals(child)
 		if child is Transition:
 			var callable = _on_before_transition.bind(child, state)
@@ -215,7 +215,7 @@ func _process(delta):
 
 func _collect_active_states(root:Node, parent:TreeItem):
 	for child in root.get_children():
-		if child is State:
+		if child is StateChartState:
 			if child.active:
 				var state_item = _tree.create_item(parent)
 				state_item.set_text(0, child.name)
@@ -231,7 +231,7 @@ func _clear_history():
 	_history_edit.text = ""
 	_history.clear()
 
-func _on_before_transition(transition:Transition, source:State):
+func _on_before_transition(transition:Transition, source:StateChartState):
 	if ignore_transitions:
 		return
 
@@ -245,14 +245,14 @@ func _on_event_received(event:StringName):
 	_history.add_event(Engine.get_process_frames(), event)	
 
 	
-func _on_state_entered(state:State):
+func _on_state_entered(state:StateChartState):
 	if ignore_state_changes:
 		return
 		
 	_history.add_state_entered(Engine.get_process_frames(), state.name)
 
 
-func _on_state_exited(state:State):
+func _on_state_exited(state:StateChartState):
 	if ignore_state_changes:
 		return
 		

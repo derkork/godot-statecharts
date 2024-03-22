@@ -3,7 +3,7 @@
 ## A compound state is a state that has multiple sub-states of which exactly one can
 ## be active at any given time.
 class_name CompoundState
-extends State
+extends StateChartState
 
 ## Called when a child state is entered.
 signal child_state_entered()
@@ -12,7 +12,7 @@ signal child_state_entered()
 signal child_state_exited()
 
 ## The initial state which should be activated when this state is activated.
-@export_node_path("State") var initial_state:NodePath:
+@export_node_path("StateChartState") var initial_state:NodePath:
 	get:
 		return initial_state
 	set(value):
@@ -21,10 +21,10 @@ signal child_state_exited()
 
 
 ## The currently active substate.
-var _active_state:State = null
+var _active_state:StateChartState = null
 
 ## The initial state
-@onready var _initial_state:State = get_node_or_null(initial_state)
+@onready var _initial_state:StateChartState = get_node_or_null(initial_state)
 
 ## The history states of this compound state.
 var _history_states:Array[HistoryState] = []
@@ -44,8 +44,8 @@ func _state_init():
 
 	# initialize all substates. find all children of type State and call _state_init on them.
 	for child in get_children():
-		if child is State:
-			var child_as_state:State = child as State
+		if child is StateChartState:
+			var child_as_state:StateChartState = child as StateChartState
 			child_as_state._state_init()
 			child_as_state.state_entered.connect(func(): child_state_entered.emit())
 			child_as_state.state_exited.connect(func(): child_state_exited.emit())
@@ -84,7 +84,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 	if active:
 		# find the currently active child
 		for child in get_children():
-			if child is State and child.active:
+			if child is StateChartState and child.active:
 				_active_state = child
 				break
 
@@ -128,11 +128,11 @@ func _process_transitions(event:StringName, property_change:bool = false) -> boo
 	return super._process_transitions(event, property_change)
 
 
-func _handle_transition(transition:Transition, source:State):
+func _handle_transition(transition:Transition, source:StateChartState):
 	# print("CompoundState._handle_transition: " + name + " from " + source.name + " to " + str(transition.to))
 	# resolve the target state
 	var target = transition.resolve_target()
-	if not target is State:
+	if not target is StateChartState:
 		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
 		return
 	
@@ -186,7 +186,7 @@ func _handle_transition(transition:Transition, source:State):
 	if self.is_ancestor_of(target):
 		# find the child which is the ancestor of the new target.
 		for child in get_children():
-			if child is State and child.is_ancestor_of(target):
+			if child is StateChartState and child.is_ancestor_of(target):
 				# found it. 
 				# change active state if necessary
 				if _active_state != child:
@@ -213,7 +213,7 @@ func add_child(node:Node, force_readable_name:bool = false, internal:InternalMod
 	# when a child is added in the editor and the child is a state
 	# and we don't have an initial state yet, set the initial state 
 	# to the newly added child
-	if Engine.is_editor_hint() and node is State:
+	if Engine.is_editor_hint() and node is StateChartState:
 		if initial_state.is_empty():
 			# the newly added node may have a random name now, 
 			# so we need to defer the call to build a node path
@@ -228,7 +228,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 	# count the amount of child states
 	var child_count = 0
 	for child in get_children():
-		if child is State:
+		if child is StateChartState:
 			child_count += 1
 
 	if child_count < 2:

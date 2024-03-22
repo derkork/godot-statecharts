@@ -25,7 +25,7 @@ signal event_received(event:StringName)
 @export var track_in_editor:bool = false
 
 ## The root state of the state chart.
-var _state:State = null
+var _state:StateChartState = null
 
 ## This dictonary contains known properties used in expression guards. Use the 
 ## [method set_expression_property] to add properties to this dictionary.
@@ -60,12 +60,12 @@ func _ready() -> void:
 
 	# check if the child is a state
 	var child:Node = get_child(0)
-	if not child is State:
+	if not child is StateChartState:
 		push_error("StateMachine's child must be a State")
 		return
 
 	# initialize the state machine
-	_state = child as State
+	_state = child as StateChartState
 	_state._state_init()
 
 	# enter the state
@@ -138,7 +138,7 @@ func _run_changes() -> void:
 ## Allows states to queue a transition for running. This will eventually run the transition
 ## once all currently running transitions have finished. States should call this method
 ## when they want to transition away from themselves. 
-func _run_transition(transition:Transition, source:State) -> void:
+func _run_transition(transition:Transition, source:StateChartState) -> void:
 	# if we are currently inside of a transition, queue it up. This can happen
 	# if a state has an automatic transition on enter, in which case we want to
 	# finish the current transition before starting a new one.
@@ -162,7 +162,7 @@ func _run_transition(transition:Transition, source:State) -> void:
 	_transitions_processing_active = false
 
 ## Runs the transition. Used internally by the state chart, do not call this directly.	
-func _do_run_transition(transition:Transition, source:State):
+func _do_run_transition(transition:Transition, source:StateChartState):
 	if source.active:
 		# Notify interested parties that the transition is about to be taken
 		transition.taken.emit()
@@ -171,7 +171,7 @@ func _do_run_transition(transition:Transition, source:State):
 		_warn_not_active(transition, source)	
 
 
-func _warn_not_active(transition:Transition, source:State):
+func _warn_not_active(transition:Transition, source:StateChartState):
 	push_warning("Ignoring request for transitioning from ", source.name, " to ", transition.to, " as the source state is no longer active. Check whether your trigger multiple state changes within a single frame.")
 
 
@@ -194,7 +194,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 		warnings.append("StateChart must have exactly one child")
 	else:
 		var child:Node = get_child(0)
-		if not child is State:
+		if not child is StateChartState:
 			warnings.append("StateChart's child must be a State")
 	return warnings
 

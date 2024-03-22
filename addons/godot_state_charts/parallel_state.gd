@@ -3,16 +3,16 @@
 ## A parallel state is a state which can have sub-states, all of which are active
 ## when the parallel state is active.
 class_name ParallelState
-extends State
+extends StateChartState
 
 # all children of the state
-var _sub_states:Array[State] = []
+var _sub_states:Array[StateChartState] = []
 
 func _state_init():
 	super._state_init()
 	# find all children of this state which are states
 	for child in get_children():
-		if child is State:
+		if child is StateChartState:
 			_sub_states.append(child)
 			child._state_init()
 
@@ -20,10 +20,10 @@ func _state_init():
 	# subscribe to events from our children
 
 
-func _handle_transition(transition:Transition, source:State):
+func _handle_transition(transition:Transition, source:StateChartState):
 	# resolve the target state
 	var target = transition.resolve_target()
-	if not target is State:
+	if not target is StateChartState:
 		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
 		return
 	
@@ -52,7 +52,7 @@ func _handle_transition(transition:Transition, source:State):
 	if self.is_ancestor_of(target):
 		# find the child which is the ancestor of the new target.
 		for child in get_children():
-			if child is State and child.is_ancestor_of(target):
+			if child is StateChartState and child.is_ancestor_of(target):
 				# ask child to handle the transition
 				child._handle_transition(transition, source)
 				return
@@ -106,7 +106,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 	
 	var child_count = 0
 	for child in get_children():
-		if child is State:
+		if child is StateChartState:
 			child_count += 1
 	
 	if child_count < 2:

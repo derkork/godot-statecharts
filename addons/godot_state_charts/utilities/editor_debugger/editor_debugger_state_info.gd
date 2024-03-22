@@ -26,7 +26,7 @@ static func make_array( \
 	## The remaining transition time for the pending transition if any.
 	transition_time:float, \
 	## The kind of state
-	state:State \
+	state:StateChartState \
 ) -> Array:
 	return [ \
 		chart, \
@@ -38,7 +38,7 @@ static func make_array( \
 		type_for_state(state) ]
 
 ## Get the state type for the given state.
-static func type_for_state(state:State) -> StateTypes:
+static func type_for_state(state:StateChartState) -> StateTypes:
 	if state is CompoundState:
 		return StateTypes.CompoundState
 	elif state is ParallelState:

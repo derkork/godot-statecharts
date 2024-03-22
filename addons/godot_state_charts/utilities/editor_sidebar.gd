@@ -36,7 +36,7 @@ func _repaint():
 		
 	# we can add transitions to all states
 	var can_add_transitions = \
-		_selected_node is State
+		_selected_node is StateChartState
 		
 	_add_section.visible = can_add_states or can_add_transitions
 	_no_options_label.visible = not (can_add_states or can_add_transitions)

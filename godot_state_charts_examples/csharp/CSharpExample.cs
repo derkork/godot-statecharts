@@ -13,7 +13,7 @@ public partial class CSharpExample : Node2D
 	private Label _feelLabel;
 	private int _poisonCount;
 	private int _health = 20;
-	private State _poisonedState;
+	private StateChartState _poisonedStateChartState;
 	
 	public override void _Ready()
 	{
@@ -23,7 +23,7 @@ public partial class CSharpExample : Node2D
 		
 		// Get the poisoned state node and wrap it in a State object, so we can easily
 		// interact with it from C#.
-		_poisonedState = State.Of(GetNode("%Poisoned"));
+		_poisonedStateChartState = StateChartState.Of(GetNode("%Poisoned"));
 		
 		// The the UI label.
 		_feelLabel = GetNode<Label>("%FeelLabel");
@@ -111,7 +111,7 @@ public partial class CSharpExample : Node2D
 		// States have an "Active" property that can be used to check if they are currently active.
 		// Note that you should usually not use this in your game code, as it sort of defeats the
 		// purpose of using a state chart. But it can be useful for debugging.
-		GD.Print("Are we poisoned? ", _poisonedState.Active ? "Yes" : "No");	
+		GD.Print("Are we poisoned? ", _poisonedStateChartState.Active ? "Yes" : "No");	
 	}
 
 }

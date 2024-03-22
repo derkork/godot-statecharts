@@ -1,7 +1,7 @@
 @tool
 @icon("history_state.svg")
 class_name HistoryState
-extends State
+extends StateChartState
 
 ## Whether this state is a deep history state. A deep history state
 ## will remember all nested states, while a shallow history state will
@@ -9,7 +9,7 @@ extends State
 @export var deep:bool = false
 
 ## The default state to transition to if no history is available.
-@export_node_path("State") var default_state:NodePath:
+@export_node_path("StateChartState") var default_state:NodePath:
 	set(value):
 		default_state = value
 		update_configuration_warnings()
@@ -43,7 +43,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	# the default state must be a state
 	var default_state_node = get_node_or_null(default_state)
-	if not default_state_node is State:
+	if not default_state_node is StateChartState:
 		warnings.append("The default state is not set or is not a state.")
 	else:
 		# the default state must be a child of the parent state

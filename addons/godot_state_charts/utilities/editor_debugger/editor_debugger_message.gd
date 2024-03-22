@@ -32,7 +32,7 @@ static func state_chart_removed(chart:StateChart) -> void:
 		
 		
 ## Sends a state_updated message
-static func state_updated(chart:StateChart, state:State) -> void:
+static func state_updated(chart:StateChart, state:StateChartState) -> void:
 	if not _can_send():
 		return
 
@@ -52,21 +52,21 @@ static func state_updated(chart:StateChart, state:State) -> void:
 	
 
 ## Sends a state_entered message
-static func state_entered(chart:StateChart, state:State) -> void:
+static func state_entered(chart:StateChart, state:StateChartState) -> void:
 	if not _can_send():
 		return
 		
 	EngineDebugger.send_message(STATE_ENTERED_MESSAGE,[Engine.get_process_frames(), chart.get_path(), chart.get_path_to(state)])
 
 ## Sends a state_exited message
-static func state_exited(chart:StateChart, state:State) -> void:
+static func state_exited(chart:StateChart, state:StateChartState) -> void:
 	if not _can_send():
 		return
 		
 	EngineDebugger.send_message(STATE_EXITED_MESSAGE,[Engine.get_process_frames(), chart.get_path(), chart.get_path_to(state)])
 
 ## Sends a transition taken message
-static func transition_taken(chart:StateChart, source:State, transition:Transition) -> void:
+static func transition_taken(chart:StateChart, source:StateChartState, transition:Transition) -> void:
 	if not _can_send():
 		return
 		
@@ -81,7 +81,7 @@ static func event_received(chart:StateChart, event_name:StringName) -> void:
 	EngineDebugger.send_message(STATE_CHART_EVENT_RECEIVED_MESSAGE, [Engine.get_process_frames(), chart.get_path(), event_name])
 
 ## Sends a transition pending message
-static func transition_pending(chart:StateChart, source:State, transition:Transition, pending_transition_time:float) -> void:
+static func transition_pending(chart:StateChart, source:StateChartState, transition:Transition, pending_transition_time:float) -> void:
 	if not _can_send():
 		return
 		

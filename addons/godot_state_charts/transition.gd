@@ -10,7 +10,7 @@ extends Node
 signal taken()
 
 ## The target state to which the transition should switch
-@export_node_path("State") var to:NodePath:
+@export_node_path("StateChartState") var to:NodePath:
 	set(value):
 		to = value
 		update_configuration_warnings()
@@ -50,7 +50,7 @@ func evaluate_guard() -> bool:
 		return true
 
 	var parent_state = get_parent()
-	if parent_state == null or not (parent_state is State):
+	if parent_state == null or not (parent_state is StateChartState):
 		push_error("Transitions must be children of states.")
 		return false	
 		
@@ -58,12 +58,12 @@ func evaluate_guard() -> bool:
 
 ## Resolves the target state and returns it. If the target state is not found,
 ## this function will return null.
-func resolve_target() -> State:
+func resolve_target() -> StateChartState:
 	if to == null or to.is_empty():
 		return null
 
 	var result = get_node_or_null(to) 
-	if result is State:
+	if result is StateChartState:
 		return result
 
 	return null
@@ -79,7 +79,7 @@ func _get_configuration_warnings():
 	elif resolve_target() == null:
 		warnings.append("The target state " + str(to) + " could not be found")
 
-	if not (get_parent() is State):
+	if not (get_parent() is StateChartState):
 		warnings.append("Transitions must be children of states.")
 	
 	return warnings
