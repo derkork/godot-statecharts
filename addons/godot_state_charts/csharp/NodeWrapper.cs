@@ -28,6 +28,22 @@ namespace GodotStateCharts
         {
             Wrapped.Connect(signal, method, flags);
         }
-
+        
+        
+        /// <summary>
+        /// Allows to call methods on the wrapped node deferred.
+        /// </summary>
+        public void CallDeferred(string method, params Variant[] args)
+        {
+            Wrapped.CallDeferred(method, args);
+        }
+        
+        /// <summary>
+        /// Allows to call methods on the wrapped node.
+        /// </summary>
+        public void Call(string method, params Variant[] args)
+        {
+            Wrapped.Call(method, args);
+        }
     }
 }

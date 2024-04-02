@@ -38,7 +38,7 @@ namespace GodotStateCharts
         /// node below the given one.</param>
         public void DebugNode(Node node)
         {
-            Wrapped.Call("debug_node", node);
+            Call(MethodName.DebugNode, node);
         }
         
         /// <summary>
@@ -47,7 +47,19 @@ namespace GodotStateCharts
         /// <param name="text">the text to add</param>
         public void AddHistoryEntry(string text)
         {
-            Wrapped.Call("add_history_entry", text);
+            Call(MethodName.AddHistoryEntry, text);
+        }
+        
+        public new class MethodName : Node.MethodName
+        {
+            /// <summary>
+            /// Sets the node that the state chart debugger should debug.
+            /// </summary>
+            public static readonly string DebugNode = "debug_node";
+            /// <summary>
+            ///  Adds a history entry to the history output.
+            /// </summary>
+            public static readonly string AddHistoryEntry = "add_history_entry";
         }
     }
 }

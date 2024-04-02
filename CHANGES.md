@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.15.1] - 2024-04-02
+### Improved
+- The C# wrappers for the state chart nodes now have a `CallDeferred` function and a new `MethodNames` enum which contains the names of all methods that can be called on a state chart node. This makes it easier to call methods on a state chart node from C# code (e.g. `		_stateChart.CallDeferred(StateChart.MethodName.SendEvent, "player_entered")
+  ` ([#101](https://github.com/derkork/godot-statecharts/issues/101)).
+
+### Fixed
+- Compound states will now properly handle some edge cases that occur when a transition is immediately leaving them once they are entered. This will prevent multiple child states of compound states from being active at the same time or child states being entered but never exited even though the compound state is left ([#100](https://github.com/derkork/godot-statecharts/issues/100)).
+
 
 ## [0.15.0] - 2024-03-25
 ### Breaking change

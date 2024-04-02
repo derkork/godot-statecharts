@@ -39,7 +39,7 @@ namespace GodotStateCharts
         /// <param name="eventName">the name of the event to send</param>
         public void SendEvent(string eventName)
         {
-            Wrapped.Call("send_event", eventName);
+            Call(MethodName.SendEvent, eventName);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace GodotStateCharts
         /// <param name="value">the value to set the property to.</param>
         public void SetExpressionProperty(string name, Variant value)
         {
-            Wrapped.Call("set_expression_property", name, value);
+            Call(MethodName.SetExpressionProperty, name, value);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace GodotStateCharts
         /// </summary>
         public void Step()
         {
-            Wrapped.Call("step");
+            Call(MethodName.Step);
         }
 
         public class SignalName : Node.SignalName
@@ -78,5 +78,26 @@ namespace GodotStateCharts
             /// </summary>
             public static readonly StringName EventReceived = "event_received";
         }
+        
+        public new class MethodName : Node.MethodName
+        {
+            /// <summary>
+            /// Sends an event to the state chart node.
+            /// </summary>
+            public static readonly StringName SendEvent = "send_event";
+            
+            /// <summary>
+            /// Sets an expression property on the state chart node for later use with expression guards.
+            /// </summary>
+            public static readonly StringName SetExpressionProperty = "set_expression_property";
+            
+            /// <summary>
+            /// Steps the state chart node. This will invoke all <code>state_stepped</code> signals on the
+            /// currently active states in the state charts. See the "Stepping Mode" section of the manual
+            /// for more details.
+            /// </summary>
+            public static readonly StringName Step = "step";
+        }
+        
     }
 }
