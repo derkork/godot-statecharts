@@ -52,8 +52,11 @@ func _state_init():
 
 func _state_enter(expect_transition:bool = false):
 	super._state_enter()
-	# activate the initial state unless we expect a transition
-	if not expect_transition:
+	# activate the initial state _unless_ one of these are true 
+	# - we expect a transition because we are entering this state just to activate child states further down
+	# - we already have an active state because entering the state triggered an immediate transition to a child state
+	# - we are no longer active becasue entering the state triggered an immediate transition to some other state
+	if not expect_transition and not is_instance_valid(_active_state) and _state_active:
 		if _initial_state != null:
 			_active_state = _initial_state
 			_active_state._state_enter()
