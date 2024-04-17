@@ -112,6 +112,7 @@ func _state_enter(expect_transition:bool = false):
 		if not transition.has_event and transition.evaluate_guard():
 			# first match wins
 			_run_transition(transition)
+			break
 
 ## Called when the state is exited.
 func _state_exit():
