@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.15.2] - 2024-04-17
+### Fixed
+- Using a history state as initial state of a compound state will no longer leave the compound state stuck at the history state.
+- When having multiple automatic transitions with a delay in a state the first matching transition will be taken. Before, if all automatic transitions had a delay, the last matching transition was taken which was different from the documented behavior.
+
 ## [0.15.1] - 2024-04-02
 ### Improved
 - The C# wrappers for the state chart nodes now have a `CallDeferred` function and a new `MethodNames` enum which contains the names of all methods that can be called on a state chart node. This makes it easier to call methods on a state chart node from C# code (e.g. `		_stateChart.CallDeferred(StateChart.MethodName.SendEvent, "player_entered")
