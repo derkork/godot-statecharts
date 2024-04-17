@@ -58,8 +58,11 @@ func _state_enter(expect_transition:bool = false):
 	# - we are no longer active becasue entering the state triggered an immediate transition to some other state
 	if not expect_transition and not is_instance_valid(_active_state) and _state_active:
 		if _initial_state != null:
-			_active_state = _initial_state
-			_active_state._state_enter()
+			if _initial_state is HistoryState:
+				_restore_history_state(_initial_state)
+			else:
+				_active_state = _initial_state
+				_active_state._state_enter()
 		else:
 			push_error("No initial state set for state '" + name + "'.")
 
@@ -164,22 +167,8 @@ func _handle_transition(transition:Transition, source:StateChartState):
 		# now check if the target is a history state, if this is the 
 		# case, we need to restore the saved state
 		if target is HistoryState:
-			# print("Target is history state, restoring saved state.")
-			var saved_state = target.history
-			if saved_state != null:
-				# restore the saved state
-				_state_restore(saved_state, -1 if target.deep else 1)
-				return
-			# print("No history saved so far, activating default state.")
-			# if we don't have history, we just activate the default state
-			var default_state = target.get_node_or_null(target.default_state)
-			if is_instance_valid(default_state):
-				_active_state = default_state
-				_active_state._state_enter()
-				return
-			else:
-				push_error("The default state '" + target.default_state + "' of the history state '" + target.name + "' cannot be found.")
-				return
+			_restore_history_state(target)
+			return
 
 		# else, just activate the target state
 		_active_state = target
@@ -210,6 +199,24 @@ func _handle_transition(transition:Transition, source:StateChartState):
 	# ask the parent
 	get_parent()._handle_transition(transition, source)
 
+
+func _restore_history_state(target:HistoryState):
+	# print("Target is history state, restoring saved state.")
+	var saved_state = target.history
+	if saved_state != null:
+		# restore the saved state
+		_state_restore(saved_state, -1 if target.deep else 1)
+		return
+	# print("No history saved so far, activating default state.")
+	# if we don't have history, we just activate the default state
+	var default_state = target.get_node_or_null(target.default_state)
+	if is_instance_valid(default_state):
+		_active_state = default_state
+		_active_state._state_enter()
+		return
+	else:
+		push_error("The default state '" + str(target.default_state) + "' of the history state '" + target.name + "' cannot be found.")
+		return
 
 func add_child(node:Node, force_readable_name:bool = false, internal:InternalMode = INTERNAL_MODE_DISABLED) -> void:
 	super.add_child(node, force_readable_name, internal)
