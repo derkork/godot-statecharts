@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## Unreleased
+### Fixed
+- The history log in the state chart debugger in the editor now only updates when there were actually changes. This will increase performance and prevent the log from becoming un-scrollable.
+
+
 ## [0.15.2] - 2024-04-17
 ### Fixed
 - Using a history state as initial state of a compound state will no longer leave the compound state stuck at the history state.

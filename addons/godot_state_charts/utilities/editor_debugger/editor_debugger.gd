@@ -206,9 +206,10 @@ func _repaint_current_chart() -> void:
 		return
 
 	# get the history for this chart and update the history text edit
-	var history = _chart_histories[_current_chart]
-	_history_edit.text = history.get_history_text()
-	_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
+	var history:DebuggerHistory = _chart_histories[_current_chart]
+	if history != null and history.dirty:
+		_history_edit.text = history.get_history_text()
+		_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
 	
 	# update the tree
 	for state_info in _state_infos[_current_chart].values():
@@ -312,16 +313,7 @@ func _on_timer_timeout():
 	# repaint the current chart
 	_repaint_current_chart()
 
-	var chart_history = _chart_histories.get(_current_chart, null)
-
-	# ignore the timer if the history edit isn't visible
-	if not _history_edit.visible or chart_history == null or not chart_history.dirty:
-		var dirty = false if chart_history == null else chart_history.dirty
-		return 
 	
-	# fill the history field
-	_history_edit.text = chart_history.get_history_text()
-	_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
 
 ## Called when the ignore events checkbox is toggled.
 func _on_ignore_events_checkbox_toggled(button_pressed:bool) -> void:
