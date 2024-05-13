@@ -201,13 +201,13 @@ func _repaint_charts() -> void:
 
 
 ## Repaints the tree of the currently selected state chart.
-func _repaint_current_chart() -> void:
+func _repaint_current_chart(force:bool = false) -> void:
 	if _current_chart.is_empty():
 		return
 
 	# get the history for this chart and update the history text edit
 	var history:DebuggerHistory = _chart_histories[_current_chart]
-	if history != null and history.dirty:
+	if history != null and (history.dirty or force):
 		_history_edit.text = history.get_history_text()
 		_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
 	
@@ -294,7 +294,7 @@ func _on_all_state_charts_tree_item_selected():
 		
 	var path = item.get_meta("__path")
 	_current_chart = path
-	_repaint_current_chart()
+	_repaint_current_chart(true)
 
 
 ## Called every 0.5 seconds to update the history text edit and the maximum lines setting.	
