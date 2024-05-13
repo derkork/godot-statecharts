@@ -82,7 +82,7 @@ func initialize(settings:EditorSettings, session:EditorDebuggerSession):
 	
 ## Returns the given setting or the default value if the setting is not set.
 ## No clue, why this isn't a built-in function.
-func _get_setting_or_default(key, default):
+func _get_setting_or_default(key, default) -> Variant :
 	if _settings == null:
 		return default
 	
@@ -92,7 +92,7 @@ func _get_setting_or_default(key, default):
 	return _settings.get_setting(key)
 
 ## Sets the given setting and marks it as changed.
-func _set_setting(key, value):
+func _set_setting(key, value) -> void:
 	if _settings == null:
 		return
 	_settings.set_setting(key, value)
@@ -110,7 +110,7 @@ func _clear_all():
 	_chart_histories.clear()
 	_all_state_charts_tree.clear()
 	
-	var root = _all_state_charts_tree.create_item()
+	var root := _all_state_charts_tree.create_item()
 	root.set_text(0, "State Charts")
 	root.set_selectable(0, false)
 	
@@ -121,7 +121,7 @@ func _clear_current():
 	_current_chart = ""
 	_current_state_chart_tree.clear()
 	_history_edit.clear()
-	var root = _current_state_chart_tree.create_item()
+	var root := _current_state_chart_tree.create_item()
 	root.set_text(0, "States")
 	root.set_selectable(0, false)
 
@@ -218,7 +218,7 @@ func _repaint_current_chart(force:bool = false) -> void:
 		if DebuggerStateInfo.get_transition_pending(state_info):
 			var transition_path := DebuggerStateInfo.get_transition_path(state_info)
 			var transition_time := DebuggerStateInfo.get_transition_time(state_info)
-			var name = _get_node_name(transition_path)
+			var name := _get_node_name(transition_path)
 			_add_to_tree(_current_state_chart_tree, DebuggerStateInfo.get_transition_path(state_info), preload("../../transition.svg"), "%s (%.1fs)" % [name, transition_time])	
 	_clear_unused_items(_current_state_chart_tree.get_root())
 
@@ -239,7 +239,7 @@ func _clear_unused_items(root:TreeItem) -> void:
 
 
 ## Frees this tree item and all its children
-func _free_all(root:TreeItem):
+func _free_all(root:TreeItem) -> void:
 	if root == null:
 		return
 
@@ -253,12 +253,12 @@ func _free_all(root:TreeItem):
 ## The node path will be used as structure for the tree. The created 
 ## leaf will have the given icon and text.
 func _add_to_tree(tree:Tree, path:NodePath, icon:Texture2D, text:String = ""):
-	var ref = tree.get_root()
+	var ref := tree.get_root()
 	
 	for i in path.get_name_count():
-		var segment = path.get_name(i)
+		var segment := path.get_name(i)
 		# do we need to add a new child?
-		var needs_new = true
+		var needs_new := true
 		
 		if ref != null:
 			for child in ref.get_children():
