@@ -33,7 +33,7 @@ signal transition_pending(initial_delay:float, remaining_delay:float)
 
 
 ## Whether the state is currently active (internal flag, use active).
-var _state_active = false
+var _state_active:bool = false
 
 ## Whether the current state is active.
 var active:bool:
@@ -52,7 +52,7 @@ var _transitions:Array[Transition] = []
 ## The state chart that owns this state.
 var _chart:StateChart
 
-func _ready():
+func _ready() -> void:
 	# don't run in the editor
 	if Engine.is_editor_hint():
 		return
@@ -61,7 +61,7 @@ func _ready():
 		
 
 ## Finds the owning state chart by moving upwards.
-func _find_chart(parent:Node):
+func _find_chart(parent:Node) -> StateChart:
 	if parent is StateChart:
 		return parent
 	
@@ -96,7 +96,7 @@ func _state_init():
 ## In this case the state should not automatically activate a default child state.
 ## This is to avoid a situation where a state is entered, activates a child then immediately
 ## exits and activates another child due to a transition.
-func _state_enter(expect_transition:bool = false):
+func _state_enter(_expect_transition:bool = false):
 	# print("state_enter: " + name)
 	_state_active = true
 	
@@ -137,7 +137,7 @@ func _state_exit():
 ##
 ## This method will only be called if the state is active and should only be called on
 ## active children if children should be saved.
-func _state_save(saved_state:SavedState, child_levels:int = -1):
+func _state_save(saved_state:SavedState, child_levels:int = -1) -> void:
 	if not active:
 		push_error("_state_save should only be called if the state is active.")
 		return
@@ -153,7 +153,7 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 		return
 
 	# calculate the child levels for the children, -1 means all children
-	var sub_child_levels = -1 if child_levels == -1 else child_levels - 1
+	var sub_child_levels:int = -1 if child_levels == -1 else child_levels - 1
 
 	# save all children
 	for child in get_children():
@@ -170,9 +170,9 @@ func _state_save(saved_state:SavedState, child_levels:int = -1):
 ##
 ## If the state was not active when it was saved, this method still will be called
 ## but the given SavedState object will not contain any data for this state.
-func _state_restore(saved_state:SavedState, child_levels:int = -1):
+func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
 	# print("restoring state " + name)
-	var our_saved_state = saved_state.get_substate_or_null(self)
+	var our_saved_state := saved_state.get_substate_or_null(self)
 	if our_saved_state == null:
 		# if we are currently active, deactivate the state
 		if active:
@@ -196,7 +196,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 		return
 
 	# calculate the child levels for the children, -1 means all children
-	var sub_child_levels = -1 if child_levels == -1 else child_levels - 1
+	var sub_child_levels := -1 if child_levels == -1 else child_levels - 1
 
 	# restore all children
 	for child in get_children():
@@ -205,7 +205,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 
 
 ## Called while the state is active.
-func _process(delta:float):
+func _process(delta:float) -> void:
 	if Engine.is_editor_hint():
 		return
 
@@ -221,7 +221,7 @@ func _process(delta:float):
 		# if the transition is ready, trigger it
 		# and clear it.
 		if _pending_transition_time <= 0:
-			var transition_to_send = _pending_transition
+			var transition_to_send := _pending_transition
 			_pending_transition = null
 			_pending_transition_time = 0
 			# print("requesting transition from " + name + " to " + transition_to_send.to.get_concatenated_names() + " now")
@@ -229,11 +229,11 @@ func _process(delta:float):
 
 
 
-func _handle_transition(transition:Transition, source:StateChartState):
+func _handle_transition(_transition:Transition, _source:StateChartState):
 	push_error("State " + name + " cannot handle transitions.")
 	
 
-func _physics_process(delta:float):
+func _physics_process(delta:float) -> void:
 	if Engine.is_editor_hint():
 		return
 	state_physics_processing.emit(delta)
@@ -289,10 +289,10 @@ func _queue_transition(transition:Transition):
 
 
 func _get_configuration_warnings() -> PackedStringArray:
-	var result = []
+	var result := []
 	# if not at least one of our ancestors is a StateChart add a warning
-	var parent = get_parent()
-	var found = false
+	var parent := get_parent()
+	var found := false
 	while is_instance_valid(parent):
 		if parent is StateChart:
 			found = true
