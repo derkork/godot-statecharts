@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Unreleased
+### Improved
+- The state chart debugger in the editor now automatically selects the first state chart when the game starts. This reduces the amount of clicking needed to start debugging a state chart ([#118](https://github.com/derkork/godot-statecharts/issues/118)).
 ### Fixed
 - The history log in the state chart debugger in the editor now only updates when there were actually changes. This will increase performance and prevent the log from becoming un-scrollable.
 

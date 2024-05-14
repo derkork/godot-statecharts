@@ -129,11 +129,17 @@ func _clear_current():
 func add_chart(path:NodePath):
 	_state_infos[path] = {}
 	_chart_histories[path] = DebuggerHistory.new()
+	
 	_repaint_charts()
 
 	# push the settings to the new chart remote
 	DebuggerMessage.settings_updated(_session, path, _ignore_events, _ignore_transitions)
-	
+
+	if _current_chart.is_empty():
+		_current_chart = path
+		_select_current_chart()
+
+
 ## Removes a state chart from the debugger.
 func remove_chart(path:NodePath):
 	_state_infos.erase(path)
@@ -199,7 +205,24 @@ func _repaint_charts() -> void:
 		_add_to_tree(_all_state_charts_tree, chart, preload("../../state_chart.svg"))
 	_clear_unused_items(_all_state_charts_tree.get_root())
 
+	
+## Selects the current chart in the main tree.
+func _select_current_chart(item:TreeItem = _all_state_charts_tree.get_root()) -> void:
+	if item.has_meta("__path") and item.get_meta("__path") == _current_chart:
+		_all_state_charts_tree.set_selected(item, 0)
+		return
+	
+	var first_child := item.get_first_child()
+	if first_child != null:
+		_select_current_chart(first_child)
+		
+	var next := item.get_next()
+	while next != null:
+		_select_current_chart(next)
+		next = next.get_next()
 
+			
+		
 ## Repaints the tree of the currently selected state chart.
 func _repaint_current_chart(force:bool = false) -> void:
 	if _current_chart.is_empty():
