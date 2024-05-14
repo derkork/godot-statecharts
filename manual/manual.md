@@ -23,7 +23,15 @@ There is only a single class with two methods for your code to interface with th
 
 ## Installation
 
+### Requirements
+
+This plugin requires Godot 4.0.3 or later. Earlier versions of Godot 4 may work but are not officially supported. The plugin will not work with Godot 3.x.
+
+### Installation with the Godot Asset Library
+
 The easiest way to install the plugin is to use the Godot Asset Library. Search for "Godot State Charts" and install the plugin. You can exclude the `godot_state_charts_examples` folder if you don't need the examples. 
+
+### Manual installation
 
 You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
 
