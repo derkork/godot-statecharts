@@ -282,7 +282,11 @@ func _queue_transition(transition:Transition):
 	# print("transitioning from " + name + " to " + transition.to.get_concatenated_names() + " in " + str(transition.delay_seconds) + " seconds" )
 	# queue the transition for the delay time (0 means next frame)
 	_pending_transition = transition
-	_pending_transition_time = transition.delay_seconds
+
+	if transition.min_delay_seconds >= 0 && transition.min_delay_seconds < transition.delay_seconds:
+		_pending_transition_time = randf_range(transition.min_delay_seconds, transition.delay_seconds)
+	else:
+		_pending_transition_time = transition.delay_seconds
 	
 	# enable processing when we have a transition
 	set_process(true)

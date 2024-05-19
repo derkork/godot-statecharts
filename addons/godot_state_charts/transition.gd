@@ -29,6 +29,10 @@ signal taken()
 		guard = value
 		update_configuration_warnings()
 
+## If this value is set to a value >= 0 the delay will be a random
+## value between this value and delay_seconds.
+@export var min_delay_seconds:float = -1.0
+
 ## A delay in seconds before the transition is taken. Can be 0 in which case
 ## the transition will be taken immediately. The transition will only be taken
 ## if the state is still active when the delay has passed and has never been left.
