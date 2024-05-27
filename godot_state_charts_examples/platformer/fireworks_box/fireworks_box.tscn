@@ -156,11 +156,9 @@ lifetime_randomness = 0.17
 particle_flag_disable_z = true
 direction = Vector3(0, -1, 0)
 spread = 42.97
-gravity = Vector3(0, 20, 0)
 initial_velocity_min = 26.32
 initial_velocity_max = 52.63
-orbit_velocity_min = 0.0
-orbit_velocity_max = 0.0
+gravity = Vector3(0, 20, 0)
 turbulence_noise_scale = 8.14
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4ryt0"]
@@ -189,6 +187,7 @@ script = ExtResource("6_bf3gq")
 to = NodePath("../../Rattling")
 event = &"counter_changed"
 guard = SubResource("Resource_y5h70")
+delay_seconds = "0.0"
 
 [node name="Rattling" type="Node" parent="StateChart/Root"]
 script = ExtResource("4_ot1ih")
@@ -198,12 +197,14 @@ script = ExtResource("6_bf3gq")
 to = NodePath("../../Exploding")
 event = &"counter_changed"
 guard = SubResource("Resource_lsbaa")
+delay_seconds = "0.0"
 
 [node name="Get back to Idle" type="Node" parent="StateChart/Root/Rattling"]
 script = ExtResource("6_bf3gq")
 to = NodePath("../../Idle")
 event = &"counter_changed"
 guard = SubResource("Resource_t7gf7")
+delay_seconds = "0.0"
 
 [node name="Exploding" type="Node" parent="StateChart/Root"]
 script = ExtResource("4_ot1ih")
@@ -211,7 +212,7 @@ script = ExtResource("4_ot1ih")
 [node name="Die after 4s" type="Node" parent="StateChart/Root/Exploding"]
 script = ExtResource("6_bf3gq")
 to = NodePath("../../Dead")
-delay_seconds = 4.0
+delay_seconds = "4"
 
 [node name="Dead" type="Node" parent="StateChart/Root"]
 script = ExtResource("4_ot1ih")

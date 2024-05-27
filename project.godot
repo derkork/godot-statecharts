@@ -12,7 +12,7 @@ config_version=5
 
 config/name="godot-state-charts"
 run/main_scene="res://godot_state_charts_examples/platformer/platformer_demo.tscn"
-config/features=PackedStringArray("4.0", "C#", "Forward Plus")
+config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]

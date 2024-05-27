@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://v5vg88it87oj"]
+[gd_scene load_steps=29 format=3 uid="uid://v5vg88it87oj"]
 
 [ext_resource type="Script" path="res://godot_state_charts_examples/platformer/ninja_frog/ninja_frog.gd" id="1_xi1lh"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="3_qw75p"]
@@ -169,8 +169,6 @@ states/Start/position = Vector2(210.5, 73.75)
 transitions = ["Start", "Idle", SubResource("AnimationNodeStateMachineTransition_i3ow4"), "Idle", "Move", SubResource("AnimationNodeStateMachineTransition_a52qu"), "Move", "Idle", SubResource("AnimationNodeStateMachineTransition_1q7sj"), "Move", "DoubleJump", SubResource("AnimationNodeStateMachineTransition_4cnci"), "DoubleJump", "Move", SubResource("AnimationNodeStateMachineTransition_ddbej")]
 graph_offset = Vector2(84, -7)
 
-[sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_63x7j"]
-
 [node name="NinjaFrog" type="CharacterBody2D" groups=["player"]]
 input_pickable = true
 script = ExtResource("1_xi1lh")
@@ -191,11 +189,9 @@ offset = Vector2(0, -12)
 hframes = 31
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
+callback_mode_process = 0
 tree_root = SubResource("AnimationNodeStateMachine_ckafx")
 anim_player = NodePath("../AnimationPlayer")
-active = true
-process_callback = 0
-parameters/playback = SubResource("AnimationNodeStateMachinePlayback_63x7j")
 parameters/Move/blend_position = -0.380028
 
 [node name="StateChart" type="Node" parent="."]
@@ -250,7 +246,6 @@ event = &"jump"
 editor_description = "After 0.2 seconds automatically move to falling state where no more jump is possible."
 script = ExtResource("9_wswdv")
 to = NodePath("../../CannotJump")
-delay_seconds = 0.2
 
 [node name="DoubleJumpEnabled" type="Node" parent="StateChart/Root/Movement/Airborne"]
 editor_description = "This state is active while the player is in the air and has jumped one time already. While the state is active, a second jump is allowed."

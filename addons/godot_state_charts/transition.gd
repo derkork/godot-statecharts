@@ -32,7 +32,7 @@ signal taken()
 ## A delay in seconds before the transition is taken. Can be 0 in which case
 ## the transition will be taken immediately. The transition will only be taken
 ## if the state is still active when the delay has passed and has never been left.
-@export var delay_seconds:float = 0.0:
+@export var delay_seconds:String = "0":
 	set(value):
 		delay_seconds = value
 		update_configuration_warnings()
