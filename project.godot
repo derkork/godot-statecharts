@@ -27,7 +27,7 @@ project/assembly_name="godot-state-charts"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [rendering]
 

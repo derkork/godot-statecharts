@@ -1,10 +1,11 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
 
-# Only include the addons folder when downloading from the Asset Library.
+# Only include the addons/godot_state_charts folder when downloading from the Asset Library.
 /**        export-ignore
 /addons    !export-ignore
-/addons/** !export-ignore
+/addons/godot_state_charts !export-ignore
+/addons/godot_state_charts/** !export-ignore
 # also include the examples folder
 /godot_state_charts_examples !export-ignore
 /godot_state_charts_examples/** !export-ignore
