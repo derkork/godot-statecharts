@@ -101,10 +101,12 @@ func _exit_tree():
 func _on_tests_finished(should_exit, should_exit_on_success):
 	_write_results()
 
+	var failed = _gut.get_fail_count() > 0
+	var exit_code = 1 if failed else 0
 	if(should_exit):
-		get_tree().quit()
+		get_tree().quit(exit_code)
 	elif(should_exit_on_success and _gut.get_fail_count() == 0):
-		get_tree().quit()
+		get_tree().quit(exit_code)
 
 
 func get_gut():
