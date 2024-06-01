@@ -10,5 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Setup Project
+        run: timeout 25s godot -e --headless
       - name: Run tests
         run: godot --headless --path "$PWD" -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gprefix=test_ -gsuffix=.gd -gexit -ginclude_subdirs
