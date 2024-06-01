@@ -2,15 +2,15 @@ name: "run tests"
 on: push
 
 jobs:
-  run_tests:
+  execute-gut:
     name: Run tests
     runs-on: ubuntu-latest
-    container:
-      image: docker://barichello/godot-ci:4.0.3
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
-      - name: Setup Project
-        run: timeout 25s godot -e --headless || true
+        uses: actions/checkout@v2
       - name: Run tests
-        run: godot --headless --path "$PWD" -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gprefix=test_ -gsuffix=.gd -gexit -ginclude_subdirs
+        uses: ceceppa/godot-gut-ci@main
+        with:
+          godot_version: 4.0.3
+          gut_params: -gdir=res://tests/ -gprefix=test_ -gsuffix=.gd -gexit -ginclude_subdirs
+
