@@ -152,13 +152,20 @@ func _run_transition(transition:Transition, source:StateChartState) -> void:
 	# if for some reason the state no longer is active, ignore the transition	
 	_do_run_transition(transition, source)
 	
+	var execution_count := 1
+	
 	# if we still have transitions
 	while _queued_transitions.size() > 0:
 		var next_transition_entry = _queued_transitions.pop_front()
 		var next_transition = next_transition_entry.keys()[0]
 		var next_transition_source = next_transition_entry[next_transition]
 		_do_run_transition(next_transition, next_transition_source)
-
+		execution_count += 1
+	
+		if execution_count > 100:
+			push_error("Infinite loop detected in transitions. Aborting. The state chart is now in an invalid state and no longer usable.")
+			break
+	
 	_transitions_processing_active = false
 
 ## Runs the transition. Used internally by the state chart, do not call this directly.	

@@ -267,6 +267,7 @@
     <Content Include="tests\test_delayed_transition.gd" />
     <Content Include="tests\test_expression_guard.gd" />
     <Content Include="tests\test_history_state_simple.gd" />
+    <Content Include="tests\test_infinite_loop_detection.gd" />
     <Content Include="tests\test_not_guard.gd" />
     <Content Include="tests\test_parallel_transition.gd" />
     <Content Include="tests\test_pending_transition_cancellation.gd" />
