@@ -2,6 +2,9 @@ extends StateChartTestBase
 
 
 func test_automatic_transition_on_property_change():
+	# Ensure that we have an initial value for the property, to avoid error messages.
+	set_initial_expression_properties({"x": 0})
+	
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)

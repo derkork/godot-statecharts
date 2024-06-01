@@ -11,6 +11,13 @@ func send_event(event: String) -> void:
 func set_expression_property(name: String, value: Variant) -> void:
 	_chart.set_expression_property(name, value)
 
+@warning_ignore("shadowed_variable_base_class")
+func get_expression_property(name: String, default:Variant = null) -> Variant:
+	return _chart.get_expression_property(name, default)	
+
+func set_initial_expression_properties(properties: Dictionary) -> void:
+	_chart.initial_expression_properties = properties	
+
 func step()-> void:
 	_chart.step()
 	

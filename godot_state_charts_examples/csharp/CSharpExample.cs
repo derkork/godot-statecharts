@@ -11,7 +11,6 @@ public partial class CSharpExample : Node2D
 	
 	private StateChart _stateChart;
 	private Label _feelLabel;
-	private int _poisonCount;
 	private int _health = 20;
 	private StateChartState _poisonedStateChartState;
 	
@@ -35,10 +34,11 @@ public partial class CSharpExample : Node2D
 	/// </summary>
 	private void OnDrinkPoisonButtonPressed()
 	{
-		_poisonCount += 3; // we add three rounds worth of poison
-		
 		// This uses the regular API to interact with the state chart.
-		_stateChart.SetExpressionProperty("poison_count", _poisonCount);
+		var currentPoisonCount = _stateChart.GetExpressionProperty("poison_count", 0);
+		currentPoisonCount += 3; // we add three rounds worth of poison
+		
+		_stateChart.SetExpressionProperty("poison_count", currentPoisonCount);
 		_stateChart.SendEvent("poisoned");
 		
 		// Ends the round
@@ -50,8 +50,6 @@ public partial class CSharpExample : Node2D
 	/// </summary>
 	private void OnDrinkCureButtonPressed()
 	{
-		_poisonCount = 0;
-		
 		// Here we use some custom-made extension methods from StateChartExt.cs to have a nicer API
 		// that is specific to our game. This avoids having to use strings for property names and
 		// event names and it also helps with type safety and when you need to find all places where
@@ -81,8 +79,7 @@ public partial class CSharpExample : Node2D
 		_stateChart.Step();
 
 		// Then at the beginning of the next round, we reduce any poison count by 1
-		_poisonCount = Mathf.Max(0, _poisonCount - 1);
-		_stateChart.SetPoisonCount(_poisonCount);
+		_stateChart.SetPoisonCount( Mathf.Max(0, _stateChart.GetPoisonCount() - 1));
 		
 		// And update the UI
 		RefreshUi();
@@ -91,7 +88,7 @@ public partial class CSharpExample : Node2D
 	private void OnPoisonedStateStepped()
 	{
 		// when we step while poisoned, remove the amount of poison from our health (but not below 0)
-		_health = Mathf.Max(0, _health - _poisonCount);
+		_health = Mathf.Max(0, _health - _stateChart.GetPoisonCount());
 	}
 	
 	private void OnNormalStateStepped()
@@ -103,7 +100,7 @@ public partial class CSharpExample : Node2D
 	
 	private void RefreshUi()
 	{
-		_feelLabel.Text = $"Health: {_health} Poison: {_poisonCount}";
+		_feelLabel.Text = $"Health: {_health} Poison: {_stateChart.GetPoisonCount()}";
 	}
 
 	private void OnDebugButtonPressed()

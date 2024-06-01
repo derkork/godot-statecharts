@@ -51,6 +51,18 @@ namespace GodotStateCharts
         {
             Call(MethodName.SetExpressionProperty, name, value);
         }
+        
+        
+        /// <summary>
+        /// Returns the value of an expression property on the state chart node.
+        /// </summary>
+        /// <param name="name">the name of the proeprty to read. This is case sensitive. </param>
+        /// <param name="defaultValue">the default value to be returned if no such property exists</param>
+        /// <returns>the value of the property</returns>
+        public T GetExpressionProperty<[MustBeVariant]T>(string name, T defaultValue = default)
+        {
+            return Call(MethodName.GetExpressionProperty, name, Variant.From(defaultValue)).As<T>();
+        }
 
         /// <summary>
         /// Steps the state chart node. This will invoke all <code>state_stepped</code> signals on the
@@ -90,6 +102,11 @@ namespace GodotStateCharts
             /// Sets an expression property on the state chart node for later use with expression guards.
             /// </summary>
             public static readonly StringName SetExpressionProperty = "set_expression_property";
+            
+            /// <summary>
+            /// Returns the value of an expression property on the state chart node.
+            /// </summary>
+            public static readonly StringName GetExpressionProperty = "get_expression_property";
             
             /// <summary>
             /// Steps the state chart node. This will invoke all <code>state_stepped</code> signals on the

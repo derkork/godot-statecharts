@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - The delay for a transition can now be an expression rather than just a float value. This allows for more dynamic transitions. For example the delay can now be a random value (using `randf_range()`) or any expression property. Of course you can still just use a single float number.  This change is backwards-compatible, all existing state charts will automatically be converted to the new format when loaded. There is a new example named `random_transitions` which shows this new feature to create a randomly wandering mob. A big thanks goes out to [Miguel Silva](https://github.com/mrjshzk) and [alextkd2003](https://github.com/alextkd2003) for providing POC PRs for this feature.
+- It is now possible to read expression properties back from the state chart. This is useful for debugging or for avoiding to hold the same value in multiple places ([#110](https://github.com/derkork/godot-statecharts/issues/110)).
+- It is now possible to set initial values for expression properties in the state chart. This avoids getting errors when using expressions in transitions that run immediately after the state chart is started and the expression property has not been set yet. This is again backwards-compatible, all existing state charts will automatically start with an empty dictionary of expression properties.
 
 ### Improved
 - The state chart debugger in the editor now automatically selects the first state chart when the game starts. This reduces the amount of clicking needed to start debugging a state chart ([#118](https://github.com/derkork/godot-statecharts/issues/118)).

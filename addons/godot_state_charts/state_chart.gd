@@ -24,6 +24,13 @@ signal event_received(event:StringName)
 ## state chart debugger in the editor.
 @export var track_in_editor:bool = false
 
+## Initial values for the expression properties. These properties can be used in expressions, e.g
+## for guards or transition delays. It is recommended to set an initial value for each property
+## you use in an expression to ensure that this expression is always valid. If you don't set
+## an initial value, some expressions may fail to be evaluated if they use a property that has
+## not been set yet.
+@export var initial_expression_properties:Dictionary = {}
+
 ## The root state of the state chart.
 var _state:StateChartState = null
 
@@ -63,6 +70,14 @@ func _ready() -> void:
 	if not child is StateChartState:
 		push_error("StateMachine's child must be a State")
 		return
+	
+	# set the initial expression properties
+	if initial_expression_properties != null:
+		for key in initial_expression_properties.keys():
+			if not key is String and not key is StringName:
+				push_error("Expression property names must be strings. Ignoring initial expression property with key ", key)
+				continue
+			_expression_properties[key] = initial_expression_properties[key]
 
 	# initialize the state machine
 	_state = child as StateChartState
@@ -111,7 +126,13 @@ func set_expression_property(name:StringName, value) -> void:
 	_property_change_pending = true
 	_run_changes()
 		
-		
+
+## Returns the value of a previously set expression property. If the property does not exist, the default value
+## will be returned.
+func get_expression_property(name:StringName, default:Variant = null) -> Variant:
+	return _expression_properties.get(name, default)
+
+
 func _run_changes() -> void:
 	if _locked_down:
 		return

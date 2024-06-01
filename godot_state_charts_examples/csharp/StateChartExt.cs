@@ -13,6 +13,11 @@ public static class StateChartExt
         stateChart.SetExpressionProperty("poison_count", poisonCount);
     }
     
+    public static int GetPoisonCount(this StateChart stateChart)
+    {
+        return stateChart.GetExpressionProperty("poison_count", 0);
+    }
+    
     public static void SendCuredEvent(this StateChart stateChart)
     {
         stateChart.SendEvent("cured");

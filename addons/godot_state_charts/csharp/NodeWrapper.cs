@@ -24,26 +24,26 @@ namespace GodotStateCharts
         /// <param name="signal"></param>
         /// <param name="method"></param>
         /// <param name="flags"></param>
-        public void Connect(StringName signal, Callable method, uint flags = 0u)
+        public Error Connect(StringName signal, Callable method, uint flags = 0u)
         {
-            Wrapped.Connect(signal, method, flags);
+            return Wrapped.Connect(signal, method, flags);
         }
         
         
         /// <summary>
         /// Allows to call methods on the wrapped node deferred.
         /// </summary>
-        public void CallDeferred(string method, params Variant[] args)
+        public Variant CallDeferred(string method, params Variant[] args)
         {
-            Wrapped.CallDeferred(method, args);
+            return Wrapped.CallDeferred(method, args);
         }
         
         /// <summary>
         /// Allows to call methods on the wrapped node.
         /// </summary>
-        public void Call(string method, params Variant[] args)
+        public Variant Call(string method, params Variant[] args)
         {
-            Wrapped.Call(method, args);
+            return Wrapped.Call(method, args);
         }
     }
 }
