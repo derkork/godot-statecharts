@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - The history log in the state chart debugger in the editor now only updates when there were actually changes. This will increase performance and prevent the log from becoming un-scrollable.
 
+## [Unreleased]
+### Improved
+- There are now some automated tests to ensure that changes to the library will not break existing functionality. This should help to prevent regressions in the future.
+
+### Fixed
+-  Expression guards will no longer print the error message twice if the expression is not valid.
+- 
 
 ## [0.15.2] - 2024-04-17
 ### Fixed

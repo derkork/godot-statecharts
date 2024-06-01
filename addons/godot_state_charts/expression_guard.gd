@@ -32,7 +32,7 @@ func is_satisfied(context_transition:Transition, context_state:StateChartState) 
 	for input_name in input_names:
 		input_values.append(root._expression_properties[input_name])
 
-	var result = the_expression.execute(input_values)
+	var result = the_expression.execute(input_values, null, false)
 	if the_expression.has_execute_failed():
 		push_error("Expression execute error: " + the_expression.get_error_text() + " for expression: " + expression)
 		return false
