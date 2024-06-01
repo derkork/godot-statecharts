@@ -12,7 +12,10 @@ extends Resource
 @export var pending_transition_name: NodePath 
 
 ## The remaining time of the active transition, if any
-@export var pending_transition_time: float = 0
+@export var pending_transition_remaining_delay: float = 0
+
+## The initial time of the active transition, if any
+@export var pending_transition_initial_delay: float = 0
 
 ## History of the state, if this state is a history state, otherwise null
 @export var history:SavedState = null

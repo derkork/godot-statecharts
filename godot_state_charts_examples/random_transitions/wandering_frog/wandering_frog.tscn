@@ -1,0 +1,209 @@
+[gd_scene load_steps=19 format=3 uid="uid://nji5r3vfeuwg"]
+
+[ext_resource type="Script" path="res://godot_state_charts_examples/random_transitions/wandering_frog/wandering_frog.gd" id="1_tfcjx"]
+[ext_resource type="Texture2D" uid="uid://bgswg1pgd01d1" path="res://godot_state_charts_examples/platformer/ninja_frog/full.png" id="2_hm4wf"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="3_2vqqk"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="4_44md5"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_j65h7"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_s6am2"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="7_f5w5i"]
+
+[sub_resource type="Shader" id="Shader_pnpgx"]
+code = "shader_type canvas_item;
+
+void fragment() {
+	COLOR.rgb = vec3(0);
+	COLOR.a = 0.5 * 1.0-smoothstep(0.0, 1.0, distance(UV, vec2(0.5)));
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fnfpn"]
+shader = SubResource("Shader_pnpgx")
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1ethx"]
+radius = 12.0
+
+[sub_resource type="Animation" id="Animation_uq0h4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_10ku2"]
+resource_name = "double_jump"
+length = 0.4
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [23, 28]
+}
+
+[sub_resource type="Animation" id="Animation_ibg22"]
+resource_name = "fall"
+length = 0.1
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [29]
+}
+
+[sub_resource type="Animation" id="Animation_5rh2e"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [12, 22]
+}
+
+[sub_resource type="Animation" id="Animation_jaga7"]
+resource_name = "jump"
+length = 0.1
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [30]
+}
+
+[sub_resource type="Animation" id="Animation_6odvc"]
+resource_name = "walk"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0, 11]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_au2ov"]
+_data = {
+"RESET": SubResource("Animation_uq0h4"),
+"double_jump": SubResource("Animation_10ku2"),
+"fall": SubResource("Animation_ibg22"),
+"idle": SubResource("Animation_5rh2e"),
+"jump": SubResource("Animation_jaga7"),
+"walk": SubResource("Animation_6odvc")
+}
+
+[sub_resource type="Resource" id="Resource_27kjk"]
+script = ExtResource("7_f5w5i")
+expression = "randf() < 0.5"
+
+[node name="WanderingFrog" type="CharacterBody2D"]
+collision_mask = 2
+input_pickable = true
+script = ExtResource("1_tfcjx")
+
+[node name="Shadow" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_fnfpn")
+offset_left = -19.0
+offset_top = -6.0
+offset_right = 21.0
+offset_bottom = 12.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -15)
+shape = SubResource("CapsuleShape2D_1ethx")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_au2ov")
+}
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_hm4wf")
+offset = Vector2(0, -12)
+hframes = 31
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("3_2vqqk")
+track_in_editor = true
+
+[node name="Wander" type="Node" parent="StateChart"]
+editor_description = "This controls the wandering."
+script = ExtResource("4_44md5")
+initial_state = NodePath("Decide Next")
+
+[node name="Decide Next" type="Node" parent="StateChart/Wander"]
+editor_description = "In this state the frog randomly decides what to do next. The \"To Idle\" transition has a guard which will pick it with a chance of 50%. If it is not picked, then the \"To Walk\" transition is picked. "
+script = ExtResource("5_j65h7")
+
+[node name="To Idle" type="Node" parent="StateChart/Wander/Decide Next"]
+script = ExtResource("6_s6am2")
+to = NodePath("../../Idle")
+guard = SubResource("Resource_27kjk")
+delay_in_seconds = "0.0"
+
+[node name="To Walk" type="Node" parent="StateChart/Wander/Decide Next"]
+script = ExtResource("6_s6am2")
+to = NodePath("../../Walk")
+delay_in_seconds = "0.0"
+
+[node name="Idle" type="Node" parent="StateChart/Wander"]
+script = ExtResource("5_j65h7")
+
+[node name="To Decide Next" type="Node" parent="StateChart/Wander/Idle"]
+editor_description = "This will bring the frog back into the \"Decide Next\" state after a random amount of time."
+script = ExtResource("6_s6am2")
+to = NodePath("../../Decide Next")
+delay_in_seconds = "randf_range(1.5, 3)"
+
+[node name="Walk" type="Node" parent="StateChart/Wander"]
+script = ExtResource("5_j65h7")
+
+[node name="To Decide Next" type="Node" parent="StateChart/Wander/Walk"]
+editor_description = "This will bring the frog back into the \"Decide Next\" state after a random amount of time."
+script = ExtResource("6_s6am2")
+to = NodePath("../../Idle")
+delay_in_seconds = "randf_range(3, 7)"
+
+[connection signal="state_entered" from="StateChart/Wander/Idle" to="." method="_on_idle_state_entered"]
+[connection signal="state_entered" from="StateChart/Wander/Walk" to="." method="_on_walk_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/Wander/Walk" to="." method="_on_walk_state_physics_processing"]

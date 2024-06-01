@@ -217,12 +217,12 @@ func _collect_active_states(root:Node, parent:TreeItem):
 	for child in root.get_children():
 		if child is StateChartState:
 			if child.active:
-				var state_item = _tree.create_item(parent)
+				var state_item:TreeItem = _tree.create_item(parent)
 				state_item.set_text(0, child.name)
 
 				if is_instance_valid(child._pending_transition):
-					var transition_item = state_item.create_child()
-					transition_item.set_text(0, ">> %s (%.2f)" % [child._pending_transition.name, child._pending_transition_time])
+					var transition_item: TreeItem = state_item.create_child()
+					transition_item.set_text(0, ">> %s (%.2f)" % [child._pending_transition.name, child._pending_transition_remaining_delay])
 
 				_collect_active_states(child, state_item)
 

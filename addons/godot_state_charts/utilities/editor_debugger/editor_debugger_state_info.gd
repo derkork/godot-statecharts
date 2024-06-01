@@ -23,8 +23,8 @@ static func make_array( \
 	transition_pending:bool, \
 	## The path of the pending transition if any.
 	transition_path:NodePath, \
-	## The remaining transition time for the pending transition if any.
-	transition_time:float, \
+	## The remaining transition delay for the pending transition if any.
+	transition_delay:float, \
 	## The kind of state
 	state:StateChartState \
 ) -> Array:
@@ -34,7 +34,7 @@ static func make_array( \
 		active, \
 		transition_pending, \
 		transition_path, \
-		transition_time, \
+		transition_delay, \
 		type_for_state(state) ]
 
 ## Get the state type for the given state.
@@ -66,7 +66,7 @@ static func get_transition_pending(array:Array) -> bool:
 static func get_transition_path(array:Array) -> NodePath:
 	return array[4]
 
-static func get_transition_time(array:Array) -> float:
+static func get_transition_delay(array:Array) -> float:
 	return array[5]
 
 static func get_state_type(array:Array) -> StateTypes:

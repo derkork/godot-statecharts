@@ -1,0 +1,108 @@
+[gd_scene load_steps=7 format=3 uid="uid://i4v5fyt2ix01"]
+
+[ext_resource type="PackedScene" uid="uid://nji5r3vfeuwg" path="res://godot_state_charts_examples/random_transitions/wandering_frog/wandering_frog.tscn" id="1_r2x6m"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="2_n8tkm"]
+
+[sub_resource type="Shader" id="Shader_8j6vc"]
+code = "shader_type canvas_item;
+
+void fragment() {
+	COLOR.rgb *= (1.0-0.3*(1.0-UV.y));
+}
+
+void vertex() {
+	VERTEX.x -= UV.y * (0.5 - UV.x) * 100.0;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8axp2"]
+shader = SubResource("Shader_8j6vc")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fkyfr"]
+size = Vector2(36, 418)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e3j0h"]
+size = Vector2(405, 35)
+
+[node name="Random Transitions" type="Node2D"]
+
+[node name="Ground" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_8axp2")
+offset_left = 39.0
+offset_top = 68.0
+offset_right = 319.0
+offset_bottom = 478.0
+color = Color(0.0980392, 0.560784, 0.152941, 1)
+
+[node name="ColliderLeft" type="StaticBody2D" parent="."]
+position = Vector2(0, 40)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ColliderLeft"]
+position = Vector2(35, 199)
+shape = SubResource("RectangleShape2D_fkyfr")
+
+[node name="ColliderRight" type="StaticBody2D" parent="."]
+position = Vector2(329, 45)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ColliderRight"]
+position = Vector2(-9, 196)
+shape = SubResource("RectangleShape2D_fkyfr")
+
+[node name="ColliderTop" type="StaticBody2D" parent="."]
+position = Vector2(375, 45)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ColliderTop"]
+position = Vector2(-176, 12)
+shape = SubResource("RectangleShape2D_e3j0h")
+
+[node name="ColliderBottom" type="StaticBody2D" parent="."]
+position = Vector2(375, 428)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ColliderBottom"]
+position = Vector2(-188, -27)
+shape = SubResource("RectangleShape2D_e3j0h")
+
+[node name="WanderingFrog" parent="." instance=ExtResource("1_r2x6m")]
+modulate = Color(0.454902, 0.458824, 1, 1)
+position = Vector2(106, 158)
+
+[node name="WanderingFrog2" parent="." instance=ExtResource("1_r2x6m")]
+position = Vector2(224, 208)
+
+[node name="WanderingFrog3" parent="." instance=ExtResource("1_r2x6m")]
+position = Vector2(149, 275)
+
+[node name="WanderingFrog4" parent="." instance=ExtResource("1_r2x6m")]
+position = Vector2(297, 340)
+
+[node name="WanderingFrog5" parent="." instance=ExtResource("1_r2x6m")]
+position = Vector2(79, 359)
+
+[node name="WanderingFrog6" parent="." instance=ExtResource("1_r2x6m")]
+position = Vector2(225, 126)
+
+[node name="StateChartDebugger" parent="." instance=ExtResource("2_n8tkm")]
+offset_left = 344.0
+offset_top = 33.0
+offset_right = 636.0
+offset_bottom = 438.0
+initial_node_to_watch = NodePath("../WanderingFrog")
+
+[node name="Label" type="RichTextLabel" parent="."]
+offset_left = 10.0
+offset_top = 375.0
+offset_right = 334.0
+offset_bottom = 459.0
+mouse_filter = 2
+bbcode_enabled = true
+text = "[font_size=10]
+The frogs random movement is controlled by the state chart. Each frog choses to wander or be idle for a random amount of seconds. Even though all frog instances use the same state chart they behave differently because they use random expressions to control which state they enter and for how long they stay in there. The debugger shows the state chart of the blue-tinted frog.
+[/font_size]"
+fit_content = true

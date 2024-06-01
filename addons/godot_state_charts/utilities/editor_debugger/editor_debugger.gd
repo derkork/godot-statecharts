@@ -240,9 +240,9 @@ func _repaint_current_chart(force:bool = false) -> void:
 			_add_to_tree(_current_state_chart_tree, DebuggerStateInfo.get_state(state_info), DebuggerStateInfo.get_state_icon(state_info))
 		if DebuggerStateInfo.get_transition_pending(state_info):
 			var transition_path := DebuggerStateInfo.get_transition_path(state_info)
-			var transition_time := DebuggerStateInfo.get_transition_time(state_info)
+			var transition_delay := DebuggerStateInfo.get_transition_delay(state_info)
 			var name := _get_node_name(transition_path)
-			_add_to_tree(_current_state_chart_tree, DebuggerStateInfo.get_transition_path(state_info), preload("../../transition.svg"), "%s (%.1fs)" % [name, transition_time])	
+			_add_to_tree(_current_state_chart_tree, DebuggerStateInfo.get_transition_path(state_info), preload("../../transition.svg"), "%s (%.1fs)" % [name, transition_delay])	
 	_clear_unused_items(_current_state_chart_tree.get_root())
 
 

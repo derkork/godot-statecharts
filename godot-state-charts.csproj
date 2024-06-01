@@ -27,6 +27,7 @@
     <Content Include="addons\godot_state_charts\expression_guard.gd" />
     <Content Include="addons\godot_state_charts\expression_guard.svg" />
     <Content Include="addons\godot_state_charts\expression_guard.svg.import" />
+    <Content Include="addons\godot_state_charts\expression_util.gd" />
     <Content Include="addons\godot_state_charts\godot_state_charts.gd" />
     <Content Include="addons\godot_state_charts\guard.gd" />
     <Content Include="addons\godot_state_charts\history_state.gd" />
@@ -257,6 +258,9 @@
     <Content Include="godot_state_charts_examples\platformer\terrain\terrain_tiles.png" />
     <Content Include="godot_state_charts_examples\platformer\terrain\terrain_tiles.png.import" />
     <Content Include="godot_state_charts_examples\platformer\terrain\terrain_tiles.tres" />
+    <Content Include="godot_state_charts_examples\random_transitions\random_transitions.tscn" />
+    <Content Include="godot_state_charts_examples\random_transitions\wandering_frog\wandering_frog.gd" />
+    <Content Include="godot_state_charts_examples\random_transitions\wandering_frog\wandering_frog.tscn" />
     <Content Include="godot_state_charts_examples\stepping\stepping.gd" />
     <Content Include="godot_state_charts_examples\stepping\stepping.tscn" />
     <Content Include="tests\framework\state_chart_test_base.gd" />
@@ -274,6 +278,7 @@
     <Content Include="tests\test_simple_transition.gd" />
     <Content Include="tests\test_state_is_active_guard.gd" />
     <Content Include="tests\test_stepping.gd" />
+    <Content Include="tests\test_transition_delay_expression.gd" />
     <Content Include="tests\test_transition_pending_signal.gd" />
     <Content Include="tests\test_transition_taken_signal.gd" />
   </ItemGroup>

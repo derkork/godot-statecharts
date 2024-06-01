@@ -82,7 +82,7 @@ func transition(from: StateChartState, to: StateChartState, event: String, delay
 	transition.to = transition.get_path_to(to)
 	transition.event = event
 	transition.guard = guard
-	transition.delay_seconds = float(delay)
+	transition.delay_in_seconds = delay
 	return transition
 
 

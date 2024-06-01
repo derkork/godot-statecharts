@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- The delay for a transition can now be an expression rather than just a float value. This allows for more dynamic transitions. For example the delay can now be a random value (using `randf_range()`) or any expression property. Of course you can still just use a single float number.  This change is backwards-compatible, all existing state charts will automatically be converted to the new format when loaded. There is a new example named `random_transitions` which shows this new feature to create a randomly wandering mob. A big thanks goes out to [Miguel Silva](https://github.com/mrjshzk) and [alextkd2003](https://github.com/alextkd2003) for providing POC PRs for this feature.
+
 ### Improved
 - The state chart debugger in the editor now automatically selects the first state chart when the game starts. This reduces the amount of clicking needed to start debugging a state chart ([#118](https://github.com/derkork/godot-statecharts/issues/118)).
 - The state chart will now detect infinite transition loops that would cause the game to freeze (>100 transitions within a single frame). When such a loop is detected, the state chart will print an error message and stop processing transitions. After that, the state chart is in an undefined state and will no longer work properly. This has been added for easier debugging of freezes. Note that this will not catch infinite loops that involve delayed transitions as such loops will not freeze the game and may actually be desired ([#116](https://github.com/derkork/godot-statecharts/issues/116)).

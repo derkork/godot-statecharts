@@ -46,7 +46,7 @@ static func state_updated(chart:StateChart, state:StateChartState) -> void:
 		state.active, \
 		is_instance_valid(state._pending_transition), \
 		transition_path, \
-		state._pending_transition_time, \
+		state._pending_transition_remaining_delay, \
 		state)]
 	)
 	
@@ -81,11 +81,11 @@ static func event_received(chart:StateChart, event_name:StringName) -> void:
 	EngineDebugger.send_message(STATE_CHART_EVENT_RECEIVED_MESSAGE, [Engine.get_process_frames(), chart.get_path(), event_name])
 
 ## Sends a transition pending message
-static func transition_pending(chart:StateChart, source:StateChartState, transition:Transition, pending_transition_time:float) -> void:
+static func transition_pending(chart:StateChart, source:StateChartState, transition:Transition, pending_transition_remaining_delay:float) -> void:
 	if not _can_send():
 		return
 		
-	EngineDebugger.send_message(TRANSITION_PENDING_MESSAGE, [Engine.get_process_frames(), chart.get_path(), chart.get_path_to(source),  chart.get_path_to(transition), pending_transition_time])
+	EngineDebugger.send_message(TRANSITION_PENDING_MESSAGE, [Engine.get_process_frames(), chart.get_path(), chart.get_path_to(source),  chart.get_path_to(transition), pending_transition_remaining_delay])
 
 ## Sends a settings updated message
 ## session is an EditorDebuggerSession but this does not exist after export
