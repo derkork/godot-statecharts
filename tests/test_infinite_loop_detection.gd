@@ -11,4 +11,6 @@ func test_infinite_loop_detection():
 	
 	await finish_setup()
 	
+	pass_test("No infinite loop. Nice.")
+	
 	

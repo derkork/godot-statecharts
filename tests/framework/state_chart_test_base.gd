@@ -110,18 +110,21 @@ func state_is_active_guard(state: StateChartState) -> StateIsActiveGuard:
 
 	
 func all_of_guard(guard:Array[Guard]) -> AllOfGuard:
+	@warning_ignore("shadowed_variable")
 	var all_of_guard: AllOfGuard = AllOfGuard.new()
 	all_of_guard.guards = guard
 	return all_of_guard
 
 	
 func any_of_guard(guard:Array[Guard]) -> AnyOfGuard:
+	@warning_ignore("shadowed_variable")
 	var any_of_guard: AnyOfGuard = AnyOfGuard.new()
 	any_of_guard.guards = guard
 	return any_of_guard
 
 	
 func not_guard(guard:Guard) -> NotGuard:
+	@warning_ignore("shadowed_variable")
 	var not_guard: NotGuard = NotGuard.new()
 	not_guard.guard = guard
 	return not_guard
