@@ -11,4 +11,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Run tests
-        run: godot --headless --path "$PWD" -d -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gprefix=test_ -gsuffix=.gd -gexit -ginclude_subdirs
+        run: godot --headless --path "$PWD" -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gprefix=test_ -gsuffix=.gd -gexit -ginclude_subdirs
