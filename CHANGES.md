@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Improved
+- The constructor of the `StateChart` wrapper class for C# is now protected to allow for easier subclassing ([#119](https://github.com/derkork/godot-statecharts/issues/119)).
 - There are now some automated tests to ensure that changes to the library will not break existing functionality. This should help to prevent regressions in the future.
 
 ### Fixed
 -  Expression guards will no longer print the error message twice if the expression is not valid.
-- 
 
 ## [0.15.2] - 2024-04-17
 ### Fixed

@@ -10,7 +10,7 @@ namespace GodotStateCharts
     /// </summary>
     public class StateChart : NodeWrapper
     {
-        private StateChart(Node wrapped) : base(wrapped)
+        protected StateChart(Node wrapped) : base(wrapped)
         {
         }
 
