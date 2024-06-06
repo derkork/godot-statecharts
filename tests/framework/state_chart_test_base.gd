@@ -73,6 +73,9 @@ func parallel_state(name: String, parent: StateChartState = null) -> ParallelSta
 
 @warning_ignore("shadowed_variable_base_class")
 func atomic_state( name: String, parent: StateChartState) -> AtomicState:
+	assert(not(parent is AtomicState))
+	assert(not(parent is HistoryState))
+	
 	var state: AtomicState = AtomicState.new()
 	state.name = name
 	parent.add_child(state)
@@ -82,7 +85,7 @@ func atomic_state( name: String, parent: StateChartState) -> AtomicState:
 	
 
 @warning_ignore("shadowed_variable_base_class")
-func transition(from: StateChartState, to: StateChartState, event: String, delay: String = "0", guard: Guard = null) -> Transition:
+func transition(from: StateChartState, to: StateChartState, event: String = "", delay: String = "0", guard: Guard = null) -> Transition:
 	@warning_ignore("shadowed_variable")
 	var transition: Transition = Transition.new()
 	from.add_child(transition)
@@ -94,11 +97,12 @@ func transition(from: StateChartState, to: StateChartState, event: String, delay
 
 
 @warning_ignore("shadowed_variable_base_class")
-func history_state(name: String, parent: CompoundState, deep:bool = false) -> HistoryState:
+func history_state(name: String, parent: CompoundState, default_state:StateChartState, deep:bool = false) -> HistoryState:
 	var state: HistoryState = HistoryState.new()
 	state.name = name
 	state.deep = deep
 	parent.add_child(state)
+	state.default_state = state.get_path_to(default_state)
 	# we don't set the initial state here, as it is not needed for history states
 	return state
 

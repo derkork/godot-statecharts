@@ -19,7 +19,7 @@ func _on_walk_state_entered():
 
 
 # While we are in walk state... 
-func _on_walk_state_physics_processing(delta):
+func _on_walk_state_physics_processing(_delta):
 	# set a new velocity
 	velocity = _direction * SPEED
 	# and move into the given direction

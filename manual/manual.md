@@ -301,7 +301,7 @@ The signal is only emitted when the transition is taken, not when it is pending.
 
 #### Automatic transitions
 
-It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you enter a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met. 
+It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you change a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met. 
 
 ![Alt text](immediate_transition.png)
 
@@ -552,6 +552,16 @@ Godot has a very nice built-in comment field named "Editor Description". Use thi
 
 Usually you don't need to worry too much about the order in which state changes are processed but there are some instances where it is important to know the order in which events are processed. The following will give you an overview on the inner workings and the order in which events are processed.
 
+#### Generic event handling rules
+
+The state chart reacts to these events:
+
+- an explicit event was sent to the state chart node using the `send_event` function.
+- an expression property was changed using the `set_expression_property` function.
+- 
+Whenever an event occurs, the state chart will try to find transitions that react to this event. Only transitions in states that are currently active will be considered. Transitions will be checked in a depth-first manner. So the innermost transition that handles any given event (be it explicit or automatic) will run. When a transition runs, the event is considered as handled and will no longer be processed by any other transition, except if that other transition happens to live in a parallel state (each parallel state can handle events even if that event was already handled by another parallel state). If the transition has a guard and it evaluates to `false` then the next transition that reacts to the event will be checked. If no transition reacts to the event, the event will bubble up to the parent state. This process will continue until the event is handled or the root state is reached. If the event is not handled by any state, it will be ignored. 
+
+#### Example
 For this example we will use the following state chart:
 
 ![Example state chart for the order of events](order_of_events_chart.png) 

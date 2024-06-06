@@ -266,11 +266,17 @@
     <Content Include="tests\framework\state_chart_test_base.gd" />
     <Content Include="tests\test_all_of_guard.gd" />
     <Content Include="tests\test_any_of_guard.gd" />
+    <Content Include="tests\test_automatic_transition_leaving_compound_state.gd" />
     <Content Include="tests\test_automatic_transition_on_property_change.gd" />
+    <Content Include="tests\test_parallel_state_event_handling.gd" />
     <Content Include="tests\test_automatic_transition_on_state_enter.gd" />
+    <Content Include="tests\test_immediate_condition_state.gd" />
+    <Content Include="tests\test_property_changes_immediately_visible.gd" />
     <Content Include="tests\test_delayed_transition.gd" />
     <Content Include="tests\test_expression_guard.gd" />
+    <Content Include="tests\test_history_state_as_initial_state.gd" />
     <Content Include="tests\test_history_state_simple.gd" />
+    <Content Include="tests\test_explicit_event_consumption.gd" />
     <Content Include="tests\test_infinite_loop_detection.gd" />
     <Content Include="tests\test_expression_properties.gd" />
     <Content Include="tests\test_not_guard.gd" />

@@ -7,7 +7,7 @@ func test_history_state_simple():
 	var a := compound_state("a", root)
 	var a1 := atomic_state("a1", a)
 	var a2 := atomic_state("a2", a)
-	var h := history_state("h", a)
+	var h := history_state("h", a, a1)
 
 	transition(a1, a2, "to_a2")
 	
