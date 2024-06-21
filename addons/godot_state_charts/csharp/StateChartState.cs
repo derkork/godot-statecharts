@@ -10,8 +10,19 @@ namespace GodotStateCharts
     /// </summary>
     public class StateChartState : NodeWrapper
     {
-
-        protected StateChartState(Node wrapped) : base(wrapped) { }
+        protected StateChartState(Node wrapped) : base(wrapped) 
+        {
+            // Connect the signals to the events
+            wrapped.Connect(SignalName.StateEntered, Callable.From(OnStateEntered));
+            wrapped.Connect(SignalName.StateExited, Callable.From(OnStateExited));
+            wrapped.Connect(SignalName.EventReceived, Callable.From<string>(OnEventReceived));
+            wrapped.Connect(SignalName.StateProcessing, Callable.From<float>(OnStateProcessing));
+            wrapped.Connect(SignalName.StatePhysicsProcessing, Callable.From<float>(OnStatePhysicsProcessing));
+            wrapped.Connect(SignalName.StateStepped, Callable.From(OnStateStepped));
+            wrapped.Connect(SignalName.StateInput, Callable.From<InputEvent>(OnStateInput));
+            wrapped.Connect(SignalName.StateUnhandledInput, Callable.From<InputEvent>(OnStateUnhandledInput));
+            wrapped.Connect(SignalName.TransitionPending, Callable.From<(float, float)>(OnTransitionPending));
+        }
 
         /// <summary>
         /// Creates a wrapper object around the given node and verifies that the node
@@ -37,10 +48,30 @@ namespace GodotStateCharts
         /// </summary>
         public bool Active => Wrapped.Get("active").As<bool>();
 
-      
-        public class SignalName : Godot.Node.SignalName
-        {
+        // Custom events for the signals
+        public event Action StateEntered;
+        public event Action StateExited;
+        public event Action<string> EventReceived;
+        public event Action<float> StateProcessing;
+        public event Action<float> StatePhysicsProcessing;
+        public event Action StateStepped;
+        public event Action<InputEvent> StateInput;
+        public event Action<InputEvent> StateUnhandledInput;
+        public event Action<float, float> TransitionPending;
 
+        // Methods to raise the events
+        private void OnStateEntered() => StateEntered?.Invoke();
+        private void OnStateExited() => StateExited?.Invoke();
+        private void OnEventReceived(string eventName) => EventReceived?.Invoke(eventName);
+        private void OnStateProcessing(float delta) => StateProcessing?.Invoke(delta);
+        private void OnStatePhysicsProcessing(float delta) => StatePhysicsProcessing?.Invoke(delta);
+        private void OnStateStepped() => StateStepped?.Invoke();
+        private void OnStateInput(InputEvent inputEvent) => StateInput?.Invoke(inputEvent);
+        private void OnStateUnhandledInput(InputEvent inputEvent) => StateUnhandledInput?.Invoke(inputEvent);
+        private void OnTransitionPending((float initialDelay, float remainingDelay) delays) => TransitionPending?.Invoke(delays.initialDelay, delays.remainingDelay);
+
+        public new class SignalName : Godot.Node.SignalName
+        {
             /// <summary>
             /// Called when the state is entered.
             /// </summary>
@@ -87,7 +118,6 @@ namespace GodotStateCharts
             /// Returns the initial delay and the remaining delay of the transition.
             /// </summary>
             public static readonly StringName TransitionPending = "transition_pending";
-            
         }
     }
 }
