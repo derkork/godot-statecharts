@@ -10,8 +10,33 @@ namespace GodotStateCharts
     /// </summary>
     public class StateChartState : NodeWrapper
     {
+        public TypeSafeSignal<Action> StateEntered { get; }
+        public TypeSafeSignal<Action> StateExited { get;  }
+        public TypeSafeSignal<Action<StringName>> EventReceived { get;  }
+        
+        public TypeSafeSignal<Action<float>> StateProcessing { get;  }
+        public TypeSafeSignal<Action<float>> StatePhysicsProcessing { get;  }
+        
+        public TypeSafeSignal<Action> StateStepped { get;  }
+        
+        public TypeSafeSignal<Action<InputEvent>> StateInput { get;  }
+        
+        public TypeSafeSignal<Action<InputEvent>> StateUnhandledInput { get;  }
+        
+        public TypeSafeSignal<Action<float,float>> TransitionPending { get;  }
 
-        protected StateChartState(Node wrapped) : base(wrapped) { }
+        protected StateChartState(Node wrapped) : base(wrapped)
+        {
+            StateEntered = new TypeSafeSignal<Action>(Wrapped, SignalName.StateEntered);
+            StateExited = new TypeSafeSignal<Action>(Wrapped, SignalName.StateExited);
+            EventReceived = new TypeSafeSignal<Action<StringName>>(Wrapped, SignalName.EventReceived);
+            StateProcessing = new TypeSafeSignal<Action<float>>(Wrapped, SignalName.StateProcessing);
+            StatePhysicsProcessing = new TypeSafeSignal<Action<float>>(Wrapped, SignalName.StatePhysicsProcessing);
+            StateStepped = new TypeSafeSignal<Action>(Wrapped, SignalName.StateStepped);
+            StateInput = new TypeSafeSignal<Action<InputEvent>>(Wrapped, SignalName.StateInput);
+            StateUnhandledInput = new TypeSafeSignal<Action<InputEvent>>(Wrapped, SignalName.StateUnhandledInput);
+            TransitionPending = new TypeSafeSignal<Action<float,float>>(Wrapped, SignalName.TransitionPending);
+        }
 
         /// <summary>
         /// Creates a wrapper object around the given node and verifies that the node
