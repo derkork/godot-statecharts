@@ -10,8 +10,11 @@ namespace GodotStateCharts
     /// </summary>
     public class StateChart : NodeWrapper
     {
+        public TypeSafeSignal<Action> EventReceived { get; private set; } 
+            
         protected StateChart(Node wrapped) : base(wrapped)
         {
+            EventReceived = new TypeSafeSignal<Action>(Wrapped, SignalName.EventReceived);
         }
 
         /// <summary>
