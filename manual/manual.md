@@ -361,7 +361,11 @@ These expression properties can then be used in your expressions. The following 
 
 > **Note:** all expressions for the expression guards are written in GDScript even if you use C# to interact with the StateChart.
 
-It is important to make sure that your code sets any expression property used by the guard before the guard is first evaluated. For example, if your guard uses a `player_health` expression property, you will need to call `set_expression_property('player_health', some_health)` _before_ the guard is evaluated. Otherwise the guard will not be able to evaluate the expression because it has no value for `player_health`. It is recommended that you use the `_ready`/`_Ready` method to initialize all expression properties used in your state chart with some sane default value.
+It is important to make sure that your code sets any expression property used by the guard before the guard is first evaluated. For example, if your guard uses a `player_health` expression property, you will need to call `set_expression_property('player_health', some_health)` _before_ the guard is evaluated. Otherwise the guard will not be able to evaluate the expression because it has no value for `player_health`. You can set some sane initial values in two ways:
+
+1. Starting with version 0.16.0 you can set initial values for expression properties in the state chart inspector:
+   ![Setting initial properties in the state chart inspector.](initial_property_values.png)
+2. You can use the `_ready`/`_Ready` method to initialize all expression properties used in your state chart with some sane default value by calling `set_expression_property`.
 
 ### Event queueing mechanism
 
