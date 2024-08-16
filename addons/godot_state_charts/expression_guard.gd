@@ -4,6 +4,7 @@ class_name ExpressionGuard
 extends Guard
 
 const ExpressionUtil = preload("expression_util.gd")
+const DebugUtil = preload("debug_util.gd")
 
 var expression:String = ""
 
@@ -15,7 +16,7 @@ func is_satisfied(context_transition:Transition, context_state:StateChartState) 
 		push_error("Could not find root state chart node, cannot evaluate expression")
 		return false
 
-	var result:Variant = ExpressionUtil.evaluate_expression("guard in " + str(context_transition.get_path()), root, expression, false)
+	var result:Variant = ExpressionUtil.evaluate_expression("guard in " + DebugUtil.path_of(context_transition), root, expression, false)
 
 	if typeof(result) != TYPE_BOOL:
 		push_error("Expression result is not a boolean. Returning false.")

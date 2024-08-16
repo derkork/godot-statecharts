@@ -31,10 +31,16 @@ func _init(state_chart:StateChart):
 
 func _register_settings_updates():
 	# print("Registering settings updates for ", _state_chart.get_path())
+	if not _state_chart.is_inside_tree():
+		return
+	
 	EngineDebugger.register_message_capture(DebuggerMessage.SETTINGS_UPDATED_MESSAGE + str(_state_chart.get_path()), _on_settings_updated)
 
 func _unregister_settings_updates():
 	# print("Unregistering settings updates for ", _state_chart.get_path())
+	if not _state_chart.is_inside_tree():
+		return
+
 	EngineDebugger.unregister_message_capture(DebuggerMessage.SETTINGS_UPDATED_MESSAGE + str(_state_chart.get_path()))
 
 func _on_settings_updated(key:String, data:Array) -> bool:
