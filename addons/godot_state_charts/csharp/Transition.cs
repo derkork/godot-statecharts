@@ -1,18 +1,37 @@
+using System;
+
 namespace GodotStateCharts
 {
     using Godot;
 
     /// <summary>
-    /// A transition between two states. This class only exists to make the 
-    /// signal names available in C#. It is not intended to be instantiated
-    /// or otherwise used.
+    /// A transition between two states. 
     /// </summary>
-    public class Transition {
+    public class Transition : NodeWrapper {
+        
+        /// <summary>
+        /// Called when the transition is taken.
+        /// </summary>
+        public event Action Taken {
+            add => Wrapped.Connect(SignalName.Taken, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.Taken, Callable.From(value));
+        }
+        
+        private Transition(Node transition) : base(transition) {}
+        
+        public static Transition Of(Node transition) {
+            if (transition.GetScript().As<Script>() is not GDScript gdScript
+                || !gdScript.ResourcePath.EndsWith("transition.gd"))
+            {
+                throw new ArgumentException("Given node is not a transition.");
+            }
+            return new Transition(transition);
+        }
+        
+        
         public class SignalName : Godot.Node.SignalName
         {
-            /// <summary>
-            /// Called when the transition is taken.
-            /// </summary>
+            /// <see cref="Transition.Taken"/>
             public static readonly StringName Taken = "taken";
         }
     }

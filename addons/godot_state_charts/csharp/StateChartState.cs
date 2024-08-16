@@ -10,33 +10,91 @@ namespace GodotStateCharts
     /// </summary>
     public class StateChartState : NodeWrapper
     {
-        public TypeSafeSignal<Action> StateEntered { get; }
-        public TypeSafeSignal<Action> StateExited { get;  }
-        public TypeSafeSignal<Action<StringName>> EventReceived { get;  }
-        
-        public TypeSafeSignal<Action<float>> StateProcessing { get;  }
-        public TypeSafeSignal<Action<float>> StatePhysicsProcessing { get;  }
-        
-        public TypeSafeSignal<Action> StateStepped { get;  }
-        
-        public TypeSafeSignal<Action<InputEvent>> StateInput { get;  }
-        
-        public TypeSafeSignal<Action<InputEvent>> StateUnhandledInput { get;  }
-        
-        public TypeSafeSignal<Action<float,float>> TransitionPending { get;  }
-
-        protected StateChartState(Node wrapped) : base(wrapped)
+        /// <summary>
+        /// Called when the state is entered.
+        /// </summary>
+        public event Action StateEntered
         {
-            StateEntered = new TypeSafeSignal<Action>(Wrapped, SignalName.StateEntered);
-            StateExited = new TypeSafeSignal<Action>(Wrapped, SignalName.StateExited);
-            EventReceived = new TypeSafeSignal<Action<StringName>>(Wrapped, SignalName.EventReceived);
-            StateProcessing = new TypeSafeSignal<Action<float>>(Wrapped, SignalName.StateProcessing);
-            StatePhysicsProcessing = new TypeSafeSignal<Action<float>>(Wrapped, SignalName.StatePhysicsProcessing);
-            StateStepped = new TypeSafeSignal<Action>(Wrapped, SignalName.StateStepped);
-            StateInput = new TypeSafeSignal<Action<InputEvent>>(Wrapped, SignalName.StateInput);
-            StateUnhandledInput = new TypeSafeSignal<Action<InputEvent>>(Wrapped, SignalName.StateUnhandledInput);
-            TransitionPending = new TypeSafeSignal<Action<float,float>>(Wrapped, SignalName.TransitionPending);
+            add => Wrapped.Connect(SignalName.StateEntered, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StateEntered, Callable.From(value));
         }
+        
+        /// <summary>
+        ///  Called when the state is exited.
+        /// </summary>
+        public event Action StateExited
+        {
+            add => Wrapped.Connect(SignalName.StateExited, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StateExited, Callable.From(value));
+        }
+        
+        /// <summary>
+        /// Called when the state receives an event. Only called if the state is active.
+        /// </summary>
+        public event Action<StringName> EventReceived
+        {
+            add => Wrapped.Connect(SignalName.EventReceived, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.EventReceived, Callable.From(value));
+        }
+
+        /// <summary>
+        /// Called when the state is processing.
+        /// </summary>
+        public event Action<float> StateProcessing
+        {
+            add => Wrapped.Connect(SignalName.StateProcessing, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StateProcessing, Callable.From(value));
+        }
+        
+        /// <summary>
+        /// Called when the state is physics processing.
+        /// </summary>
+        public event Action<float> StatePhysicsProcessing
+        {
+            add => Wrapped.Connect(SignalName.StatePhysicsProcessing, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StatePhysicsProcessing, Callable.From(value));
+        }
+        
+        /// <summary>
+        /// Called when the state chart <code>Step</code> function is called.
+        /// </summary>
+        public event Action StateStepped
+        {
+            add => Wrapped.Connect(SignalName.StateStepped, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StateStepped, Callable.From(value));
+        }
+        
+        /// <summary>
+        /// Called when the state is receiving input.
+        /// </summary>
+        public event Action<InputEvent> StateInput
+        {
+            add => Wrapped.Connect(SignalName.StateInput, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StateInput, Callable.From(value));
+        }
+        
+        /// <summary>
+        /// Called when the state is receiving unhandled input.
+        /// </summary>
+        public event Action<InputEvent> StateUnhandledInput
+        {
+            add => Wrapped.Connect(SignalName.StateUnhandledInput, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.StateUnhandledInput, Callable.From(value));
+        }
+        
+        /// <summary>
+        /// Called every frame while a delayed transition is pending for this state.
+        /// Returns the initial delay and the remaining delay of the transition.
+        /// </summary>
+        public event Action<float,float> TransitionPending
+        {
+            add => Wrapped.Connect(SignalName.TransitionPending, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.TransitionPending, Callable.From(value));
+        }
+        
+
+        protected StateChartState(Node wrapped) : base(wrapped) {}
+       
 
         /// <summary>
         /// Creates a wrapper object around the given node and verifies that the node
@@ -66,51 +124,31 @@ namespace GodotStateCharts
         public class SignalName : Godot.Node.SignalName
         {
 
-            /// <summary>
-            /// Called when the state is entered.
-            /// </summary>
+            /// <see cref="StateChartState.StateEntered"/>
             public static readonly StringName StateEntered = "state_entered";
 
-            /// <summary>
-            ///  Called when the state is exited.
-            /// </summary>
+            /// <see cref="StateChartState.StateExited"/>
             public static readonly StringName StateExited = "state_exited";
 
-            /// <summary>
-            /// Called when the state receives an event. Only called if the state is active.
-            /// </summary>
+            /// <see cref="StateChartState.EventReceived"/>
             public static readonly StringName EventReceived = "event_received";
     
-            /// <summary>
-            /// Called when the state is processing.
-            /// </summary>
+            /// <see cref="StateChartState.StateProcessing"/>
             public static readonly StringName StateProcessing = "state_processing";
-
-            /// <summary>
-            /// Called when the state is physics processing.
-            /// </summary>
+    
+            /// <see cref="StateChartState.StatePhysicsProcessing"/>
             public static readonly StringName StatePhysicsProcessing = "state_physics_processing";
             
-            /// <summary>
-            /// Called when the state chart <code>Step</code> function is called.
-            /// </summary>
+            /// <see cref="StateChartState.StateStepped"/>
             public static readonly StringName StateStepped = "state_stepped";
 
-            /// <summary>
-            /// Called when the state is receiving input.
-            /// </summary>
+            /// <see cref="StateChartState.StateInput"/>
             public static readonly StringName StateInput = "state_input";
                 
-            
-            /// <summary>
-            /// Called when the state is receiving unhandled input.
-            /// </summary>
+            /// <see cref="StateChartState.StateUnhandledInput"/>
             public static readonly StringName StateUnhandledInput = "state_unhandled_input";
             
-            /// <summary>
-            /// Called every frame while a delayed transition is pending for this state.
-            /// Returns the initial delay and the remaining delay of the transition.
-            /// </summary>
+            /// <see cref="StateChartState.TransitionPending"/>
             public static readonly StringName TransitionPending = "transition_pending";
             
         }
