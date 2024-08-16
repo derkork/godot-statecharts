@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - The library now handles cases better where code tries to access a state chart that has been removed from the tree. This may happen when using Godot's `change_scene_to_file` or `change_scene_to_packed` functions. Debug output in these cases will no longer try to get full path names of nodes that have been removed from the tree. This should prevent errors and crashes in these cases ([#129](https://github.com/derkork/godot-statecharts/issues/129)).
 - The error messages for evaluating expressions have been improved. They now show the expression that was evaluated and the result of the evaluation ([#138](https://github.com/derkork/godot-statecharts/issues/138)) 
+- Compound state should no longer show a warning for overriding `add_child`. A big thanks goes out to [yesfish](https://github.com/huwpascoe) for finding this and providing a fix ([#128](https://github.com/derkork/godot-statecharts/issues/128)).
 
 ## [0.16.0] - 2024-06-06 
 ### Added

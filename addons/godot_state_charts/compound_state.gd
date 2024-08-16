@@ -29,8 +29,26 @@ var _active_state:StateChartState = null
 ## The history states of this compound state.
 var _history_states:Array[HistoryState] = []
 ## Whether any of the history states needs a deep history.
-var _needs_deep_history = false
+var _needs_deep_history:bool = false
 
+func _init() -> void:
+	# subscribe to the child_entered_tree signal in edit mode so we can
+	# automatically set the initial state when a new sub-state is added
+	if Engine.is_editor_hint():
+		child_entered_tree.connect(
+			func(child:Node):
+			# when a child is added in the editor and the child is a state
+			# and we don't have an initial state yet, set the initial state 
+			# to the newly added child
+			if child is StateChartState and initial_state.is_empty():
+				# the newly added node may have a random name now, 
+				# so we need to defer the call to build a node path
+				# to the next frame, so the editor has time to rename
+				# the node to its final name
+				(func(): initial_state = get_path_to(child)).call_deferred()
+		)
+
+	
 func _state_init():
 	super._state_init()
 
@@ -218,18 +236,7 @@ func _restore_history_state(target:HistoryState):
 		push_error("The default state '" + str(target.default_state) + "' of the history state '" + target.name + "' cannot be found.")
 		return
 
-func add_child(node:Node, force_readable_name:bool = false, internal:InternalMode = INTERNAL_MODE_DISABLED) -> void:
-	super.add_child(node, force_readable_name, internal)
-	# when a child is added in the editor and the child is a state
-	# and we don't have an initial state yet, set the initial state 
-	# to the newly added child
-	if Engine.is_editor_hint() and node is StateChartState:
-		if initial_state.is_empty():
-			# the newly added node may have a random name now, 
-			# so we need to defer the call to build a node path
-			# to the next frame, so the editor has time to rename
-			# the node to its final name
-			(func(): initial_state = get_path_to(node)).call_deferred()
+
 			
 
 func _get_configuration_warnings() -> PackedStringArray:
