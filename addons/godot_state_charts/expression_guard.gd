@@ -19,7 +19,7 @@ func is_satisfied(context_transition:Transition, context_state:StateChartState) 
 	var result:Variant = ExpressionUtil.evaluate_expression("guard in " + DebugUtil.path_of(context_transition), root, expression, false)
 
 	if typeof(result) != TYPE_BOOL:
-		push_error("Expression result is not a boolean. Returning false.")
+		push_error("Expression: ", expression ," result: ", result,  " is not a boolean. Returning false.")
 		return false
 
 	return result
