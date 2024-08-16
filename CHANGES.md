@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2024-08-16
+### Fixed
+- The library now handles cases better where code tries to access a state chart that has been removed from the tree. This may happen when using Godot's `change_scene_to_file` or `change_scene_to_packed` functions. Debug output in these cases will no longer try to get full path names of nodes that have been removed from the tree. This should prevent errors and crashes in these cases ([#129](https://github.com/derkork/godot-statecharts/issues/129)).
+- The error messages for evaluating expressions have been improved. They now show the expression that was evaluated and the result of the evaluation ([#138](https://github.com/derkork/godot-statecharts/issues/138)) 
+
 ## [0.16.0] - 2024-06-06 
 ### Added
 - The delay for a transition can now be an expression rather than just a float value. This allows for more dynamic transitions. For example the delay can now be a random value (using `randf_range()`) or any expression property. Of course you can still just use a single float number.  This change is backwards-compatible, all existing state charts will automatically be converted to the new format when loaded. There is a new example named `random_transitions` which shows this new feature to create a randomly wandering mob. A big thanks goes out to [Miguel Silva](https://github.com/mrjshzk) and [alextkd2003](https://github.com/alextkd2003) for providing POC PRs for this feature.
