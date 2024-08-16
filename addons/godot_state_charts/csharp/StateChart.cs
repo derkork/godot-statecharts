@@ -10,6 +10,24 @@ namespace GodotStateCharts
     /// </summary>
     public class StateChart : NodeWrapper
     {
+        /// <summary>
+        /// Emitted when the state chart receives an event. This will be 
+        /// emitted no matter which state is currently active and can be 
+        /// useful to trigger additional logic elsewhere in the game 
+        /// without having to create a custom event bus. It is also used
+        /// by the state chart debugger. Note that this will emit the 
+        /// events in the order in which they are processed, which may 
+        /// be different from the order in which they were received. This is
+        /// because the state chart will always finish processing one event
+        /// fully before processing the next. If an event is received
+        /// while another is still processing, it will be enqueued.
+        /// </summary>
+        public event Action<StringName> EventReceived
+        {
+            add => Wrapped.Connect(SignalName.EventReceived, Callable.From(value));
+            remove => Wrapped.Disconnect(SignalName.EventReceived, Callable.From(value));
+        } 
+            
         protected StateChart(Node wrapped) : base(wrapped)
         {
         }
@@ -76,18 +94,9 @@ namespace GodotStateCharts
 
         public class SignalName : Node.SignalName
         {
-            /// <summary>
-            /// Emitted when the state chart receives an event. This will be 
-            /// emitted no matter which state is currently active and can be 
-            /// useful to trigger additional logic elsewhere in the game 
-            /// without having to create a custom event bus. It is also used
-            /// by the state chart debugger. Note that this will emit the 
-            /// events in the order in which they are processed, which may 
-            /// be different from the order in which they were received. This is
-            /// because the state chart will always finish processing one event
-            /// fully before processing the next. If an event is received
-            /// while another is still processing, it will be enqueued.
-            /// </summary>
+           /// <see cref="StateChart.EventReceived"/>
+           /// 
+           /// </summary>
             public static readonly StringName EventReceived = "event_received";
         }
         
