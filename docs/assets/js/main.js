@@ -59,22 +59,9 @@ layout: null
     Search.init();
 }(jQuery));
 
-function scrollToAnchor() {
-    
-    try {
-        const offset = window.innerWidth > 768 ? 70 : 0;
-        const hash = location.hash ? decodeURIComponent(location.hash) : '';
-        if(hash && $(hash).length){
-            scrollTo(0, $(hash).offset().top - offset);
-        }
-    } catch (error) {
-        console.log('Anchor not found:', location.hash);
-    }
-}
-
 function addLinksToAnchors() {
     const anchors = $('h2[id], h3[id], h4[id], h5[id]');
-    
+
     if (anchors.length) {
         anchors.each(function(e) {
             const element = $(anchors[e]);
@@ -84,11 +71,6 @@ function addLinksToAnchors() {
     }
 }
 
-$(window).bind('hashchange', function(e){
-    scrollToAnchor();
-});
-
 $(document).ready(function(){
-    scrollToAnchor();
     addLinksToAnchors();
 });
