@@ -9,6 +9,12 @@ description: "Here you can find tips and tricks that can help you using the plug
 
 {{ page.description }}
 
+## Index
+- [Keep state and logic separate](#keep-state-and-logic-separate)
+- [Remember that events bubble up in the chart tree](#remember-that-events-bubble-up-in-the-chart-tree)
+- [Give everything meaningful names](#give-everything-meaningful-names)
+- [Use the built-in "Editor Description" feature](#use-the-built-in-editor-description-feature)
+
 ### Keep state and logic separate
 
 State charts work best when you keep the state and the logic separate. This means that the state charts should contain all the rules for changing states while your code should only contain the logic that is executed when being in a state or when entering or leaving a state. You should not track the current state in your code, that is the responsibility of the state chart. The `StateChart` class deliberately does not expose the current state of the state chart for this reason.

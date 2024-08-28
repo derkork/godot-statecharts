@@ -7,6 +7,11 @@ description: "Here you can find the appendix of the documentation."
 
 # Appendix
 
+## Index
+- [Order of events](#order-of-events)
+    - [Generic event handling rules](#generic-event-handling-rules)
+    - [Example](#example)
+
 ### Order of events
 
 Usually you don't need to worry too much about the order in which state changes are processed but there are some instances where it is important to know the order in which events are processed. The following will give you an overview on the inner workings and the order in which events are processed.

@@ -9,6 +9,13 @@ description: "Below you can find the installation instructions for the plugin."
 
 {{ page.description }}
 
+## Index
+- [Requirements](#requirements)
+- [Installation with the Godot Asset Library](#installation-with-the-godot-asset-library)
+- [Manual installation](#manual-installation)
+- [Installation with C#](#installation-with-c)
+- [Updating from an earlier version](#updating-from-an-earlier-version)
+
 ### Requirements
 
 This plugin requires Godot 4.0.3 or later. Earlier versions of Godot 4 may work but are not officially supported. The plugin will not work with Godot 3.x.

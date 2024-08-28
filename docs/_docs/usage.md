@@ -7,7 +7,29 @@ description: "Here you can find the usage instructions for the plugin."
 
 # {{ page.title }}
 
-{{ page.description }}
+## Index
+- [Examples](#examples)
+- [The State Chart Node](#the-state-chart-node)
+- [States](#states)
+    - [Connecting to state signals from code](#connecting-to-state-signals-from-code)
+    - [Atomic states](#atomic-states)
+    - [Compound states](#compound-states)
+    - [Parallel states](#parallel-states)
+    - [History states](#history-states)
+    - [Animation tree states](#animation-tree-states)
+    - [Animation player states](#animation-player-states)
+- [Events and transitions](#events-and-transitions)
+    - [Multiple transitions on the same state](#multiple-transitions-on-the-same-state)
+    - [Event selection and management](#event-selection-and-management)
+    - [Transition taken signal](#transition-taken-signal)
+    - [Automatic transitions](#automatic-transitions)
+    - [Delayed transitions](#delayed-transitions)
+    - [Transition guards](#transition-guards)
+    - [Expression guards](#expression-guards)
+- [Event queueing mechanism](#event-queueing-mechanism)
+- [Debugging](#debugging)
+    - [Debugging in-game with the state chart debugger](#debugging-in-game-with-the-state-chart-debugger)
+    - [Debugging in the editor](#debugging-in-the-editor)
 
 The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with.
 
@@ -40,7 +62,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 - `random_transitions` - an example how to use expressions to randomly transition between states and controlling the length of transition delays.
 - `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
 
-### The _State Chart_ node
+### The _State Chart_ Node
 
 <img src="{{ site.baseurl }}/assets/img/manual/icons/state_chart.svg" width="32" height="32" align="left"> The _State Chart_ node is your main way of interacting with the state charts. It allows you to send events to the state chart using the `send_event(event)` method. You can also set expression properties with the `set_expression_property(name, value)`  function, which can later be used by expression guards to determine whether a certain transition should be taken (see the section on expression guards for more information).
 
@@ -222,10 +244,10 @@ In deeper state charts, events will be passed to the active states going all the
 >
 > This means that if you call `send_event`, `set_expression_property` or `step` in a `_ready` function things will most likely not work as expected. If you must call any of these functions in a `_ready` function, you can use `call_deferred` to delay the event sending by one frame, e.g. `state_chart.send_event.call_deferred("some_event")`.
 
-##### Multiple transitions on the same state
+#### Multiple transitions on the same state
 A single state can have multiple transitions. If this is the case, all transitions will be checked from top to bottom and the first transition that reacts to the event will be executed. If you want to have multiple transitions that react to the same event, you can use [guards](#transition-guards) to determine which transition should be taken.
 
-##### Event selection and management
+#### Event selection and management
 
 Starting with version 0.12.0 the plugin provides a dropdown for events in the editor UI. This dropdown allows you to quickly select an event from a list of all events that are currently used in the state chart. This helps to avoid typos and makes it easier to find the event you are looking for.
 
@@ -237,7 +259,7 @@ The dropdown also has "Manage..." entry which allows you to rename events that a
 
 In the dialog, select the event you want to rename and enter the new name. All transitions in the current state chart that use the event will be updated automatically. You can undo the renaming by pressing `Ctrl+Z`. Also note, that renaming an event will not rename the event in your code, so you will have to update the event name in your code manually.
 
-##### Transition taken signal
+#### Transition taken signal
 
 Each transition provides a `taken` signal which is fired when the transition is taken. This is useful if you need to determine how you left a state, which you cannot do with the `state_exited` signal alone. You can use this signal run side effects when a specific transition is taken. For example the platformer demo uses the signal to run the double-jump animation when the player leaves the _Double Jump_ state through the _On Jump_ transition.
 
@@ -269,7 +291,7 @@ A transition can have a guard which determines whether the transition should be 
 - <img src="{{ site.baseurl }}/assets/img/manual/icons/state_is_active_guard.svg" width="16" height="16" align="left"> _StateIsActiveGuard_ - this guard allows you to configure and monitor a state. The guard evaluates to `true` if the state is active and to `false` if the state is inactive.
 - <img src="{{ site.baseurl }}/assets/img/manual/icons/expression_guard.svg" width="16" height="16" align="left"> _ExpressionGuard_ - this guard allows you to use expressions to determine whether the transition should be taken or not.
 
-##### Expression guards
+#### Expression guards
 Expression guards give you the most flexibility when it comes to guards. You can use expressions to determine whether a transition should be taken or not. Expression guards are evaluated using the [Godot Expression](https://docs.godotengine.org/en/stable/classes/class_expression.html) class. You can add so-called _expression properties_ to the state chart node by calling the `set_expression_property(name, value)` method.
 
 ```gdscript
