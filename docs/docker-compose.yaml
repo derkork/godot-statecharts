@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  site:
+    container_name: docsy
+    command: jekyll serve --watch --drafts
+    image: jekyll/jekyll:3.8
+    volumes: 
+      - "./:/srv/jekyll"
+      - "./vendor/bundle:/usr/local/bundle"
+      # remove "./vendor/bundle:/usr/local/bundle" volume when deploying in production
+    ports: 
+      - "4000:4000"

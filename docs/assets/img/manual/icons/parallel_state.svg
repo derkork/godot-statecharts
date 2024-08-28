@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <rect id="Artboard1" x="0" y="0" width="32" height="32" style="fill:none;"/>
+    <g id="Artboard11" serif:id="Artboard1">
+        <g transform="matrix(1.03705,0,0,1.03705,-0.460588,-0.659827)">
+            <g id="BG">
+                <path d="M30.337,8.833C30.337,4.841 27.096,1.601 23.104,1.601L8.64,1.601C4.649,1.601 1.408,4.841 1.408,8.833L1.408,23.297C1.408,27.288 4.649,30.529 8.64,30.529L23.104,30.529C27.096,30.529 30.337,27.288 30.337,23.297L30.337,8.833Z" style="fill:none;stroke:rgb(225,142,57);stroke-width:0.96px;"/>
+            </g>
+        </g>
+        <g id="ParallelState">
+            <g transform="matrix(1.36246,0,0,1.36246,-10.1682,-18.2448)">
+                <circle cx="19.207" cy="19.263" r="4.404" style="fill:rgb(225,142,57);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-0.0397943,-0.229175)">
+                <path d="M4.306,16.267L27.54,16.341" style="fill:none;stroke:rgb(225,142,57);stroke-width:2px;"/>
+            </g>
+            <g transform="matrix(1.36246,0,0,1.36246,-10.1682,-2.24482)">
+                <circle cx="19.207" cy="19.263" r="4.404" style="fill:rgb(225,142,57);"/>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <rect id="Artboard1" x="0" y="0" width="32" height="32" style="fill:none;"/>
+    <g id="Artboard11" serif:id="Artboard1">
+        <g transform="matrix(1.03705,0,0,1.03705,-0.460588,-0.659827)">
+            <g id="BG">
+                <path d="M30.337,8.833C30.337,4.841 27.096,1.601 23.104,1.601L8.64,1.601C4.649,1.601 1.408,4.841 1.408,8.833L1.408,23.297C1.408,27.288 4.649,30.529 8.64,30.529L23.104,30.529C27.096,30.529 30.337,27.288 30.337,23.297L30.337,8.833Z" style="fill:none;stroke:rgb(225,142,57);stroke-width:0.96px;"/>
+            </g>
+        </g>
+        <g id="AnimationTreeState">
+            <g transform="matrix(3.01177,0,0,3.01177,-34.5681,-33.1274)">
+                <circle cx="16.79" cy="16.312" r="3.319" style="fill:rgb(225,142,57);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-0.944123,0.510573)">
+                <path d="M12.988,9.407L14.259,22.064L15.427,22.185L15.484,19.654L17.723,19.607L17.7,21.031L18.427,20.976L18.583,18.442L15.48,18.154L15.515,14.006L20.744,13.909L20.738,16.136L21.79,16.077L21.992,12.615L15.399,12.643L14.958,9.391L12.988,9.407Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

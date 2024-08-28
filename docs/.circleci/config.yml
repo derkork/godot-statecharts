@@ -1,0 +1,50 @@
+version: 2.1
+
+workflows:
+  version: 2
+
+  # The build workflow will build a preview for the site, intended for PRs
+  build:
+    jobs:
+      - build-site:
+          filters:
+            branches:
+              ignore: master
+
+build_jekyll: &build_jekyll
+    name: Jekyll Build
+    command: |
+        echo "Building RSE Blog for Preview"
+        cp ~/repo/.circleci/circle_urls.sh ~/repo/circle_urls.sh
+        cd ~/repo
+        chmod u+x circle_urls.sh
+        bash circle_urls.sh              
+        bundle exec jekyll build
+        
+jobs:
+  build-site:
+    docker:
+      - image: circleci/ruby:2.4.1
+    working_directory: ~/repo
+    environment:
+      - JEKYLL_ENV: production
+      - NOKOGIRI_USE_SYSTEM_LIBRARIES: true
+      - BUNDLE_PATH: ~/repo/vendor/bundle
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - rubygems-v1
+      - run:
+          name: Bundle Install
+          command: |
+              cd ~/repo
+              bundle check || bundle install
+      - save_cache:
+          key: rubygems-v1
+          paths:
+            - vendor/bundle
+      - run: *build_jekyll
+      - store_artifacts:
+          path: ~/repo/_site
+          destination: docsy-jekyll
