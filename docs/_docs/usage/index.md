@@ -33,7 +33,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 
 - `ant_hill` - a rudimentary ant hill simulation. The ants are controlled by a state chart that handles the different states of the ants such as searching for food, carrying food, returning to the nest, etc. This example shows how state charts can simplify a lot of the if-else logic that is often needed to implement AI.
 - `automatic_transitions` - an example that shows how to use automatic transitions that react to changes in expression properties.
-- `cooldown` - an example on how to drive UI elements with the `transition_pending` signal. See also the section on [delayed transitions](./events-and-transitions#delayed-transitions) for more information.
+- `cooldown` - an example on how to drive UI elements with the `transition_pending` signal. See also the section on [delayed transitions](../usage/events-and-transitions#delayed-transitions) for more information.
 - `csharp` - an example on how to use the API from C#. Note that you need to use the .NET version of Godot 4 for this example to work. See also the section on [installation with C#](../installation#installation-with-c) for more information.
 - `history_states` - an example that shows how you can use history states to implement a state machine that can remember the last active state of a compound state.
 - `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](../appendix#order-of-events) for more information.
