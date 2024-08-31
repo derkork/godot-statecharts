@@ -6,9 +6,6 @@ not_editable: true
 excluded_in_search: true
 ---
 
-<input class="form-control td-search-input" type="search" name="q" id="search-input" placeholder="&#xf002 Pesquisar…"  style="margin-top:5px" autofocus>
-<i style="color:white; margin-right:8px; margin-left:5px" class="fa fa-search"></i>
-
 <p><span id="search-process">Loading</span> results <span id="search-query-container" style="display: none;">for "<strong id="search-query"></strong>"</span></p>
 
 <ul id="search-results"></ul>
@@ -59,5 +56,7 @@ excluded_in_search: true
 		{% endfor %}
 	};
 </script>
-<script src="{{ site.baseurl }}/assets/js/lunr.min.js"></script>
+
+<!-- Lunr.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.7.2/lunr.min.js" integrity="sha512-g75VIuG5LutKZvRY+UxPpzyOSmRpWJBFi20iM+uS/dPf0v+cpU7O3StPRDjSMyFbKz4MkPCTGddHzlzKxEdGzg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="{{ site.baseurl }}/assets/js/search.js"></script>

@@ -18,7 +18,7 @@ description: "Transitions allow you to switch between states."
 - [Expression guards](#expression-guards)
 - [Event queueing mechanism](#event-queueing-mechanism)
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/transition.svg" class="mr-3" width="32" height="32" align="left"> Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. You can send events to the state chart by calling the `send_event(event)` method. To send an event you first need to get hold of the state chart node. A simple way to do this is to use the `get_node` function:
+<img src="{{ site.baseurl }}/assets/img/manual/icons/transition.svg" class="state-icon"> Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. You can send events to the state chart by calling the `send_event(event)` method. To send an event you first need to get hold of the state chart node. A simple way to do this is to use the `get_node` function:
 
 ```gdscript
 # my_node.gd

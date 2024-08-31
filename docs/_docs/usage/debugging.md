@@ -14,7 +14,7 @@ description: "When the game is running it is very useful to see the current stat
 
 ## Debugging in-game with the state chart debugger
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/state_chart_debugger.svg" class="mr-3" width="32" height="32" align="left"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add it to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":
+<img src="{{ site.baseurl }}/assets/img/manual/icons/state_chart_debugger.svg" class="state-icon"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add it to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":
 
 ![Adding the state chart debugger]({{ site.baseurl }}/assets/img/manual/add_statechart_debugger.gif)
 

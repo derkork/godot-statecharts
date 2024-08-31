@@ -21,7 +21,7 @@ description: "States are the building blocks from which you build your state cha
 
 ## The _State Chart_ Node
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/state_chart.svg" class="mr-3" width="32" height="32" align="left"> The _State Chart_ node is your main way of interacting with the state charts. It allows you to send events to the state chart using the `send_event(event)` method. You can also set expression properties with the `set_expression_property(name, value)`  function, which can later be used by expression guards to determine whether a certain transition should be taken (see the section on expression guards for more information).
+<img src="{{ site.baseurl }}/assets/img/manual/icons/state_chart.svg" class="state-icon"> The _State Chart_ node is your main way of interacting with the state charts. It allows you to send events to the state chart using the `send_event(event)` method. You can also set expression properties with the `set_expression_property(name, value)`  function, which can later be used by expression guards to determine whether a certain transition should be taken (see the section on expression guards for more information).
 
 ## The States
 
@@ -78,11 +78,11 @@ If you want to connect signals from the editor UI you can just do it like you wo
 
 ## Atomic states
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/atomic_state.svg" class="mr-3" width="32" height="32" align="left"> Atomic states are the most basic type of state. They cannot have child states. Atomic states have no additional properties.
+<img src="{{ site.baseurl }}/assets/img/manual/icons/atomic_state.svg" class="state-icon"> Atomic states are the most basic type of state. They cannot have child states. Atomic states have no additional properties.
 
 ## Compound states
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/compound_state.svg" class="mr-3" width="32" height="32" align="left"> Compound states are states which have at least one child state (though having at least two child states makes more sense). Only one child state of a compound state can be active at any given time. Compound states have the following properties:
+<img src="{{ site.baseurl }}/assets/img/manual/icons/compound_state.svg" class="state-icon"> Compound states are states which have at least one child state (though having at least two child states makes more sense). Only one child state of a compound state can be active at any given time. Compound states have the following properties:
 
 - _Initial state_ - this property determines which child state will be activated when the compound state is entered directly. You can always activate a child state by explicitly transitioning to it. If you do not set an initial state then no child state will be activated and an error will be printed to the console.
 
@@ -95,11 +95,11 @@ Compound states have two signals in addition to the signals that all states have
 
 ## Parallel states
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/parallel_state.svg" class="mr-3" width="32" height="32" align="left"> Parallel states are similar to compound states in that they can have multiple child states. However, all child states of a parallel state are active at the same time when the parallel state is active. They allow you to model multiple states which are independent of each other. As such they are a great tool for avoiding combinatorial state explosion that you can get with simple state machines. Parallel states have no additional properties.
+<img src="{{ site.baseurl }}/assets/img/manual/icons/parallel_state.svg" class="state-icon"> Parallel states are similar to compound states in that they can have multiple child states. However, all child states of a parallel state are active at the same time when the parallel state is active. They allow you to model multiple states which are independent of each other. As such they are a great tool for avoiding combinatorial state explosion that you can get with simple state machines. Parallel states have no additional properties.
 
 ## History states
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/history_state.svg" class="mr-3" width="32" height="32" align="left"> History states are pseudo-states. They are not really a state but rather activate the last active state when being transitioned to. They can only be used as child states of compound states. They are useful when you temporarily want to leave a compound state and then return to the state you were in before you left. History states have the following properties:
+<img src="{{ site.baseurl }}/assets/img/manual/icons/history_state.svg" class="state-icon"> History states are pseudo-states. They are not really a state but rather activate the last active state when being transitioned to. They can only be used as child states of compound states. They are useful when you temporarily want to leave a compound state and then return to the state you were in before you left. History states have the following properties:
 
 - _Deep_ - if true the history state will capture and restore the state of the whole sub-tree below the compound state. If false the history state will only capture and restore the last active state of its immediate parent compound state.
 - _Default state_ - this is the state which will be activated if the history state is entered and no history has been captured yet. If you do not set a default state, the history state will not activate any state when it is entered and an error will be printed to the console.
@@ -113,7 +113,7 @@ To use a history state, set up a transition that transitions directly to the his
 
 > ⚠️ **Note**: this feature is currently experimental and may change or be replaced in the future.
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/animation_tree_state.svg" class="mr-3" width="32" height="32" align="left"> Animation tree states are a variation of atomic states. They can be linked to an animation tree. When an animation tree state is activated it will ask the animation tree to travel to the same state (the animation tree state and the state inside the animation tree should have the same name). This can be used to control animation trees with the same state chart events that you use to control your game logic. Animation tree states have the following properties:
+<img src="{{ site.baseurl }}/assets/img/manual/icons/animation_tree_state.svg" class="state-icon"> Animation tree states are a variation of atomic states. They can be linked to an animation tree. When an animation tree state is activated it will ask the animation tree to travel to the same state (the animation tree state and the state inside the animation tree should have the same name). This can be used to control animation trees with the same state chart events that you use to control your game logic. Animation tree states have the following properties:
 
 - _Animation tree_ - the animation tree that should be controlled by the animation tree state.
 - _State Name_ - the name of the state inside the animation tree that should be activated when the animation tree state is activated. This is optional, if you do not set a state name, the animation tree state will activate the state with the same name as the animation tree state.
@@ -129,7 +129,7 @@ Animation tree states are usually independent of the rest of the states, so it i
 
 > ⚠️ **Note**: this feature is currently experimental and may change or be replaced in the future.
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/animation_player_state.svg" class="mr-3" width="32" height="32" align="left"> Animation player states are similar to animation tree states. They can be linked to an animation player. When an animation player state is activated it will ask the animation player to play the same animation (the animation player state and the animation inside the animation player should have the same name). This can be used to control animation players with the same state chart events that you use to control your game logic. Animation player states have the following properties:
+<img src="{{ site.baseurl }}/assets/img/manual/icons/animation_player_state.svg" class="state-icon"> Animation player states are similar to animation tree states. They can be linked to an animation player. When an animation player state is activated it will ask the animation player to play the same animation (the animation player state and the animation inside the animation player should have the same name). This can be used to control animation players with the same state chart events that you use to control your game logic. Animation player states have the following properties:
 
 - _Animation player_ - the animation player that should be controlled by the animation player state.
 - _Animation Name_ - the name of the animation inside the animation player that should be played when the animation player state is activated. This is optional, if you do not set an animation name, the animation player state will play the animation with the same name as the animation player state.

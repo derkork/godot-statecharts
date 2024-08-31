@@ -8,12 +8,12 @@
     <div class="container-fluid td-outer">
       <div class="td-main">
         <div class="row flex-xl-nowrap">
-          <div class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+          <div class="col-12 col-md-3 col-xl-2 td-sidebar py-0 d-print-none">
           {% include sidebar.html %}
           </div>
-          <main class="col-12 col-md-9 col-xl-10 pl-md-5" role="main">
-           <div class="td-content">
-	      {{ content }}	
+          <main class="col-12 col-md-9 col-xl-10 pl-md-5 pt-1 pt-md-5 main-column" role="main">
+           <div class=" pt-0 pt-md-5">
+	      {{ content }}
               {% if section.links %}<div class="section-index">
                <hr class="panel-line">{% for child in section.links %}
                  <div class="entry">
