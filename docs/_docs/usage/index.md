@@ -25,7 +25,7 @@ Starting with version 0.2.0 there is also an improved UI to quickly add nodes an
 
 If you hold down `Shift` while clicking the button for the node you want to add, the newly added node will be selected automatically. Otherwise the node will be added to the currently selected node but the currently selected node will stay selected.
 
-The new UI supports undo/redo, so you can undo the addition of a node or transition with `Ctrl+Z`. You can move the sidebar to the other side of the editor by clicking the <img src="{{ site.baseurl }}/assets/img/manual/icons/toggle_sidebar.svg" width="16" height="16" title="toggle sidebar icon"> icon at the bottom of the sidebar.
+The new UI supports undo/redo, so you can undo the addition of a node or transition with `Ctrl+Z`. You can move the sidebar to the other side of the editor by clicking the <img src="{{ site.baseurl }}/assets/img/manual/icons/toggle_sidebar.svg" class="state-icon" title="toggle sidebar icon"> icon at the bottom of the sidebar.
 
 ## Examples
 
