@@ -22,7 +22,7 @@ The state chart reacts to these events:
 
 - an explicit event was sent to the state chart node using the `send_event` function.
 - an expression property was changed using the `set_expression_property` function.
--
+
 Whenever an event occurs, the state chart will try to find transitions that react to this event. Only transitions in states that are currently active will be considered. Transitions will be checked in a depth-first manner. So the innermost transition that handles any given event (be it explicit or automatic) will run. When a transition runs, the event is considered as handled and will no longer be processed by any other transition, except if that other transition happens to live in a parallel state (each parallel state can handle events even if that event was already handled by another parallel state). If the transition has a guard and it evaluates to `false` then the next transition that reacts to the event will be checked. If no transition reacts to the event, the event will bubble up to the parent state. This process will continue until the event is handled or the root state is reached. If the event is not handled by any state, it will be ignored.
 
 #### Example
