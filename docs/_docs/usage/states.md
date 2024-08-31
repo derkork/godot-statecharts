@@ -32,10 +32,10 @@ States are the building blocks from which you build your state charts. A state c
 - `event_received(event)` - this signal is emitted when an event is received by the state while the state is active. The event is passed as a parameter.
 - `state_processing(delta)` - this signal is emitted every frame while the state is active. The delta time is passed as a parameter. The signal will obey pause mode of the tree, so if the node is paused, this signal will not be emitted.
 - `state_physics_processing(delta)` - this signal is emitted every physics frame while the state is active. The delta time is passed as a parameter. The signal will obey pause mode of the tree, so if the node is paused, this signal will not be emitted.
-- `state_stepped()` - called whenever the `step` method of the state chart is called. See [stepping mode](../stepping-mode) for more information on stepping mode.
+- `state_stepped()` - called whenever the `step` method of the state chart is called. See [stepping mode]({{ site.baseurl }}/stepping-mode) for more information on stepping mode.
 - `state_input(input_event)` - called when input is received while the state is active. This is useful to limit input to certain states.
 - `state_unhandled_input(input_event)` - called when unhandled input is received while the state is active. Again this is useful to limit input to certain states.
-- `transition_pending(initial_delay, remaining_delay)` - called every frame while a [delayed transition](events-and-transitions#delayed-transitions) is pending for this state. The initial and remaining delay of the transition in seconds are passed as parameters. This can be used to drive progress bars or cooldown indicators or trigger additional effects at certain time indices during the transition. An example of this can be found in the `cooldown` demo. Note, that this is never called for transitions without a delay.
+- `transition_pending(initial_delay, remaining_delay)` - called every frame while a [delayed transition]({{ site.baseurl }}/usage/events-and-transitions#delayed-transitions) is pending for this state. The initial and remaining delay of the transition in seconds are passed as parameters. This can be used to drive progress bars or cooldown indicators or trigger additional effects at certain time indices during the transition. An example of this can be found in the `cooldown` demo. Note, that this is never called for transitions without a delay.
 
 ## Connecting to state signals from code
 
