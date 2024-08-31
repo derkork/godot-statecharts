@@ -2,12 +2,10 @@
 layout: page
 title: Installation
 permalink: /installation
-description: "Below you can find the installation instructions for the plugin."
+description: "Here you can find the installation instructions for the plugin."
 ---
 
 # {{ page.title }}
-
-{{ page.description }}
 
 ## Index
 - [Requirements](#requirements)
@@ -16,15 +14,15 @@ description: "Below you can find the installation instructions for the plugin."
 - [Installation with C#](#installation-with-c)
 - [Updating from an earlier version](#updating-from-an-earlier-version)
 
-### Requirements
+## Requirements
 
 This plugin requires Godot 4.0.3 or later. Earlier versions of Godot 4 may work but are not officially supported. The plugin will not work with Godot 3.x.
 
-### Installation with the Godot Asset Library
+## Installation with the Godot Asset Library
 
 The easiest way to install the plugin is to use the Godot Asset Library. Search for "Godot State Charts" and install the plugin. You can exclude the `godot_state_charts_examples` folder if you don't need the examples.
 
-### Manual installation
+## Manual installation
 
 You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
 
@@ -33,7 +31,7 @@ After you installed it, make sure you enable the plugin in the project settings:
 ![Enabling the plugin in the project settings]({{ site.baseurl }}/assets/img/manual/enable_plugin.png)
 
 
-### Installation with C#
+## Installation with C#
 
 If you want to use this library with C#, make sure you are using the .NET version of Godot 4. This can be downloaded from the [Godot download page](https://godotengine.org/download). The standard version of Godot 4 does not support C#. If you got Godot from Steam, you have the standard version and need to download the .NET version separately from the Godot website. There are additional installation steps for the Godot .NET version, so make sure you follow the instructions on the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
 
@@ -43,7 +41,7 @@ After you installed the plugin as described above, you may need to initialize yo
 
 > ⚠️ **Note**: the C# API is currently experimental and may change in the future. Please give it a try and let me know if you encounter any issues.
 
-### Updating from an earlier version
+## Updating from an earlier version
 
 The asset library currently has no support for plugin updates, therefore in order to update the plugin, perform the following steps:
 

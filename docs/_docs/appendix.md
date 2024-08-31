@@ -12,11 +12,11 @@ description: "Here you can find the appendix of the documentation."
     - [Generic event handling rules](#generic-event-handling-rules)
     - [Example](#example)
 
-### Order of events
+## Order of events
 
 Usually you don't need to worry too much about the order in which state changes are processed but there are some instances where it is important to know the order in which events are processed. The following will give you an overview on the inner workings and the order in which events are processed.
 
-#### Generic event handling rules
+### Generic event handling rules
 
 The state chart reacts to these events:
 
@@ -25,7 +25,7 @@ The state chart reacts to these events:
 
 Whenever an event occurs, the state chart will try to find transitions that react to this event. Only transitions in states that are currently active will be considered. Transitions will be checked in a depth-first manner. So the innermost transition that handles any given event (be it explicit or automatic) will run. When a transition runs, the event is considered as handled and will no longer be processed by any other transition, except if that other transition happens to live in a parallel state (each parallel state can handle events even if that event was already handled by another parallel state). If the transition has a guard and it evaluates to `false` then the next transition that reacts to the event will be checked. If no transition reacts to the event, the event will bubble up to the parent state. This process will continue until the event is handled or the root state is reached. If the event is not handled by any state, it will be ignored.
 
-#### Example
+### Example
 For this example we will use the following state chart:
 
 ![Example state chart for the order of events]({{ site.baseurl }}/assets/img/manual/order_of_events_chart.png)
