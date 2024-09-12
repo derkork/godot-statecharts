@@ -7,8 +7,8 @@
 
 <p align="center">
   <a href="https://godotengine.org/asset-library/asset/1778">Install from the Godot Asset Libary</a> | 
-  <a href="manual/manual.md">Read the manual</a> |
-  <a href="manual/faq.md">FAQ</a> |
+  <a href="https://derkork.github.io/godot-statecharts/">Read the manual</a> |
+  <a href="https://derkork.github.io/godot-statecharts/faq">FAQ</a> |
   <a href="https://discord.gg/4JBkykG">Godot Engine Discord</a>
 </p>
 
@@ -25,7 +25,7 @@ Godot State Charts is an extension for Godot Engine 4 or later that allows you t
 
 
 <p align="center">
-  <img src="manual/demo_video.gif" alt="Example of State Charts in action">
+  <img src="docs/assets/img/manual/demo_video.gif" alt="Example of State Charts in action">
 </p>
 
 ## Features
@@ -39,7 +39,7 @@ Godot State Charts is an extension for Godot Engine 4 or later that allows you t
 - Built-in debug view allows you to inspect your state charts in the game while they are running.
 - Inactive states will not update every frame for improved performance.
 - All states adhere to the pause mode, so state charts will pause when the game is paused.
-- Comprehensive documentation with a proper [manual](manual/manual.md) and annotated examples. 
+- Comprehensive documentation with a proper [manual](https://derkork.github.io/godot-statecharts/) and annotated examples. 
 
 
 ### Attribution
