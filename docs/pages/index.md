@@ -7,9 +7,6 @@ description: "Godot State Charts is a plugin for Godot Engine that allows you to
 
 # {{ site.title }}
 
-
-
-
 {{ page.description }}
 Now what is a state chart? [Statecharts.dev](https://statecharts.dev/) explains it like this:
 
@@ -19,7 +16,7 @@ Godot State Charts allows you to build state charts in the Godot editor.  The li
 
 There is only a single class with two methods for your code to interface with the state chart. This makes it easy to integrate state charts into your game, as you don't need to extend from a base class or implement an interface for your states. 
 
-Please check the links on the left for more information on how to use the plugin. If you have any questions or problems, please check the [FAQ](/faq) or open an issue on the [GitHub repository](https://github.com/derkork/godot-statecharts/issues/new). 
+Please check the links on the left for more information on how to use the plugin. If you have any questions or problems, please check the [FAQ]({{site.baseurl}}/faq) or open an issue on the [GitHub repository](https://github.com/derkork/godot-statecharts/issues/new). 
 
 ## Video Tutorial
 
