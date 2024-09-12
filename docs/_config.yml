@@ -15,12 +15,11 @@
 # in the templates via {{ site.myvariable }}.
 
 title: Godot State Charts
-email: your-email@domain.com
-author: derkork, Jan Thomä
+email: info@godotneers.com
+author: Jan Thomä
 description: > # this means to ignore newlines until "baseurl:"
   A state charts extension for Godot 4.
 
-# DO NOT CHANGE THE LINE OF THIS FILE without editing .circleci/circle_urls.sh
 baseurl: "/godot-statecharts" # the subpath of your site, e.g. /blog
 
 # This is mostly for testing
@@ -61,8 +60,7 @@ themeColor: red # purple, green, blue, orange, purple, grey
 fixedNav: 'true' # true or false
 
 permalink: /:year/:title/
-markdown: kramdown
-exclude: [_site, CHANGELOG.md, LICENSE, README.md, vendor]
+exclude: [ _site, CHANGELOG.md, LICENSE, README.md, vendor ]
 
 # Collections
 collections:
@@ -77,15 +75,14 @@ defaults:
       type: "docs"
     values:
       layout: page
-  -
-    scope:
+  - scope:
       path: ""
       type: "pages"
     values:
       layout: "page"
-  -
-    scope:
+  - scope:
       path: "posts"
       type: "posts"
     values:
       layout: "post"
+

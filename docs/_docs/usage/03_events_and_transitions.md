@@ -7,8 +7,9 @@ description: "Transitions allow you to switch between states."
 
 # {{ page.title }}
 
-## Index
+## Table of Contents
 
+- [Transitions](#transitions)
 - [Multiple transitions on the same state](#multiple-transitions-on-the-same-state)
 - [Event selection and management](#event-selection-and-management)
 - [Transition taken signal](#transition-taken-signal)
@@ -18,7 +19,8 @@ description: "Transitions allow you to switch between states."
 - [Expression guards](#expression-guards)
 - [Event queueing mechanism](#event-queueing-mechanism)
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/transition.svg" class="state-icon"> Transitions allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. You can send events to the state chart by calling the `send_event(event)` method. To send an event you first need to get hold of the state chart node. A simple way to do this is to use the `get_node` function:
+## Transitions
+_Transitions_ ![Transition icon]({{ site.baseurl }}/assets/img/manual/icons/transition.svg){:class="state-icon"} allow you to switch between states. Rather than directly switching the state chart to a certain state, you send events to the state chart. You can send events to the state chart by calling the `send_event(event)` method. To send an event you first need to get hold of the state chart node. A simple way to do this is to use the `get_node` function:
 
 ```gdscript
 # my_node.gd
@@ -82,11 +84,11 @@ A single state can have multiple transitions. If this is the case, all transitio
 
 Starting with version 0.12.0 the plugin provides a dropdown for events in the editor UI. This dropdown allows you to quickly select an event from a list of all events that are currently used in the state chart. This helps to avoid typos and makes it easier to find the event you are looking for.
 
-![Event dropdown]({{ site.baseurl }}/assets/img/manual/event_dropdown.png)
+![Event dropdown]({{ site.baseurl }}/assets/img/manual/event_dropdown.png){:class="native-width centered"}
 
 The dropdown also has "Manage..." entry which allows you to rename events that are used in the state chart. This is useful if you want to rename an event that is used in multiple transitions.
 
-![Renaming an event]({{ site.baseurl }}/assets/img/manual/event_rename.png)
+![Renaming an event]({{ site.baseurl }}/assets/img/manual/event_rename.png){:class="native-width centered"}
 
 In the dialog, select the event you want to rename and enter the new name. All transitions in the current state chart that use the event will be updated automatically. You can undo the renaming by pressing `Ctrl+Z`. Also note, that renaming an event will not rename the event in your code, so you will have to update the event name in your code manually.
 
@@ -100,7 +102,7 @@ The signal is only emitted when the transition is taken, not when it is pending.
 
 It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you change a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met.
 
-![Alt text]({{ site.baseurl }}/assets/img/manual/immediate_transition.png)
+![Automatic transition]({{ site.baseurl }}/assets/img/manual/immediate_transition.png){:class="native-width centered"}
 
 Note that automatic transitions will still only be evaluated for currently active states.
 
@@ -116,11 +118,11 @@ Transition delay is an expression, which means you can not only put in a number 
 
 A transition can have a guard which determines whether the transition should be taken or not. If a transition reacts to an event the transition's guard will be evaluated. If the guard evaluates to `true` the transition will be taken. Otherwise the next transition which reacts to the event will be checked. If a transition has no guard, it will always be taken. Guards can be nested to create more complex guards. The following guards are available:
 
-- <img src="{{ site.baseurl }}/assets/img/manual/icons/all_of_guard.svg" class="mr-3" width="16" height="16" align="left"> _AllOfGuard_ - this guard evaluates to `true` if all of its child guards evaluate to `true` (logical AND).
-- <img src="{{ site.baseurl }}/assets/img/manual/icons/any_of_guard.svg" class="mr-3" width="16" height="16" align="left"> _AnyOfGuard_ - this guard evaluates to `true` if any of its child guards evaluate to `true` (logical OR).
-- <img src="{{ site.baseurl }}/assets/img/manual/icons/not_guard.svg" class="mr-3" width="16" height="16" align="left"> _NotGuard_ - this guard evaluates to the opposite of its child guard.
-- <img src="{{ site.baseurl }}/assets/img/manual/icons/state_is_active_guard.svg" class="mr-3" width="16" height="16" align="left"> _StateIsActiveGuard_ - this guard allows you to configure and monitor a state. The guard evaluates to `true` if the state is active and to `false` if the state is inactive.
-- <img src="{{ site.baseurl }}/assets/img/manual/icons/expression_guard.svg" class="mr-3" width="16" height="16" align="left"> _ExpressionGuard_ - this guard allows you to use expressions to determine whether the transition should be taken or not.
+- _AllOfGuard_ ![AllOfGuard icon]({{ site.baseurl }}/assets/img/manual/icons/all_of_guard.svg){:class="state-icon"} - this guard evaluates to `true` if all of its child guards evaluate to `true` (logical AND).
+- _AnyOfGuard_ ![AnyOfGuard icon]({{ site.baseurl }}/assets/img/manual/icons/any_of_guard.svg){:class="state-icon"} - this guard evaluates to `true` if any of its child guards evaluate to `true` (logical OR).
+- _NotGuard_ ![NotGuard icon]({{ site.baseurl }}/assets/img/manual/icons/not_guard.svg){:class="state-icon"} - this guard evaluates to the opposite of its child guard.
+- _StateIsActiveGuard_ ![StateIsActiveGuard icon]({{ site.baseurl }}/assets/img/manual/icons/state_is_active_guard.svg){:class="state-icon"} - this guard allows you to configure and monitor a state. The guard evaluates to `true` if the state is active and to `false` if the state is inactive.
+- _ExpressionGuard_ ![ExpressionGuard icon]({{ site.baseurl }}/assets/img/manual/icons/expression_guard.svg){:class="state-icon"} - this guard allows you to use expressions to determine whether the transition should be taken or not.
 
 ## Expression guards
 Expression guards give you the most flexibility when it comes to guards. You can use expressions to determine whether a transition should be taken or not. Expression guards are evaluated using the [Godot Expression](https://docs.godotengine.org/en/stable/classes/class_expression.html) class. You can add so-called _expression properties_ to the state chart node by calling the `set_expression_property(name, value)` method.
@@ -154,14 +156,14 @@ public class MyNode : Node
 
 These expression properties can then be used in your expressions. The following example shows how to use expression guards to check whether the player's health is below 50%:
 
-![Example of an expression guard for transitioning into berserk mode when player's health sinks below 50%]({{ site.baseurl }}/assets/img/manual/expression_guard.png)
+![Example of an expression guard for transitioning into berserk mode when player's health sinks below 50%]({{ site.baseurl }}/assets/img/manual/expression_guard.png){:class="native-width centered"}
 
 > **Note:** all expressions for the expression guards are written in GDScript even if you use C# to interact with the StateChart.
 
 It is important to make sure that your code sets any expression property used by the guard before the guard is first evaluated. For example, if your guard uses a `player_health` expression property, you will need to call `set_expression_property('player_health', some_health)` _before_ the guard is evaluated. Otherwise the guard will not be able to evaluate the expression because it has no value for `player_health`. You can set some sane initial values in two ways:
 
 1. Starting with version 0.16.0 you can set initial values for expression properties in the state chart inspector:
-   ![Setting initial properties in the state chart inspector.]({{ site.baseurl }}/assets/img/manual/initial_property_values.png)
+   ![Setting initial properties in the state chart inspector.]({{ site.baseurl }}/assets/img/manual/initial_property_values.png){:class="native-width centered"}
 2. You can use the `_ready`/`_Ready` method to initialize all expression properties used in your state chart with some sane default value by calling `set_expression_property`.
 
 ## Event queueing mechanism

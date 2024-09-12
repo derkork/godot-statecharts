@@ -7,14 +7,15 @@ description: "When the game is running it is very useful to see the current stat
 
 # {{ page.title }}
 
-## Index
+## Table of Contents
 
 - [Debugging in-game with the state chart debugger](#debugging-in-game-with-the-state-chart-debugger)
+- [Changing the watched node at runtime](#changing-the-watched-node-at-runtime)
 - [Debugging in the editor](#debugging-in-the-editor)
 
 ## Debugging in-game with the state chart debugger
 
-<img src="{{ site.baseurl }}/assets/img/manual/icons/state_chart_debugger.svg" class="state-icon"> When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a state chart debugger that you can add to your scene. You can add it to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":
+When the game is running it is very useful to see the current state of the state chart for debugging purposes. For this, this library contains a _State Chart Debugger_ ![State chart debugger icon]({{ site.baseurl }}/assets/img/manual/icons/state_chart_debugger.svg){:class="state-icon"} that you can add to your scene by pressing the "Instantiate child scene" icon above the node tree and then looking for "debugger":
 
 ![Adding the state chart debugger]({{ site.baseurl }}/assets/img/manual/add_statechart_debugger.gif)
 
@@ -23,6 +24,8 @@ description: "When the game is running it is very useful to see the current stat
 ![The state chart debugger]({{ site.baseurl }}/assets/img/manual/state_chart_debugger.png)
 
 The state chart debugger has a property _Initial node to watch_ where you can set a node that should be watched. It doesn't necessarily need to be a state chart node, the debugger will search for a state chart anywhere below the node you set. This is useful when you have the state chart nested in a sub-scene and you want to watch the state chart from the root scene where you don't have access to the state chart node.
+
+## Changing the watched node at runtime
 
 You can also use the `debug_node` function of the state chart debugger to change the node that is being watched at runtime. For example you could add code that changes the debugged node when clicking on a unit or object in your game
 
@@ -96,7 +99,7 @@ Starting with version 0.10.0 the plugin contains an in-editor debugger, which sh
 
 This feature is opt-in, so for a state chart to appear in the debugger, you need to set the _Track in Editor_ property of the state chart to `true`.
 
-![Track the current state chart in the editor]({{ site.baseurl }}/assets/img/manual/track_in_editor.png)
+![Track the current state chart in the editor]({{ site.baseurl }}/assets/img/manual/track_in_editor.png){:class="native-width centered"}
 
 Once this is set, the state chart will appear in the in-editor debugger when the game is running. From there you can select a state chart in the tree on the left and see its current state and history on the right. As with the in-game debugger you have flags to toggle whether events, state changes and transitions should appear in the history.
 

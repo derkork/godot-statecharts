@@ -1,13 +1,13 @@
 ---
 layout: page
-title: Installation
+title: Installation and Updates
 permalink: /installation
 description: "Here you can find the installation instructions for the plugin."
 ---
 
 # {{ page.title }}
 
-## Index
+## Table of Contents
 - [Requirements](#requirements)
 - [Installation with the Godot Asset Library](#installation-with-the-godot-asset-library)
 - [Manual installation](#manual-installation)
@@ -33,7 +33,7 @@ After you installed it, make sure you enable the plugin in the project settings:
 
 ## Installation with C#
 
-If you want to use this library with C#, make sure you are using the .NET version of Godot 4. This can be downloaded from the [Godot download page](https://godotengine.org/download). The standard version of Godot 4 does not support C#. If you got Godot from Steam, you have the standard version and need to download the .NET version separately from the Godot website. There are additional installation steps for the Godot .NET version, so make sure you follow the instructions on the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
+If you want to use this library with C#, make sure you are using the .NET version of Godot 4. This can be downloaded from the [Godot download page](https://godotengine.org/download). The standard version of Godot 4 does not support C#. **If you got Godot from Steam, you have the standard version and need to download the .NET version separately from the Godot website.** There are additional installation steps for the Godot .NET version, so make sure you follow the instructions on the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
 
 After you installed the plugin as described above, you may need to initialize your C# project if you haven't already done so. You can do this by going to the menu _Project_ -> _Tools_ -> _C#_ -> _Create C# solution_.
 

@@ -7,7 +7,7 @@ description: "Here you can find the appendix of the documentation."
 
 # Appendix
 
-## Index
+## Table of Contents
 - [Order of events](#order-of-events)
     - [Generic event handling rules](#generic-event-handling-rules)
     - [Example](#example)
@@ -28,7 +28,7 @@ Whenever an event occurs, the state chart will try to find transitions that reac
 ### Example
 For this example we will use the following state chart:
 
-![Example state chart for the order of events]({{ site.baseurl }}/assets/img/manual/order_of_events_chart.png)
+![Example state chart for the order of events]({{ site.baseurl }}/assets/img/manual/order_of_events_chart.png){:class="native-width centered"}
 
 When the program starts, state _B_ is active. Since it is a parallel state, it will automatically activate its child states, _B1_ and _B2_. This is the starting position.
 

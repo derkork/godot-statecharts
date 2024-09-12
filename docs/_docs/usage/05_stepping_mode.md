@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Stepping Mode
-permalink: /stepping-mode
+permalink: /usage/stepping-mode
 description: "Here you can find instructions about how to use the stepping mode."
 ---
 

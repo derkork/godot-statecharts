@@ -1,13 +1,13 @@
 ---
 layout: page
 title: Tips & Tricks
-permalink: /tips-and-tricks
+permalink: /usage/tips-and-tricks
 description: "Here you can find tips and tricks that can help you using the plugin."
 ---
 
 # {{ page.title }}
 
-## Index
+## Table of Contents
 - [Keep state and logic separate](#keep-state-and-logic-separate)
 - [Remember that events bubble up in the chart tree](#remember-that-events-bubble-up-in-the-chart-tree)
 - [Give everything meaningful names](#give-everything-meaningful-names)
@@ -15,7 +15,7 @@ description: "Here you can find tips and tricks that can help you using the plug
 
 ## Keep state and logic separate
 
-State charts work best when you keep the state and the logic separate. This means that the state charts should contain all the rules for changing states while your code should only contain the logic that is executed when being in a state or when entering or leaving a state. You should not track the current state in your code, that is the responsibility of the state chart. The `StateChart` class deliberately does not expose the current state of the state chart for this reason.
+State charts work best when you keep the state and the logic separate. This means that the state charts should contain all the rules for changing states while your code should only contain the logic that is executed when being in a state or when entering or leaving a state. You should not track the current state in your code, that is the responsibility of the state chart. Also, be aware that there can be multiple active states at the same time, so there is no single "current state" that you can track in your code.
 
 Instead, use the provided state events to trigger logic in your code. Many times you don't even need to write any code. For example if you have a bomb that explodes and you want to play a sound when it enters the _Exploding_ state, you can simply link up the `state_entered` signal of the _Exploding_ state to the `play` function of your audio player.
 
@@ -52,7 +52,7 @@ private void OnJumpEnabledStatePhysicsProcessing(float delta)
 
 When you have multiple states that need to react on the same event, you can handle the event in the parent state. For example in the platformer demo, the frog can be in multiple different states while it is airborne.
 
-![Sub-states of the airborne state]({{ site.baseurl }}/assets/img/manual/airborne_substates.png)
+![Sub-states of the airborne state]({{ site.baseurl }}/assets/img/manual/airborne_substates.png){:class="native-width centered"}
 
 However no matter in which specific airborne state the frog is, once it lands on the ground it always should transition back to the _Grounded_ state. Therefore the transition for handling this has been added to the _Airborne_ state. This way the transition will be taken no matter in which specific airborne state the frog is. Since no sub-state of _Airborne_  (_CoyoteJumpEnabled_, _DoubleJumpEnabled_, _CannotJump_) handles the event, the event will bubble up to the parent state _Airborne_ and the transition will be taken.
 
@@ -64,4 +64,4 @@ Because both states and transitions are nodes, it is very easy to rename them in
 
 Godot has a very nice built-in comment field named "Editor Description". Use this to write down some thoughts about why a state or transition exists and how it works in conjunction with other states and transitions. This is especially useful when you have a complex state chart with many states and transitions. Just like you write comments for your code, it is a good idea to write comments for your state charts.
 
-![An example of the editor description]({{ site.baseurl }}/assets/img/manual/editor_description.png)
+![An example of the editor description]({{ site.baseurl }}/assets/img/manual/editor_description.png){:class="native-width centered"}

@@ -7,11 +7,13 @@ description: "The plugin adds a new node type called State Chart."
 
 # {{ page.title }}
 
-## Index
-
+## Table of Contents
+- [General usage](#general-usage)
 - [Examples](#examples)
 
-The plugin adds a new node type called _State Chart_. This node represents your state chart and is the only node that your code will directly interact with.
+## General usage
+
+The plugin adds several new node types to Godot. The main node is the [_State Chart_]({{site.baseurl}}/usage/nodes#the-state-chart-node) node. This node represents your state chart and is the only node that your code will directly interact with.
 
 Below this node you can add the root state of your state chart, this will usually be a _Compound State_ or a _Parallel State_. You can add as many states as you want to your state chart, but you can only have one root state. Below each state you can add _Transition_ nodes. These nodes define the transitions between states. You can add as many transitions as you want to any state.
 
@@ -29,7 +31,7 @@ The new UI supports undo/redo, so you can undo the addition of a node or transit
 
 ## Examples
 
-The plugin comes with a few examples. You can find them in the `godot_state_charts_examples` folder. To run an example, open and run it's main scene. The examples are:
+The plugin comes with a few examples. You can find them in the `godot_state_charts_examples` folder (if you have chosen to import this folder into your project). To run an example, open and run it's main scene. The examples are:
 
 - `ant_hill` - a rudimentary ant hill simulation. The ants are controlled by a state chart that handles the different states of the ants such as searching for food, carrying food, returning to the nest, etc. This example shows how state charts can simplify a lot of the if-else logic that is often needed to implement AI.
 - `automatic_transitions` - an example that shows how to use automatic transitions that react to changes in expression properties.

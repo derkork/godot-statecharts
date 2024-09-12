@@ -5,6 +5,46 @@ excluded_in_search: true
 
 @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i";
 
+h1 + h2 {
+    margin-top: 1.5rem;
+}
+
+h2 {
+    font-size: 1.3rem !important;
+}
+
+h3 {
+    font-size: 1.1rem !important;
+}
+
+.state-icon {
+    height: 1.3rem !important;
+    width: 1.3rem !important;
+    margin-right: 0.2rem;
+}
+
+.native-width {
+    width: unset !important;
+}
+
+pre {
+    padding: 0.8rem;
+}
+
+.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+blockquote {
+    padding-left: 1em;
+    border-left: 3px solid #ccc;
+    font-style: italic;
+}
+
+/* ----------------------------------------------------------------------------------------------- */
+
 .gh-source {
     display: block;
     padding-right: 1.2rem;
@@ -682,8 +722,3 @@ p > img {
     width: 100%;
 }
 
-.state-icon {
-    height: 32px !important;
-    width: 32px !important;
-    margin-right: 0.5rem;
-}
