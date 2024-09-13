@@ -31,12 +31,12 @@
  "post_run_script": "",
  "pre_run_script": "",
  "prefix": "test_",
- "selected": null,
+ "selected": "test_parallel_state_initialization.gd",
  "should_exit": true,
  "should_exit_on_success": false,
  "should_maximize": false,
  "show_help": false,
  "suffix": ".gd",
  "tests": [],
- "unit_test_name": null
+ "unit_test_name": "test_parallel_state_initialization"
 }

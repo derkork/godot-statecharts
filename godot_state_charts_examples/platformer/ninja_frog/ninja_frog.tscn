@@ -219,12 +219,14 @@ editor_description = "When jumping become airborne and enable double-jump."
 script = ExtResource("9_wswdv")
 to = NodePath("../../Airborne/DoubleJumpEnabled")
 event = &"jump"
+delay_in_seconds = "0.0"
 
 [node name="On Airborne" type="Node" parent="StateChart/Root/Movement/Grounded"]
 editor_description = "When becoming airborne (e.g. through falling) move to airborne state."
 script = ExtResource("9_wswdv")
 to = NodePath("../../Airborne")
 event = &"airborne"
+delay_in_seconds = "0.0"
 
 [node name="Airborne" type="Node" parent="StateChart/Root/Movement"]
 editor_description = "This is the root state for when the player is in the air. We have sub-states to handle the various input that is allowed when in the air."
@@ -235,6 +237,7 @@ initial_state = NodePath("CoyoteJumpEnabled")
 script = ExtResource("9_wswdv")
 to = NodePath("../../Grounded")
 event = &"grounded"
+delay_in_seconds = "0.0"
 
 [node name="CoyoteJumpEnabled" type="Node" parent="StateChart/Root/Movement/Airborne"]
 editor_description = "While in this state, the player can jump for a short time. The state is activated by default when the player becomes airborne from falling. Allowing a jump for a short time makes the controls feel nicer. The \"On Expiration\" transition will leave this state after the grace period."
@@ -245,12 +248,13 @@ editor_description = "On jump handle this as if the player originally jumped."
 script = ExtResource("9_wswdv")
 to = NodePath("../../DoubleJumpEnabled")
 event = &"jump"
+delay_in_seconds = "0.0"
 
 [node name="On Expiration" type="Node" parent="StateChart/Root/Movement/Airborne/CoyoteJumpEnabled"]
 editor_description = "After 0.2 seconds automatically move to falling state where no more jump is possible."
 script = ExtResource("9_wswdv")
 to = NodePath("../../CannotJump")
-delay_seconds = 0.2
+delay_in_seconds = "0.2"
 
 [node name="DoubleJumpEnabled" type="Node" parent="StateChart/Root/Movement/Airborne"]
 editor_description = "This state is active while the player is in the air and has jumped one time already. While the state is active, a second jump is allowed."
@@ -263,6 +267,7 @@ Triggers the double-jump animation as a side effect."
 script = ExtResource("9_wswdv")
 to = NodePath("../../CannotJump")
 event = &"jump"
+delay_in_seconds = "0.0"
 
 [node name="CannotJump" type="Node" parent="StateChart/Root/Movement/Airborne"]
 editor_description = "This state is active when the player is airborne but can no longer jump either because the coyote-jump grace period has expired or the player has already used the double-jump."
@@ -282,6 +287,7 @@ animation_tree = NodePath("../../../../AnimationTree")
 script = ExtResource("9_wswdv")
 to = NodePath("../../Move")
 event = &"moving"
+delay_in_seconds = "0.0"
 
 [node name="Move" type="Node" parent="StateChart/Root/Animation Control"]
 editor_description = "Animation tree state that that will cause the animation tree to go to the Move  state once we get the moving event."
@@ -292,6 +298,7 @@ animation_tree = NodePath("../../../../AnimationTree")
 script = ExtResource("9_wswdv")
 to = NodePath("../../Idle")
 event = &"idle"
+delay_in_seconds = "0.0"
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="state_physics_processing" from="StateChart/Root/Movement/Grounded" to="." method="_on_jump_enabled_state_physics_processing"]

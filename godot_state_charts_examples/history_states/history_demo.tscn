@@ -57,7 +57,7 @@ script = ExtResource("5_lh5sp")
 [node name="To Blue" type="Node" parent="StateChart/Root/Red Or Blue/Red"]
 script = ExtResource("6_xvm5g")
 to = NodePath("../../Blue")
-delay_seconds = 3.0
+delay_in_seconds = "3"
 
 [node name="Blue" type="Node" parent="StateChart/Root/Red Or Blue"]
 script = ExtResource("5_lh5sp")
@@ -65,12 +65,13 @@ script = ExtResource("5_lh5sp")
 [node name="To Red" type="Node" parent="StateChart/Root/Red Or Blue/Blue"]
 script = ExtResource("6_xvm5g")
 to = NodePath("../../Red")
-delay_seconds = 3.0
+delay_in_seconds = "3"
 
 [node name="On Clicked To White" type="Node" parent="StateChart/Root/Red Or Blue"]
 script = ExtResource("6_xvm5g")
 to = NodePath("../../White")
 event = &"clicked"
+delay_in_seconds = "0.0"
 
 [node name="White" type="Node" parent="StateChart/Root"]
 script = ExtResource("5_lh5sp")
@@ -78,7 +79,7 @@ script = ExtResource("5_lh5sp")
 [node name="Resume" type="Node" parent="StateChart/Root/White"]
 script = ExtResource("6_xvm5g")
 to = NodePath("../../Red Or Blue/Resume")
-delay_seconds = 1.0
+delay_in_seconds = "1"
 
 [node name="Label" type="RichTextLabel" parent="."]
 offset_left = 26.0
