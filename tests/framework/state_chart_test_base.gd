@@ -27,7 +27,9 @@ func before_each() -> void:
 
 
 func after_each() -> void:
-	remove_child(_chart)
+	var parent = _chart.get_parent()
+	if is_instance_valid(parent):
+		parent.remove_child(_chart)
 	_chart.free()
 
 func assert_active(state: StateChartState) -> void:

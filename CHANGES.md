@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.1] - 2024-11-04
+### Added
+- The state chart will now issue a warning in debug builds when trying to send an event that is not defined in any transition of the state chart. This can help to catch typos in event names early on ([#150](https://github.com/derkork/godot-statecharts/issues/150)). This warning is now enabled by default but can be disabled per state chart in state chart settings.  
+
 ## [0.17.0] - 2024-08-16
 ### Added
 - The C# wrappers now provide type-safe events for all signals that the underlying nodes emit. This way you can simply subscribe to a signal using the familiar `+=` notation, e.g. `stateChart.StateEntered += OnStateEntered`. This makes it easier to work with the state chart from C# code. A big thanks goes out to [Marques Lévy](https://github.com/Prakkkmak) for suggesting this feature and providing a POC PR for it ([#126](https://github.com/derkork/godot-statecharts/pull/126)). Note that the usual rules for signals in C# apply, e.g. signal connections will not automatically be disconnected when the receiver is freed. 
-- 
+
 ### Fixed
 - The library now handles cases better where code tries to access a state chart that has been removed from the tree. This may happen when using Godot's `change_scene_to_file` or `change_scene_to_packed` functions. Debug output in these cases will no longer try to get full path names of nodes that have been removed from the tree. This should prevent errors and crashes in these cases ([#129](https://github.com/derkork/godot-statecharts/issues/129)).
 - The error messages for evaluating expressions have been improved. They now show the expression that was evaluated and the result of the evaluation ([#138](https://github.com/derkork/godot-statecharts/issues/138)) 

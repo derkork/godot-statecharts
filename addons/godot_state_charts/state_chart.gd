@@ -8,6 +8,9 @@ extends Node
 ## The the remote debugger
 const DebuggerRemote = preload("utilities/editor_debugger/editor_debugger_remote.gd")
 
+## The state chart utility class.
+const StateChartUtil = preload("utilities/state_chart_util.gd")
+
 ## Emitted when the state chart receives an event. This will be 
 ## emitted no matter which state is currently active and can be 
 ## useful to trigger additional logic elsewhere in the game 
@@ -20,10 +23,19 @@ const DebuggerRemote = preload("utilities/editor_debugger/editor_debugger_remote
 ## while another is still processing, it will be enqueued.
 signal event_received(event:StringName)
 
+@export_group("Debugging")
 ## Flag indicating if this state chart should be tracked by the 
 ## state chart debugger in the editor.
 @export var track_in_editor:bool = false
 
+## If set, the state chart will issue a warning when trying to
+## send an event that is not configured for any transition of 
+## the state chart. It is usually a good idea to leave this
+## enabled, but in certain cases this may get in the way so
+## you can disable it here.
+@export var warn_on_sending_unknown_events:bool = true
+
+@export_group("")
 ## Initial values for the expression properties. These properties can be used in expressions, e.g
 ## for guards or transition delays. It is recommended to set an initial value for each property
 ## you use in an expression to ensure that this expression is always valid. If you don't set
@@ -54,6 +66,7 @@ var _queued_transitions:Array[Dictionary] = []
 var _transitions_processing_active:bool = false
 
 var _debugger_remote:DebuggerRemote = null
+var _valid_event_names:Array[StringName] = []
 
 
 func _ready() -> void:
@@ -70,6 +83,12 @@ func _ready() -> void:
 	if not child is StateChartState:
 		push_error("StateMachine's child must be a State")
 		return
+		
+	# in debug builds, collect a list of valid event names
+	# to warn the developer when using an event that doesn't
+	# exist.
+	if OS.is_debug_build():
+		_valid_event_names = StateChartUtil.events_of(self)
 	
 	# set the initial expression properties
 	if initial_expression_properties != null:
@@ -105,6 +124,9 @@ func send_event(event:StringName) -> void:
 	if not is_instance_valid(_state):
 		push_error("State chart has no root state. Ignoring call to `send_event`.")
 		return
+		
+	if warn_on_sending_unknown_events and event != "" and OS.is_debug_build() and not _valid_event_names.has(event):
+		push_warning("State chart does not have an event '", event , "' defined. Sending this event will do nothing.")
 	
 	_queued_events.append(event)
 	_run_changes()
