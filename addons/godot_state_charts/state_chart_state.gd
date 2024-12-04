@@ -71,9 +71,9 @@ func _find_chart(parent:Node) -> StateChart:
 
 ## Runs a transition either immediately or delayed depending on the 
 ## transition settings.
-func _run_transition(transition:Transition):
+func _run_transition(transition:Transition, immediately:bool = false):
 	var initial_delay := transition.evaluate_delay()
-	if initial_delay > 0:
+	if not immediately and initial_delay > 0:
 		_queue_transition(transition, initial_delay)
 	else:
 		_chart._run_transition(transition, self)

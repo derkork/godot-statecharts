@@ -61,6 +61,15 @@ var has_event:bool:
 	get:
 		return event != null and event.length() > 0
 
+## Takes this transition immediately or with a delay if defined
+## Note: if there is a delay on this transition and immediately param is true, it forces the transition to be taken without the delay
+func take(immediately:bool = true) -> void:
+	var parent_state:Node = get_parent()
+	if parent_state == null or not (parent_state is StateChartState):
+		push_error("Transitions must be children of states.")
+		return
+	parent_state._run_transition(self, immediately)
+
 ## Evaluates the guard expression and returns true if the transition should be taken.
 ## If no guard expression is specified, this function will always return true.
 func evaluate_guard() -> bool:
