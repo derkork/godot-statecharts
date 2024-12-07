@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2024-12-07
+### Added
+- It is now possible to manually trigger transitions using the new `take` method on the transition. This can be useful if you want to directly trigger a transition from code rather than sending events. A big thanks goes out to [Mehmet Sahin](https://github.com/mixemer) for suggesting this feature and providing a PR for it ([#152](https://github.com/derkork/godot-statecharts/issues/152)).
+
 ## [0.17.1] - 2024-11-04
 ### Added
 - The state chart will now issue a warning in debug builds when trying to send an event that is not defined in any transition of the state chart. This can help to catch typos in event names early on ([#150](https://github.com/derkork/godot-statecharts/issues/150)). This warning is now enabled by default but can be disabled per state chart in state chart settings.  

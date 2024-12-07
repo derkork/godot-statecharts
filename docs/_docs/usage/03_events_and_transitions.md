@@ -106,6 +106,43 @@ It is possible to have transitions with an empty _Event_ field. These transition
 
 Note that automatic transitions will still only be evaluated for currently active states.
 
+
+## Code-triggered transitions
+
+Since 0.18.0 it is now possible to directly trigger any transition from code. This is useful if you want to trigger a transition based on some condition that is not directly related to an event or expression property or want more fine-grained control over when a certain transition is triggered. To trigger a transition, get hold of the transition node and then call `take`on it:
+
+```gdscript
+# get the transition node, you can also use scene unique names
+var transition:Transition = $StateChart/MyState/MyTransition
+
+# trigger the transition
+transition.take()
+```
+
+In C# you can use the `Transition.Of` function to get a type-safe wrapper for the transition node:
+
+```csharp
+// get the transition node, you can also use scene unique names
+var transition = Transition.Of(GetNode("StateChart/MyState/MyTransition"));
+
+// trigger the transition
+transition.Take();
+```
+
+By default transitions triggered from code will not be delayed, even if they have a delay set (see [delayed transitions](#delayed-transitions)). If you want to trigger a delayed transition from code, you can set the `immediately` parameter to `false`:
+
+```gdscript
+transition.take(false)
+```
+
+In C# this works the same way:
+
+```csharp
+transition.Take(false);
+```
+
+Note, that if you trigger a transition from code, the parent state of the transition must be active. If the parent state is not active, then just a warning will be printed and the transition will not be taken. This is to ensure consistent behaviour with the rest of the state chart logic.
+
 ## Delayed transitions
 
 Transitions can execute immediately or after a certain time has elapsed. If a transition has no time delay it will be executed immediately (within the same frame). If a transition has a time delay, it will be marked as pending and executed after the time delay has elapsed but only if the state to which the transition belongs is still active at this time and was not left temporarily. Only one transition can ever be active or pending for any given state. So if another transition is executed for a state while one is pending, the pending transition will be discarded. A pending transition is also cancelled when the state is left through other means (e.g. because a parent state got deactivated). There is one exception to this rule, when you are using history states. When you leave a state and re-enter it through a history state, then any pending transition will be resumed as if you had never left the state.

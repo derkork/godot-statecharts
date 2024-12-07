@@ -28,11 +28,26 @@ namespace GodotStateCharts
             return new Transition(transition);
         }
         
+        /// <summary>
+        /// Takes the transition. The transition will be taken immediately by 
+        /// default, even if it has a delay. If you want to wait for the delay
+        /// to pass, you can set the immediately parameter to false.
+        /// </summary>
+        public void Take(bool immediately = true) {
+            Call(MethodName.Take, immediately);
+        }
+        
         
         public class SignalName : Godot.Node.SignalName
         {
             /// <see cref="Transition.Taken"/>
             public static readonly StringName Taken = "taken";
+        }
+
+        public class MethodName : Godot.Node.MethodName
+        {
+            /// <see cref="Transition.Take"/>
+            public static readonly StringName Take = "take";
         }
     }
 }
