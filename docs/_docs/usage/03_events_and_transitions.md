@@ -14,6 +14,7 @@ description: "Transitions allow you to switch between states."
 - [Event selection and management](#event-selection-and-management)
 - [Transition taken signal](#transition-taken-signal)
 - [Automatic transitions](#automatic-transitions)
+- [Code-triggered transitions](#code-triggered-transitions)
 - [Delayed transitions](#delayed-transitions)
 - [Transition guards](#transition-guards)
 - [Expression guards](#expression-guards)
