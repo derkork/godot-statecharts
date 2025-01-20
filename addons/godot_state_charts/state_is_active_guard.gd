@@ -1,3 +1,4 @@
+@icon("state_is_active_guard.svg")
 ## A guard that checks if a certain state is active.
 class_name StateIsActiveGuard
 extends Guard
