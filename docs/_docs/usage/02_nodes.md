@@ -15,8 +15,8 @@ description: "States are the building blocks from which you build your state cha
 - [Compound states](#compound-states)
 - [Parallel states](#parallel-states)
 - [History states](#history-states)
-- [Animation tree states](#animation-tree-states)
-- [Animation player states](#animation-player-states)
+- [Animation tree states (deprecated)](#animation-tree-states-deprecated)
+- [Animation player states (deprecated)](#animation-player-states-deprecated)
 
 ## The _State Chart_ Node
 
@@ -105,9 +105,9 @@ History states ![History state icon]({{ site.baseurl }}/assets/img/manual/icons/
 
 To use a history state, set up a transition that transitions directly to the history state. This will restore the last known state or activate the default state if no history has been captured yet. If your compound state has a history state as a child, but you do not want to restore the history when entering the compound state, you can transition to the compound state directly. This will activate the initial state of the compound state and will not restore the history. Also check the history state example in the examples folder.
 
-## Animation tree states
+## Animation tree states (deprecated)
 
-> ⚠️ **Note**: this feature is currently experimental and may change or be removed in the future.
+> ⚠️ **Note**: this node is deprecated and will be removed in a future release. It is strongly recommended to not use this node in new projects anymore.
 
 _Animation tree states_ ![Animation tree state icon]({{ site.baseurl }}/assets/img/manual/icons/animation_tree_state.svg){:class="state-icon"} are a variation of atomic states. They can be linked to an animation tree. When an animation tree state is activated it will ask the animation tree to travel to the same state (the animation tree state and the state inside the animation tree should have the same name). This can be used to control animation trees with the same state chart events that you use to control your game logic. Animation tree states have the following properties:
 
@@ -120,9 +120,9 @@ Animation tree states are usually independent of the rest of the states, so it i
 ![Separation of animation tree states]({{ site.baseurl }}/assets/img/manual/animation_tree_state_separation.png)
 
 
-## Animation player states
+## Animation player states (deprecated)
 
-> ⚠️ **Note**: this feature is currently experimental and may change or be removed in the future.
+> ⚠️ **Note**: this node is deprecated and will be removed in a future release. It is strongly recommended to not use this node in new projects anymore. 
 
 _Animation player states_ ![Animation player state icon]({{ site.baseurl }}/assets/img/manual/icons/animation_player_state.svg){:class="state-icon"} are similar to animation tree states. They can be linked to an animation player. When an animation player state is activated it will ask the animation player to play the same animation (the animation player state and the animation inside the animation player should have the same name). This can be used to control animation players with the same state chart events that you use to control your game logic. Animation player states have the following properties:
 

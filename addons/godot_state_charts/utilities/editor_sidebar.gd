@@ -95,13 +95,5 @@ func _on_transition_pressed():
 	_create_node(Transition, "Transition")
 
 
-func _on_animation_tree_state_pressed():
-	_create_node(AnimationTreeState, "AnimationTreeState")
-
-
-func _on_animation_player_state_pressed():
-	_create_node(AnimationPlayerState, "AnimationPlayerState")
-
-
 func _on_toggle_sidebar_button_pressed():
 	sidebar_toggle_requested.emit()

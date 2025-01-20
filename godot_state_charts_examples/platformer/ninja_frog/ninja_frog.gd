@@ -42,9 +42,9 @@ func _physics_process(delta):
 
 	# let the state machine know if we are moving or not
 	if velocity.length_squared() <= 0.005:
-		_state_chart.send_event("idle")
+		_animation_state_machine.travel("Idle")
 	else:
-		_state_chart.send_event("moving")
+		_animation_state_machine.travel("Move")
 
 	# set the velocity to the animation tree, so it can blend between animations
 	_animation_tree["parameters/Move/blend_position"] = signf(velocity.y)

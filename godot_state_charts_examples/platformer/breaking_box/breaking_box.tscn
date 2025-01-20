@@ -1,16 +1,14 @@
-[gd_scene load_steps=22 format=3 uid="uid://h0af1dot82p3"]
+[gd_scene load_steps=19 format=3 uid="uid://h0af1dot82p3"]
 
 [ext_resource type="Script" path="res://godot_state_charts_examples/platformer/breaking_box/breaking_box.gd" id="1_c2rh2"]
 [ext_resource type="Texture2D" uid="uid://c5dogybcf6yfo" path="res://godot_state_charts_examples/platformer/breaking_box/idle.png" id="1_dixph"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_atynw"]
 [ext_resource type="Texture2D" uid="uid://dq0ww6xvgeap3" path="res://godot_state_charts_examples/platformer/breaking_box/hit.png" id="3_ngvxc"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="4_4y463"]
 [ext_resource type="Texture2D" uid="uid://p8vbysdruo4o" path="res://godot_state_charts_examples/platformer/breaking_box/break.png" id="4_jb7vf"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="5_wouwd"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="6_p4jwe"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_1ecad"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="8_8riiw"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/animation_player_state.gd" id="9_dgb23"]
 
 [sub_resource type="Animation" id="Animation_toibu"]
 resource_name = "Break"
@@ -318,13 +316,9 @@ size = Vector2(14.5, 2)
 
 [sub_resource type="Resource" id="Resource_v858x"]
 script = ExtResource("8_8riiw")
-expression = "health <= 0"
-
-[sub_resource type="Resource" id="Resource_ble3h"]
-script = ExtResource("8_8riiw")
 expression = "health > 0"
 
-[sub_resource type="Resource" id="Resource_wd8gp"]
+[sub_resource type="Resource" id="Resource_j86i4"]
 script = ExtResource("8_8riiw")
 expression = "health <= 0"
 
@@ -338,6 +332,7 @@ position = Vector2(0, -10)
 texture = ExtResource("1_dixph")
 
 [node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -355,6 +350,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
 editor_description = "The animation player will send an \"animation_finished\" event back to the state chart. This will then take the appropriate transitions (e.g. switch back to the idle animation)."
 libraries = {
 "": SubResource("AnimationLibrary_t7nrw")
@@ -369,72 +365,61 @@ position = Vector2(0, -3)
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+unique_name_in_owner = true
 position = Vector2(0, -19)
 shape = SubResource("RectangleShape2D_jbwph")
 
 [node name="StateChart" type="Node" parent="."]
+unique_name_in_owner = true
 script = ExtResource("2_atynw")
 track_in_editor = true
 
-[node name="ParallelState" type="Node" parent="StateChart"]
-script = ExtResource("4_4y463")
-
-[node name="Root" type="Node" parent="StateChart/ParallelState"]
+[node name="Root" type="Node" parent="StateChart"]
 script = ExtResource("5_wouwd")
 initial_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="StateChart/ParallelState/Root"]
+[node name="Idle" type="Node" parent="StateChart/Root"]
 script = ExtResource("6_p4jwe")
 
-[node name="On Break" type="Node" parent="StateChart/ParallelState/Root/Idle"]
+[node name="On Damage" type="Node" parent="StateChart/Root/Idle"]
 script = ExtResource("7_1ecad")
-to = NodePath("../../Dead")
+to = NodePath("../../Blinking")
 event = &"health_changed"
 guard = SubResource("Resource_v858x")
+delay_in_seconds = "0.0"
 
-[node name="Dead" type="Node" parent="StateChart/ParallelState/Root"]
+[node name="On Break" type="Node" parent="StateChart/Root/Idle"]
+script = ExtResource("7_1ecad")
+to = NodePath("../../Dying")
+event = &"health_changed"
+guard = SubResource("Resource_j86i4")
+delay_in_seconds = "0.0"
+
+[node name="Blinking" type="Node" parent="StateChart/Root"]
 script = ExtResource("6_p4jwe")
 
-[node name="Animations" type="Node" parent="StateChart/ParallelState"]
-script = ExtResource("5_wouwd")
-initial_state = NodePath("Idle")
-
-[node name="Idle" type="Node" parent="StateChart/ParallelState/Animations"]
-script = ExtResource("9_dgb23")
-animation_player = NodePath("../../../../AnimationPlayer")
-
-[node name="On Hit" type="Node" parent="StateChart/ParallelState/Animations/Idle"]
-script = ExtResource("7_1ecad")
-to = NodePath("../../Hit")
-event = &"health_changed"
-guard = SubResource("Resource_ble3h")
-
-[node name="On Break" type="Node" parent="StateChart/ParallelState/Animations/Idle"]
-editor_description = "When the health is 0 we move to the break state."
-script = ExtResource("7_1ecad")
-to = NodePath("../../Break")
-event = &"health_changed"
-guard = SubResource("Resource_wd8gp")
-
-[node name="Hit" type="Node" parent="StateChart/ParallelState/Animations"]
-script = ExtResource("9_dgb23")
-animation_player = NodePath("../../../../AnimationPlayer")
-
-[node name="Back To Idle" type="Node" parent="StateChart/ParallelState/Animations/Hit"]
-editor_description = "The \"animation_finished\" event is sent by the animation player once the animation finishes playing. This way we can properly time the state transitions to the animation without having to explicitely stating the length of the animation here."
+[node name="Animation Finished" type="Node" parent="StateChart/Root/Blinking"]
 script = ExtResource("7_1ecad")
 to = NodePath("../../Idle")
 event = &"animation_finished"
+delay_in_seconds = "0.0"
 
-[node name="Break" type="Node" parent="StateChart/ParallelState/Animations"]
-editor_description = "The break animation is final, so we stay in this state indefinitely.
+[node name="Dying" type="Node" parent="StateChart/Root"]
+script = ExtResource("6_p4jwe")
 
-The \"event_received\" signal is used to notify the root script when the break animation is finished. The root script will then destroy the whole box."
-script = ExtResource("9_dgb23")
-animation_player = NodePath("../../../../AnimationPlayer")
+[node name="Animation Finished" type="Node" parent="StateChart/Root/Dying"]
+script = ExtResource("7_1ecad")
+to = NodePath("../../Dead")
+event = &"animation_finished"
+delay_in_seconds = "0.0"
+
+[node name="Dead" type="Node" parent="StateChart/Root"]
+script = ExtResource("6_p4jwe")
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
 [connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]
-[connection signal="event_received" from="StateChart/ParallelState/Root/Idle" to="." method="_on_idle_event_received"]
-[connection signal="event_received" from="StateChart/ParallelState/Animations/Break" to="." method="_on_break_animation_event_received"]
+[connection signal="state_entered" from="StateChart/Root/Idle" to="." method="_on_idle_state_entered"]
+[connection signal="state_entered" from="StateChart/Root/Blinking" to="." method="_on_blinking_state_entered"]
+[connection signal="state_entered" from="StateChart/Root/Dying" to="." method="_on_dying_state_entered"]
+[connection signal="state_entered" from="StateChart/Root/Dead" to="." method="_on_dead_state_entered"]

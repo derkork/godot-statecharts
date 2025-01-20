@@ -53,6 +53,7 @@ func _state_enter(expect_transition:bool = false):
 
 func _get_configuration_warnings():
 	var warnings = super._get_configuration_warnings()
+	warnings.append("This node is deprecated and will be removed in a future version.")
 
 	if animation_tree.is_empty():
 		warnings.append("No animation tree is set.")

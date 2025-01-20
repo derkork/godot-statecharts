@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.19.0] - 2025-01-20
+### Changed
+- The _Animation Tree State_ and _Animation Player State_ nodes are now deprecated and should not be used in new projects anymore. The nodes will now display a warning in the tree and have been removed from the _Quick Add_ sidebar. They will be fully removed in a future release.
 
 ## [0.18.0] - 2024-12-07
 ### Added
