@@ -1,3 +1,4 @@
+@icon("guard.svg")
 class_name Guard
 extends Resource
 
