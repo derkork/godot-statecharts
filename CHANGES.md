@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2025-01-21
+### Improved
+- All nodes have received new icons which are more consistent with Godot's built-in icons and are easier to recognize at a glance. A huge thanks goes out to [Donatas Kirda](https://github.com/bloodwiing) who took the time to create these fantastic new icons and provided a PR with them ([#160](https://github.com/derkork/godot-statecharts/pull/160)).
+
 ## [0.19.0] - 2025-01-20
 ### Changed
 - The _Animation Tree State_ and _Animation Player State_ nodes are now deprecated and should not be used in new projects anymore. The nodes will now display a warning in the tree and have been removed from the _Quick Add_ sidebar. They will be fully removed in a future release.
