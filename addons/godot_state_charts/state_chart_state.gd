@@ -233,6 +233,10 @@ func _process(delta:float) -> void:
 			# print("requesting transition from " + name + " to " + transition_to_send.to.get_concatenated_names() + " now")
 			_chart._run_transition(transition_to_send, self)
 
+			# Re-check transitions for StateIsActiveGuards with states that just changed
+			_chart._property_change_pending = true
+			_chart._run_changes()
+
 
 
 func _handle_transition(_transition:Transition, _source:StateChartState):
