@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://huy14b6x10bh"]
+[gd_scene load_steps=21 format=3 uid="uid://huy14b6x10bh"]
 
 [ext_resource type="Texture2D" uid="uid://bgswg1pgd01d1" path="res://godot_state_charts_examples/platformer/ninja_frog/full.png" id="2_dka03"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="3_7ryss"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="5_uojl1"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="6_xggmu"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="7_v4wmr"]
-[ext_resource type="Script" path="res://addons/godot_state_charts/expression_guard.gd" id="8_r51oc"]
 [ext_resource type="Script" path="res://godot_state_charts_examples/automatic_transitions/stamina_bar.gd" id="9_rtmjc"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/state_is_active_guard.gd" id="10_caxti"]
 [ext_resource type="Script" path="res://addons/godot_state_charts/not_guard.gd" id="11_rfa1s"]
@@ -22,10 +21,6 @@ size = Vector2(18.5, 227)
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bocu2"]
 radius = 15.0
 height = 32.0
-
-[sub_resource type="Resource" id="Resource_14sa2"]
-script = ExtResource("8_r51oc")
-expression = "stamina <= 0"
 
 [sub_resource type="Resource" id="Resource_m8fyc"]
 script = ExtResource("10_caxti")
@@ -131,11 +126,12 @@ initial_state = NodePath("Can Walk")
 editor_description = "In this state the frog can move around and will lose stamina. If stamina drops to 0 the frog will automatically transition to \"Needs Rest\"."
 script = ExtResource("5_ooc8l")
 
-[node name="On Zero Stamina To Needs Rest" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control/Can Walk"]
-editor_description = "This is an automatic transition that will transition to \"Needs rest\" if stamina drops to 0. Note that this transition has no \"event\" set, it will be checked every time an expresssion property is set."
+[node name="On Exhausted To Needs Rest" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control/Can Walk"]
+editor_description = "This transition will listen to the \"exhausted\" event, triggered when the frog's stamina sinks to 0.  We could also use an expression property tracking the stamina but using a dedicated event is faster and more extensible."
 script = ExtResource("7_v4wmr")
 to = NodePath("../../Needs Rest")
-guard = SubResource("Resource_14sa2")
+event = &"exhausted"
+delay_in_seconds = "0.0"
 
 [node name="Needs Rest" type="Node" parent="TheFrog/StateChart/ParallelState/Walking Control"]
 editor_description = "In this state the frog cannot move for 3 seconds."
@@ -145,7 +141,7 @@ script = ExtResource("5_ooc8l")
 editor_description = "This will automatically transition back to \"Can Walk\" after 3 seconds."
 script = ExtResource("7_v4wmr")
 to = NodePath("../../Can Walk")
-delay_seconds = 3.0
+delay_in_seconds = "3"
 
 [node name="Animation Control" type="Node" parent="TheFrog/StateChart/ParallelState"]
 editor_description = "This controls the pulsating red animation when the frog is exhausted. Note that you could also model this using state_entered and state_exited events on the \"Needs Rest\" state, which is simpler (and more performant). Its only done this way to show automatic events."
@@ -160,6 +156,7 @@ editor_description = "This is another example of an automatic transition. When t
 script = ExtResource("7_v4wmr")
 to = NodePath("../../Pulsating Red")
 guard = SubResource("Resource_m8fyc")
+delay_in_seconds = "0.0"
 
 [node name="Pulsating Red" type="Node" parent="TheFrog/StateChart/ParallelState/Animation Control"]
 script = ExtResource("5_ooc8l")
@@ -169,6 +166,7 @@ editor_description = "When the \"Needs Rest\" state becomes inactive, this will 
 script = ExtResource("7_v4wmr")
 to = NodePath("../../Normal")
 guard = SubResource("Resource_br5hd")
+delay_in_seconds = "0.0"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="TheFrog"]
 unique_name_in_owner = true

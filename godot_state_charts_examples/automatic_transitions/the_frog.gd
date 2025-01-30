@@ -12,9 +12,6 @@ const RECOVER_RATE = 20.0
 var stamina:float = 100
 
 	
-func _physics_process(_delta):
-	# update the stamina in the state chart at all times
-	state_chart.set_expression_property("stamina", stamina)
 
 ### WALKING CONTROL STATES
 
@@ -32,6 +29,9 @@ func _on_can_walk_state_physics_processing(delta):
 	else:
 	# else add it.
 		stamina = min(100, stamina + RECOVER_RATE * delta)
+		
+	if stamina <= 0:
+		state_chart.send_event("exhausted")
 	
 	move_and_slide()
 

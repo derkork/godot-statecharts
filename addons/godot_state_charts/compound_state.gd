@@ -135,21 +135,21 @@ func _state_exit():
 	super._state_exit()
 
 
-func _process_transitions(event:StringName, property_change:bool = false) -> bool:
+func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName = "") -> bool:
 	if not active:
 		return false
 
 	# forward to the active state
 	if is_instance_valid(_active_state):
-		if _active_state._process_transitions(event, property_change):
-			# emit the event_received signal, unless this is a property change
-			if not property_change:
+		if _active_state._process_transitions(trigger_type, event):
+			# emit the event_received signal when the trigger type is event
+			if trigger_type == StateChart.TriggerType.EVENT:
 				self.event_received.emit(event)
 			return true
 
 	# if the event was not handled by the active state, we handle it here
 	# base class will also emit the event_received signal
-	return super._process_transitions(event, property_change)
+	return super._process_transitions(trigger_type, event)
 
 
 func _handle_transition(transition:Transition, source:StateChartState):

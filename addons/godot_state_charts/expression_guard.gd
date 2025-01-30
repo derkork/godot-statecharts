@@ -24,7 +24,8 @@ func is_satisfied(context_transition:Transition, context_state:StateChartState) 
 
 	return result
 
-
+func get_supported_trigger_types() -> int:
+	return StateChart.TriggerType.PROPERTY_CHANGE
 
 func _get_property_list() -> Array[Dictionary]:
 	var properties:Array[Dictionary] = []

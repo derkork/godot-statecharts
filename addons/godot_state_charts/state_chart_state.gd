@@ -110,12 +110,9 @@ func _state_enter(_expect_transition:bool = false):
 	
 	# emit the signal
 	state_entered.emit()
-	# run all automatic transitions
-	for transition in _transitions:
-		if not transition.has_event and transition.evaluate_guard():
-			# first match wins
-			_run_transition(transition)
-			break
+
+	# process transitions that are triggered by entering the state
+	_process_transitions(StateChart.TriggerType.STATE_ENTER)
 
 ## Called when the state is exited.
 func _state_exit():
@@ -255,31 +252,32 @@ func _input(event:InputEvent):
 func _unhandled_input(event:InputEvent):
 	state_unhandled_input.emit(event)
 
-## Processes all transitions. If the property_change parameter is true
-## then only transitions which have no event are processed (eventless transitions/automatic transitions)
-func _process_transitions(event:StringName, property_change:bool = false) -> bool:
+## Processes all transitions in this state.
+func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName = "") -> bool:
 	if not active:
 		return false
 
-	# emit an event received signal if this is not a property change
-	if not property_change:
+	# emit an event received signal if this is an event trigger
+	if trigger_type == StateChart.TriggerType.EVENT:
 		event_received.emit(event)
 
 	# Walk over all transitions
 	for transition in _transitions:
-		# the currently pending transition is not replaced by itself
-		if transition != _pending_transition \
-			# automatic transitions are always evaluated
-			# non-automatic only if this evaluation was not triggered
-			# by property change AND their event matches their current event
-			and (not transition.has_event or (not property_change and transition.event == event)) \
+		# Check if the transition is triggered by the given trigger type
+		if transition.is_triggered_by(trigger_type) \
+			# if the event is given it needs to match the event of the transition
+			and (event == "" or transition.event == event) \
 			# and in every case the guard needs to match
 			and transition.evaluate_guard():
 				# print(name +  ": consuming event " + event)
 				# first match wins
-				_run_transition(transition)
+				# if the winning transition is the currently pending transition, we do not replace it
+				if transition != _pending_transition:
+					_run_transition(transition)
+			
+				# but in any case we return true, because we consumed the event
 				return true
-
+				
 	return false
 
 ## Queues the transition to be triggered after the delay.

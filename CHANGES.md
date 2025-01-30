@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Breaking Change
+- At long last, automatic transitions can now also track state changes. This way a _State Is Active_ guard can now be used in an automatic transition to run this transition whenever another state becomes active ([#114](https://github.com/derkork/godot-statecharts/issues/114)). Note that this was previously not possible, so projects which tried to emulate this behaviour using other means (e.g. continuously sending events) can now take advantage of this new behaviour and simplify their code and improve performance. Since the state chart now behaves differently than before, I'm marking this as a breaking change, though it should not affect most projects.
+
+### Fixed
+- When a transition was pending, another automatic transition could supersede it even if the pending transition had a higher priority. This has been fixed and a pending transition can only be superseded by a lower priority transition if the pending transitions trigger condition(s) are no longer met. 
+
 ## [0.20.0] - 2025-01-21
 ### Improved
 - All nodes have received new icons which are more consistent with Godot's built-in icons and are easier to recognize at a glance. A huge thanks goes out to [Donatas Kirda](https://github.com/bloodwiing) who took the time to create these fantastic new icons and provided a PR with them ([#160](https://github.com/derkork/godot-statecharts/pull/160)).

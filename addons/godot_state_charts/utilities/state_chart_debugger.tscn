@@ -9,6 +9,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_i74os")
+maximum_lines = 50
 
 [node name="TabContainer" type="TabContainer" parent="."]
 layout_mode = 2

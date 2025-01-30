@@ -1,3 +1,4 @@
+@tool
 @icon("state_is_active_guard.svg")
 ## A guard that checks if a certain state is active.
 class_name StateIsActiveGuard
@@ -16,3 +17,6 @@ func is_satisfied(context_transition:Transition, context_state:StateChartState) 
 		push_warning("State ", state , " referenced in StateIsActiveGuard below ", DebugUtil.path_of(context_state), " could not be resolved. Verify that the node path is correct.")
 		return false
 	return actual_state.active
+	
+func get_supported_trigger_types() -> int:
+	return StateChart.TriggerType.STATE_CHANGE

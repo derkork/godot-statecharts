@@ -79,27 +79,27 @@ func _state_step():
 	for child in _sub_states:
 		child._state_step()
 
-func _process_transitions(event:StringName, property_change:bool = false) -> bool:
+func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName = "") -> bool:
 	if not active:
 		return false
 
 	# forward to all children
 	var handled := false
 	for child in _sub_states:
-		var child_handled_it = child._process_transitions(event, property_change)
+		var child_handled_it = child._process_transitions(trigger_type, event)
 		handled = handled or child_handled_it
 
 	# if any child handled this, we don't touch it anymore
 	if handled:
 		# emit the event_received signal for completeness
-		# unless it was a property change
-		if not property_change:
+		# if the trigger type is event
+		if trigger_type == StateChart.TriggerType.EVENT:
 			self.event_received.emit(event)
 		return true
 
 	# otherwise handle it ourselves
 	# defer to the base class
-	return super._process_transitions(event, property_change)
+	return super._process_transitions(trigger_type, event)
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = super._get_configuration_warnings()
