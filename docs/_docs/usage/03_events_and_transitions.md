@@ -101,11 +101,18 @@ The signal is only emitted when the transition is taken, not when it is pending.
 
 ## Automatic transitions
 
-It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you change a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met.
+It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you enter or change a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met.
 
 ![Automatic transition]({{ site.baseurl }}/assets/img/manual/immediate_transition.png){:class="native-width centered"}
 
-Note that automatic transitions will still only be evaluated for currently active states.
+Automatic transitions of all currently active states remain "in play" for as long as the state is active. That means that whenever the guard condition for such a transition becomes true, the transition will be taken. 
+
+> **Note:** Automatic transitions are still event-driven. This means they will not be checked every frame, but only when an event occurs that could potentially trigger them:
+> - the state holding the transition is entered
+> - a state change happens in the state chart and the transition has a guard that checks whether a state is active
+> - a property change happens and the transition has a guard that checks the value of an expression property
+> 
+> This is done in order to keep the performance impact of automatic transitions low. For the most part this should not be a problem but if you use an expression guard that checks for something outside of the state chart (e.g. a global variable) this will not work as expected. The state chart will not be notified of changes to this variable so it has no event causing the automatic transition to be evaluated. In this case you might want to send an explicit event to the state chart when the variable changes.
 
 
 ## Code-triggered transitions

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.21.0] - 2025-01-31
 ### Breaking Change
 - At long last, automatic transitions can now also track state changes. This way a _State Is Active_ guard can now be used in an automatic transition to run this transition whenever another state becomes active ([#114](https://github.com/derkork/godot-statecharts/issues/114)). Note that this was previously not possible, so projects which tried to emulate this behaviour using other means (e.g. continuously sending events) can now take advantage of this new behaviour and simplify their code and improve performance. Since the state chart now behaves differently than before, I'm marking this as a breaking change, though it should not affect most projects.
 
