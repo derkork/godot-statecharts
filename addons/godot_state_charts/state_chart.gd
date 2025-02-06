@@ -119,13 +119,33 @@ func _ready() -> void:
 	_state = child as StateChartState
 	_state._state_init()
 
-	# enter the state
-	_state._state_enter.call_deferred()
+	# We wait one frame before entering initial state, so
+	# parents of the state chart have a chance to run their
+	# _ready methods first and not get events from the state
+	# chart while they have not yet been initialized
+	_enter_initial_state.call_deferred()
 
 	# if we are in an editor build and this chart should be tracked 
 	# by the debugger, create a debugger remote
 	if track_in_editor and OS.has_feature("editor"):
 		_debugger_remote = DebuggerRemote.new(self)
+
+
+func _enter_initial_state():
+	# https://github.com/derkork/godot-statecharts/issues/143
+	# make sure that transitions resulting from state_enter handlers still 
+	# adhere our transactional processing
+	_transitions_processing_active = true
+	_locked_down = true
+
+	# enter the state
+	_state._state_enter(false)
+	
+	# run any queued transitions that may have come up during the enter
+	_run_queued_transitions()
+	
+	# run any queued external events that may have come up during the enter
+	_run_changes()
 
 
 ## Sends an event to this state chart. The event will be passed to the innermost active state first and
@@ -146,6 +166,9 @@ func send_event(event:StringName) -> void:
 		push_warning("State chart does not have an event '", event , "' defined. Sending this event will do nothing.")
 	
 	_queued_events.append(event)
+	if _locked_down:
+		return
+		
 	_run_changes()
 		
 		
@@ -163,7 +186,9 @@ func set_expression_property(name:StringName, value) -> void:
 	
 	_expression_properties[name] = value
 	_property_change_pending = true
-	_run_changes()
+	
+	if not _locked_down:
+		_run_changes()
 		
 
 ## Returns the value of a previously set expression property. If the property does not exist, the default value
@@ -173,9 +198,6 @@ func get_expression_property(name:StringName, default:Variant = null) -> Variant
 
 
 func _run_changes() -> void:
-	if _locked_down:
-		return
-		
 	# enable the reentrance lock
 	_locked_down = true
 	
@@ -205,19 +227,26 @@ func _run_changes() -> void:
 ## once all currently running transitions have finished. States should call this method
 ## when they want to transition away from themselves. 
 func _run_transition(transition:Transition, source:StateChartState) -> void:
-	# if we are currently inside of a transition, queue it up. This can happen
-	# if a state has an automatic transition on enter, in which case we want to
-	# finish the current transition before starting a new one.
+	
+	# Queue up the transition for running
+	_queued_transitions.append({transition : source})
+	
+	# if we are currently inside of a transition, finish processing the queue so we 
+	# get a predictable order. Queing can happen a state has an automatic transition on enter, 
+	# or when a transition is triggered as part of a signal handler. In these cases, we want to
+	# finish the current transition before starting a new one because otherwise the transitions
+	# see really unpredictable state changes. In a sense, every transition is also a
+	# transaction that needs to be fully processed before the next one can start.
 	if _transitions_processing_active:
-		_queued_transitions.append({transition : source})
 		return
 		
+	_run_queued_transitions()
+	
+## Runs all queued transitions until none are left. This also checks for infinite loops in transitions and 
+## ensures triggering guards on state changes.
+func _run_queued_transitions() -> void:
 	_transitions_processing_active = true
 
-	# we can only transition away from a currently active state
-	# if for some reason the state no longer is active, ignore the transition	
-	_do_run_transition(transition, source)
-	
 	var execution_count := 1
 	
 	# if we still have transitions
@@ -236,7 +265,8 @@ func _run_transition(transition:Transition, source:StateChartState) -> void:
 	
 	# transitions trigger a state change which can in turn activate
 	# other transitions, so we need to handle these
-	_run_changes()
+	if not _locked_down:
+		_run_changes()
 
 ## Runs the transition. Used internally by the state chart, do not call this directly.	
 func _do_run_transition(transition:Transition, source:StateChartState):
