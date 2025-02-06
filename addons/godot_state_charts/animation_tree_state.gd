@@ -38,7 +38,7 @@ func _ready():
 
 
 func _state_enter(expect_transition:bool = false):
-	super._state_enter()
+	super._state_enter(expect_transition)
 
 	if not is_instance_valid(_animation_tree_state_machine):
 		return

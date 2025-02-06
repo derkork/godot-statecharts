@@ -37,7 +37,7 @@ func _ready():
 		push_error("The animation player is invalid. This node will not work.")
 
 func _state_enter(expect_transition: bool = false):
-	super._state_enter()
+	super._state_enter(expect_transition)
 
 	if not is_instance_valid(_animation_player):
 		return

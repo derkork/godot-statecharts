@@ -184,7 +184,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
 
 	# otherwise if we are currently inactive, activate the state
 	if not active:
-		_state_enter()
+		_state_enter(false)
 	# and restore any pending transition
 	_pending_transition = get_node_or_null(our_saved_state.pending_transition_name) as Transition
 	_pending_transition_remaining_delay = our_saved_state.pending_transition_remaining_delay

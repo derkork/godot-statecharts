@@ -69,7 +69,7 @@ func _state_init():
 			child_as_state.state_exited.connect(func(): child_state_exited.emit())
 
 func _state_enter(expect_transition:bool = false):
-	super._state_enter()
+	super._state_enter(expect_transition)
 	# activate the initial state _unless_ one of these are true 
 	# - we expect a transition because we are entering this state just to activate child states further down
 	# - we already have an active state because entering the state triggered an immediate transition to a child state
@@ -80,7 +80,7 @@ func _state_enter(expect_transition:bool = false):
 				_restore_history_state(_initial_state)
 			else:
 				_active_state = _initial_state
-				_active_state._state_enter()
+				_active_state._state_enter(false)
 		else:
 			push_error("No initial state set for state '" + name + "'.")
 
@@ -190,7 +190,7 @@ func _handle_transition(transition:Transition, source:StateChartState):
 
 		# else, just activate the target state
 		_active_state = target
-		_active_state._state_enter()
+		_active_state._state_enter(false)
 		return
 		
 	if self.is_ancestor_of(target):
@@ -230,7 +230,7 @@ func _restore_history_state(target:HistoryState):
 	var default_state = target.get_node_or_null(target.default_state)
 	if is_instance_valid(default_state):
 		_active_state = default_state
-		_active_state._state_enter()
+		_active_state._state_enter(false)
 		return
 	else:
 		push_error("The default state '" + str(target.default_state) + "' of the history state '" + target.name + "' cannot be found.")
