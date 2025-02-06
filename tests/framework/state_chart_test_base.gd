@@ -39,7 +39,12 @@ func assert_inactive(state: StateChartState) -> void:
 	assert_false(state.active, "Expected state " + state.name + " to be inactive")
 
 func finish_setup() -> void:
+	var debugger = preload("test_debugger.gd").new()
+	debugger.track(_chart)
+	autofree(debugger)
+
 	add_child(_chart)
+	
 	# wait one frame so the state chart can get into the initial state
 	await wait_frames(1, "waiting for state chart to become ready")
 
@@ -90,6 +95,10 @@ func atomic_state( name: String, parent: StateChartState) -> AtomicState:
 func transition(from: StateChartState, to: StateChartState, event: String = "", delay: String = "0", guard: Guard = null) -> Transition:
 	@warning_ignore("shadowed_variable")
 	var transition: Transition = Transition.new()
+	if event.is_empty():
+		transition.name = "Automatic to %s" % [to.name]
+	else:
+		transition.name = "On %s to %s" % [event, to.name] 
 	from.add_child(transition)
 	transition.to = transition.get_path_to(to)
 	transition.event = event
