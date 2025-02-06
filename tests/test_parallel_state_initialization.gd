@@ -1,8 +1,7 @@
 extends StateChartTestBase
 
 # https://github.com/derkork/godot-statecharts/issues/143
-# currently disabled because it doesn't work yet.
-func __test_parallel_state_initialization():
+func test_parallel_state_initialization():
 	var root := parallel_state("root")
 	var a := atomic_state("a", root)
 	var b := compound_state("b", root)
@@ -10,10 +9,12 @@ func __test_parallel_state_initialization():
 	var b2 := atomic_state("b2", b)
 	
 	transition(b1, b2, "some_event")
+	
+	# when we enter state a we immediately send some event and 
+	# should now be entering b2
 	a.state_entered.connect(func():
 		send_event("some_event")	
 	)
-	
 	
 	await finish_setup()
 	
