@@ -62,10 +62,10 @@ func _handle_transition(transition:Transition, source:StateChartState):
 	get_parent()._handle_transition(transition, source)
 
 func _state_enter(expect_transition:bool = false):
-	super._state_enter()
+	super._state_enter(expect_transition)
 	# enter all children
 	for child in _sub_states:
-		child._state_enter()
+		child._state_enter(expect_transition)
 	
 func _state_exit():
 	# exit all children
