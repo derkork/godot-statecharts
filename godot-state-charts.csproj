@@ -61,6 +61,7 @@
     <Content Include="addons\godot_state_charts\utilities\editor_debugger\editor_debugger_plugin.gd" />
     <Content Include="addons\godot_state_charts\utilities\editor_debugger\editor_debugger_remote.gd" />
     <Content Include="addons\godot_state_charts\utilities\editor_debugger\editor_debugger_state_info.gd" />
+    <Content Include="addons\godot_state_charts\utilities\editor_debugger\editor_remote_control.gd" />
     <Content Include="addons\godot_state_charts\utilities\editor_sidebar.gd" />
     <Content Include="addons\godot_state_charts\utilities\editor_sidebar.tscn" />
     <Content Include="addons\godot_state_charts\utilities\event_editor\event_editor.gd" />

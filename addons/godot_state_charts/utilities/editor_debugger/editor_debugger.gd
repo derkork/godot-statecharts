@@ -8,6 +8,8 @@ const DebuggerStateInfo = preload("editor_debugger_state_info.gd")
 const DebuggerHistory = preload("../debugger_history.gd")
 ## The debugger message
 const DebuggerMessage = preload("editor_debugger_message.gd")
+## The settings propapagor
+const SettingsPropagator = preload("editor_debugger_settings_propagator.gd")
 
 ## Constants for the settings
 const SETTINGS_ROOT:String = "godot_state_charts/debugger/"
@@ -133,7 +135,7 @@ func add_chart(path:NodePath):
 	_repaint_charts()
 
 	# push the settings to the new chart remote
-	DebuggerMessage.settings_updated(_session, path, _ignore_events, _ignore_transitions)
+	SettingsPropagator.send_settings_update(_session, path, _ignore_events, _ignore_transitions)
 
 	if _current_chart.is_empty():
 		_current_chart = path
@@ -345,7 +347,7 @@ func _on_ignore_events_checkbox_toggled(button_pressed:bool) -> void:
 
 	# push the new setting to all remote charts
 	for chart in _state_infos.keys():
-		DebuggerMessage.settings_updated(_session, chart, _ignore_events, _ignore_transitions)
+		SettingsPropagator.send_settings_update(_session, chart, _ignore_events, _ignore_transitions)
 
 ## Called when the ignore state changes checkbox is toggled.
 func _on_ignore_state_changes_checkbox_toggled(button_pressed:bool) -> void:
@@ -359,7 +361,7 @@ func _on_ignore_transitions_checkbox_toggled(button_pressed:bool) -> void:
 
 	# push the new setting to all remote charts
 	for chart in _state_infos.keys():
-		DebuggerMessage.settings_updated(_session, chart, _ignore_events, _ignore_transitions)
+		SettingsPropagator.send_settings_update(_session, chart, _ignore_events, _ignore_transitions)
 
 ## Called when the maximum lines spin box value is changed.
 func _on_maximum_lines_spin_box_value_changed(value:int) -> void:

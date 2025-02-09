@@ -1,13 +1,14 @@
-const MESSAGE_PREFIX = "godot_state_charts"
-const STATE_CHART_ADDED_MESSAGE = MESSAGE_PREFIX + ":state_chart_added"
-const STATE_CHART_REMOVED_MESSAGE = MESSAGE_PREFIX + ":state_chart_removed"
-const STATE_UPDATED_MESSAGE = MESSAGE_PREFIX + ":state_updated"
-const STATE_ENTERED_MESSAGE = MESSAGE_PREFIX + ":state_entered"
-const STATE_EXITED_MESSAGE = MESSAGE_PREFIX + ":state_exited"
-const TRANSITION_PENDING_MESSAGE = MESSAGE_PREFIX + ":transition_pending"
-const TRANSITION_TAKEN_MESSAGE = MESSAGE_PREFIX + ":transition_fired"
-const STATE_CHART_EVENT_RECEIVED_MESSAGE = MESSAGE_PREFIX + ":state_chart_event_received"
-const SETTINGS_UPDATED_MESSAGE = MESSAGE_PREFIX + "_settings_updated"
+@tool
+
+const MESSAGE_PREFIX = "gds"
+const STATE_CHART_ADDED_MESSAGE = MESSAGE_PREFIX + ":sca"
+const STATE_CHART_REMOVED_MESSAGE = MESSAGE_PREFIX + ":scr"
+const STATE_UPDATED_MESSAGE = MESSAGE_PREFIX + ":stu"
+const STATE_ENTERED_MESSAGE = MESSAGE_PREFIX + ":sten"
+const STATE_EXITED_MESSAGE = MESSAGE_PREFIX + ":stex"
+const TRANSITION_PENDING_MESSAGE = MESSAGE_PREFIX + ":trp"
+const TRANSITION_TAKEN_MESSAGE = MESSAGE_PREFIX + ":trf"
+const STATE_CHART_EVENT_RECEIVED_MESSAGE = MESSAGE_PREFIX + ":scev"
 
 const DebuggerStateInfo = preload("editor_debugger_state_info.gd")
 
@@ -112,9 +113,5 @@ static func transition_pending(chart:StateChart, source:StateChartState, transit
 		
 	EngineDebugger.send_message(TRANSITION_PENDING_MESSAGE, [Engine.get_process_frames(), chart.get_path(), chart.get_path_to(source),  chart.get_path_to(transition), pending_transition_remaining_delay])
 
-## Sends a settings updated message
-## session is an EditorDebuggerSession but this does not exist after export
-## so its not statically typed here. This code won't run after export anyways.
-static func settings_updated(session, chart:NodePath, ignore_events:bool, ignore_transitions:bool) -> void:
-	# print("Sending settings updated message: ", SETTINGS_UPDATED_MESSAGE + str(chart) + ":updated")
-	session.send_message(SETTINGS_UPDATED_MESSAGE + str(chart) + ":updated", [ignore_events, ignore_transitions])
+
+	

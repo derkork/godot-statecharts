@@ -127,8 +127,11 @@ func _ready() -> void:
 
 	# if we are in an editor build and this chart should be tracked 
 	# by the debugger, create a debugger remote
-	if track_in_editor and OS.has_feature("editor"):
+	if track_in_editor and OS.has_feature("editor") and not Engine.is_editor_hint():
 		_debugger_remote = DebuggerRemote.new(self)
+		# add the remote as a child, so it gets cleaned up when the state
+		# chart is deleted
+		add_child(_debugger_remote)
 
 
 func _enter_initial_state():

@@ -114,6 +114,7 @@ shape = SubResource("CapsuleShape2D_bocu2")
 [node name="StateChart" type="Node" parent="TheFrog"]
 unique_name_in_owner = true
 script = ExtResource("3_7ryss")
+track_in_editor = true
 
 [node name="ParallelState" type="Node" parent="TheFrog/StateChart"]
 script = ExtResource("5_uojl1")
