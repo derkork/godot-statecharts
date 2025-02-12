@@ -142,7 +142,7 @@ func _enter_initial_state():
 	_locked_down = true
 
 	# enter the state
-	_state._state_enter(false)
+	_state._state_enter(null)
 	
 	# run any queued transitions that may have come up during the enter
 	_run_queued_transitions()

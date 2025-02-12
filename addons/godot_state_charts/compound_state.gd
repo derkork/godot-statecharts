@@ -68,19 +68,23 @@ func _state_init():
 			child_as_state.state_entered.connect(func(): child_state_entered.emit())
 			child_as_state.state_exited.connect(func(): child_state_exited.emit())
 
-func _state_enter(expect_transition:bool = false):
-	super._state_enter(expect_transition)
+func _state_enter(transition_target:StateChartState):
+	super._state_enter(transition_target)
 	# activate the initial state _unless_ one of these are true 
-	# - we expect a transition because we are entering this state just to activate child states further down
+	# - the transition target is a descendant of this state
 	# - we already have an active state because entering the state triggered an immediate transition to a child state
 	# - we are no longer active becasue entering the state triggered an immediate transition to some other state
-	if not expect_transition and not is_instance_valid(_active_state) and _state_active:
+	var target_is_descendant := false
+	if transition_target != null and is_ancestor_of(transition_target):
+		target_is_descendant = true
+	
+	if not target_is_descendant and not is_instance_valid(_active_state) and _state_active:
 		if _initial_state != null:
 			if _initial_state is HistoryState:
 				_restore_history_state(_initial_state)
 			else:
 				_active_state = _initial_state
-				_active_state._state_enter(false)
+				_active_state._state_enter(null)
 		else:
 			push_error("No initial state set for state '" + name + "'.")
 
@@ -174,7 +178,7 @@ func _handle_transition(transition:Transition, source:StateChartState):
 	if target == self:
 		# exit this state and re-enter it
 		_state_exit()
-		_state_enter(false)
+		_state_enter(target)
 		return
 
 	if target in get_children():
@@ -190,7 +194,7 @@ func _handle_transition(transition:Transition, source:StateChartState):
 
 		# else, just activate the target state
 		_active_state = target
-		_active_state._state_enter(false)
+		_active_state._state_enter(target)
 		return
 		
 	if self.is_ancestor_of(target):
@@ -204,10 +208,10 @@ func _handle_transition(transition:Transition, source:StateChartState):
 						_active_state._state_exit()
 
 					_active_state = child
-					# set the "expect_transition" flag to true because we will send
+					# give the transition target because we will send
 					# the transition to the child state right after we activate it.
 					# this avoids the child needlessly entering the initial state
-					_active_state._state_enter(true)
+					_active_state._state_enter(target)
 					
 				# ask child to handle the transition
 				child._handle_transition(transition, source)
@@ -230,7 +234,7 @@ func _restore_history_state(target:HistoryState):
 	var default_state = target.get_node_or_null(target.default_state)
 	if is_instance_valid(default_state):
 		_active_state = default_state
-		_active_state._state_enter(false)
+		_active_state._state_enter(null)
 		return
 	else:
 		push_error("The default state '" + str(target.default_state) + "' of the history state '" + target.name + "' cannot be found.")

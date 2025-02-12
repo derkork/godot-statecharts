@@ -94,12 +94,11 @@ func _state_init():
 			_transitions.append(child)
 	
 	
-## Called when the state is entered. The parameter indicates whether the state
-## is expected to immediately handle a transition after it has been entered.
-## In this case the state should not automatically activate a default child state.
-## This is to avoid a situation where a state is entered, activates a child then immediately
-## exits and activates another child due to a transition.
-func _state_enter(_expect_transition:bool = false):
+## Called when the state is entered. The parameter gives the target of the transition
+## that caused the entering of the state. This can be used determine whether an 
+## initial child state should be activated. If the state entering was not caused by a transition
+## this can be null.
+func _state_enter(_transition_target:StateChartState):
 	# print("state_enter: " + name)
 	_state_active = true
 	
@@ -184,7 +183,7 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
 
 	# otherwise if we are currently inactive, activate the state
 	if not active:
-		_state_enter(false)
+		_state_enter(null)
 	# and restore any pending transition
 	_pending_transition = get_node_or_null(our_saved_state.pending_transition_name) as Transition
 	_pending_transition_remaining_delay = our_saved_state.pending_transition_remaining_delay

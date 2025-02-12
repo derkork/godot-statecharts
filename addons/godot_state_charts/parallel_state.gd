@@ -42,7 +42,7 @@ func _handle_transition(transition:Transition, source:StateChartState):
 		# exit this state
 		_state_exit()
 		# then re-enter it
-		_state_enter(false)
+		_state_enter(target)
 		return
 
 	if target in get_children():
@@ -61,11 +61,11 @@ func _handle_transition(transition:Transition, source:StateChartState):
 	# ask the parent
 	get_parent()._handle_transition(transition, source)
 
-func _state_enter(expect_transition:bool = false):
-	super._state_enter(expect_transition)
+func _state_enter(transition_target:StateChartState):
+	super._state_enter(transition_target)
 	# enter all children
 	for child in _sub_states:
-		child._state_enter(expect_transition)
+		child._state_enter(transition_target)
 	
 func _state_exit():
 	# exit all children
