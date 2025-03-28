@@ -187,6 +187,7 @@ to = NodePath("../../Walk")
 delay_in_seconds = "0.0"
 
 [node name="Idle" type="Node" parent="StateChart/Wander"]
+editor_description = "In this state the frog stands idly around for a random time."
 script = ExtResource("5_j65h7")
 
 [node name="To Decide Next" type="Node" parent="StateChart/Wander/Idle"]
@@ -196,6 +197,7 @@ to = NodePath("../../Decide Next")
 delay_in_seconds = "randf_range(1.5, 3)"
 
 [node name="Walk" type="Node" parent="StateChart/Wander"]
+editor_description = "In this state the frog walks into a random direction for a random amount of time."
 script = ExtResource("5_j65h7")
 
 [node name="To Decide Next" type="Node" parent="StateChart/Wander/Walk"]
