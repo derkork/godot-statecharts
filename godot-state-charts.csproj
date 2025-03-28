@@ -396,6 +396,7 @@
     <Content Include="tests\test_automatic_transition_leaving_compound_state.gd" />
     <Content Include="tests\test_automatic_transition_on_property_change.gd" />
     <Content Include="tests\test_multiple_delayed_transition.gd" />
+    <Content Include="tests\test_parallel_state_deep_transition.gd" />
     <Content Include="tests\test_parallel_state_event_handling.gd" />
     <Content Include="tests\test_automatic_transition_on_state_enter.gd" />
     <Content Include="tests\test_immediate_condition_state.gd" />
