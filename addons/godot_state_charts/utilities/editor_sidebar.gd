@@ -11,6 +11,7 @@ var _editor_interface:EditorInterface
 ## The undo/redo facility
 var _undo_redo:EditorUndoRedoManager
 
+
 @onready var _add_section:Control = %AddSection
 @onready var _no_options_label:Control = %NoOptionsLabel
 @onready var _add_node_name_line_edit:LineEdit = %AddNodeNameLineEdit
@@ -97,3 +98,5 @@ func _on_transition_pressed():
 
 func _on_toggle_sidebar_button_pressed():
 	sidebar_toggle_requested.emit()
+
+

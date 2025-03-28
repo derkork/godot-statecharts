@@ -24,7 +24,6 @@ layout_mode = 2
 
 [node name="AddSection" type="VBoxContainer" parent="VBoxContainer"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 
 [node name="AddLabel" type="Label" parent="VBoxContainer/AddSection"]

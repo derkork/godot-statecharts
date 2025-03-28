@@ -1,10 +1,16 @@
 @tool
 extends EditorPlugin
 
+const GraphView = preload("utilities/graph_view/graph_view.gd")
+const GraphViewScene = preload("utilities/graph_view/graph_view.tscn")
+
+
 ## The sidebar control for 2D
 var _ui_sidebar_canvas:Control
 ## The sidebar control for 3D
 var _ui_sidebar_spatial:Control
+## The graph view instance
+var _graph_view:GraphView
 
 ## Scene holding the sidebar
 var _sidebar_ui:PackedScene = preload("utilities/editor_sidebar.tscn")
@@ -20,6 +26,9 @@ enum SidebarLocation {
 ## The current location of the sidebar. Default is left.
 var _current_sidebar_location:SidebarLocation = SidebarLocation.LEFT
 
+
+func _handles(object):
+	return object is StateChart or object is StateChartState or object is Transition
 
 func _enter_tree():
 	# prepare a copy of the sidebar for both 2D and 3D.
@@ -37,6 +46,14 @@ func _enter_tree():
 	# update the sidebar contents accordingly
 	get_editor_interface().get_selection().selection_changed.connect(_on_selection_changed)
 
+
+	# add the graph view
+	_graph_view = GraphViewScene.instantiate()
+	_graph_view.setup(self)
+	get_editor_interface().get_editor_main_screen().add_child(_graph_view)
+	_make_visible(false)
+	
+
 	# Add the debugger plugin
 	_debugger_plugin = preload("utilities/editor_debugger/editor_debugger_plugin.gd").new()
 	_debugger_plugin.initialize(get_editor_interface().get_editor_settings())
@@ -48,12 +65,14 @@ func _enter_tree():
 
 
 func _set_window_layout(configuration):
+	_graph_view._set_window_layout(configuration)
 	_remove_sidebars()
 	_current_sidebar_location = configuration.get_value("GodotStateCharts", "sidebar_location", SidebarLocation.LEFT)
 	_add_sidebars()
 
 	
 func _get_window_layout(configuration):
+	_graph_view._get_window_layout(configuration)
 	configuration.set_value("GodotStateCharts", "sidebar_location", _current_sidebar_location)
 
 
@@ -104,7 +123,24 @@ func _exit_tree():
 		_ui_sidebar_canvas.queue_free()
 	if is_instance_valid(_ui_sidebar_spatial):
 		_ui_sidebar_spatial.queue_free()
+		
+	if is_instance_valid(_graph_view):
+		get_editor_interface().get_editor_main_screen().remove_child(_graph_view)
+		_graph_view.queue_free()
 
+func _get_plugin_name() -> String:
+	return "State Charts"
+
+func _get_plugin_icon() -> Texture2D:
+	return preload("state_chart.svg")
+
+func _has_main_screen() -> bool:
+	return true
+	
+func _make_visible(visible):
+	if is_instance_valid(_graph_view):
+		_graph_view.visible = visible
+	
 
 func _on_selection_changed() -> void:
 	# get the current selection
@@ -120,8 +156,10 @@ func _on_selection_changed() -> void:
 			_ui_sidebar_canvas.change_selected_node(selected_node)
 			_ui_sidebar_spatial.show()
 			_ui_sidebar_spatial.change_selected_node(selected_node)
+			_graph_view.change_selected_node(selected_node)
 			return
 			
 	# otherwise hide it
 	_ui_sidebar_canvas.hide()
 	_ui_sidebar_spatial.hide()
+	_graph_view.change_selected_node(null)

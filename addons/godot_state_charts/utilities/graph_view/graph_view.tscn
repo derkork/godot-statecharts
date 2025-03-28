@@ -1,0 +1,110 @@
+[gd_scene load_steps=3 format=3 uid="uid://mlv25f2or0g"]
+
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/graph_view/graph_view.gd" id="1_widu0"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/graph_view/plantuml_skin.gd" id="2_m835l"]
+
+[node name="GraphView" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_widu0")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="LeftSideBar" type="MarginContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_right = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CopyButton" type="Button" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Copy the state chart as PlantUML diagram for use in an external program."
+text = "Copy as PlantUML"
+
+[node name="RenderEnableCheckbox" type="CheckBox" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Render in editor using"
+
+[node name="ServerUrl" type="LineEdit" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "https://kroki.io"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+stretch_mode = 2
+
+[node name="DisabledLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Rendering is disabled. Please enable it above."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NoChartLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+text = "Select any state chart node in the scene tree to show a graphical rendering of the state chart."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DisclaimerLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "The above rendering is automatically generated from the state charts node data by an external service. There is no way to influence the rendering should the results be unsatisfactory. Please refrain from opening tickets for unsatisfactory rendering results."
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="RightSideBar" type="MarginContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+autostart = true
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+unique_name_in_owner = true
+timeout = 5.0
+
+[node name="Skin" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_m835l")
+
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/HBoxContainer/CopyButton" to="." method="_on_copy_button_pressed"]
+[connection signal="toggled" from="HBoxContainer/VBoxContainer/HBoxContainer/RenderEnableCheckbox" to="." method="_on_render_enable_checkbox_toggled"]
+[connection signal="text_changed" from="HBoxContainer/VBoxContainer/HBoxContainer/ServerUrl" to="." method="_on_server_url_text_changed"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
