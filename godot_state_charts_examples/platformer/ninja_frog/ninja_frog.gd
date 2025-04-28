@@ -29,17 +29,9 @@ func _physics_process(delta):
 	if signf(velocity.x) != 0:
 		_sprite.flip_h = velocity.x < 0
 
+	# gravity handled in Grounded and Airborne states
 	move_and_slide()
-
-	# handle gravity
-	if is_on_floor():
-		_state_chart.send_event("grounded")
-		velocity.y = 0
-	else:
-		## apply gravity
-		velocity.y += gravity * delta
-		_state_chart.send_event("airborne")
-
+	
 	# let the state machine know if we are moving or not
 	if velocity.length_squared() <= 0.005:
 		_animation_state_machine.travel("Idle")
@@ -48,8 +40,29 @@ func _physics_process(delta):
 
 	# set the velocity to the animation tree, so it can blend between animations
 	_animation_tree["parameters/Move/blend_position"] = signf(velocity.y)
-	
+
+
+func _on_grounded_state_physics_processing(delta):
+	if not is_on_floor():
+		_state_chart.send_event("airborne")
+		return
 		
+	velocity.y = 0
+	
+	if Input.is_action_just_pressed("ui_accept"):
+		velocity.y = JUMP_VELOCITY
+		_state_chart.send_event("jump")
+
+
+func _on_airborne_state_physics_processing(delta):
+	if is_on_floor():
+		_state_chart.send_event("grounded")
+		return
+		
+	# apply gravity	
+	velocity.y += gravity * delta
+
+
 ## Called in states that allow jumping, we process jumps only in these.
 func _on_jump_enabled_state_physics_processing(_delta):
 	if Input.is_action_just_pressed("ui_accept"):
