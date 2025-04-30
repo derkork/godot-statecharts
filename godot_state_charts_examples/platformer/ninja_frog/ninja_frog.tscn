@@ -187,7 +187,6 @@ texture_filter = 1
 texture = ExtResource("7_fehuj")
 offset = Vector2(0, -12)
 hframes = 31
-frame = 20
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_ckafx")
@@ -270,8 +269,7 @@ editor_description = "This state is active when the player is airborne but can n
 script = ExtResource("6_vmkuk")
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
-[connection signal="state_physics_processing" from="StateChart/Root/Grounded" to="." method="_on_grounded_state_physics_processing"]
-[connection signal="state_physics_processing" from="StateChart/Root/Airborne" to="." method="_on_airborne_state_physics_processing"]
+[connection signal="state_physics_processing" from="StateChart/Root/Grounded" to="." method="_on_jump_enabled_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Airborne/CoyoteJumpEnabled" to="." method="_on_jump_enabled_state_physics_processing"]
 [connection signal="state_physics_processing" from="StateChart/Root/Airborne/DoubleJumpEnabled" to="." method="_on_jump_enabled_state_physics_processing"]
 [connection signal="taken" from="StateChart/Root/Airborne/DoubleJumpEnabled/On Jump" to="." method="_on_double_jump_jump"]

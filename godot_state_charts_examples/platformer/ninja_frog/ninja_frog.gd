@@ -7,12 +7,15 @@ const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+var _gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @onready var _sprite: Sprite2D = $Sprite
 @onready var _state_chart: StateChart = $StateChart
 @onready var _animation_tree: AnimationTree = $AnimationTree
 @onready var _animation_state_machine: AnimationNodeStateMachinePlayback = _animation_tree.get("parameters/playback")
+
+## Flag indicating if the character was on the floor in the last frame.
+var _was_on_floor:bool = false
 
 # In all states, move and slide and handle left/right movement and gravity.
 func _physics_process(delta):
@@ -32,6 +35,21 @@ func _physics_process(delta):
 	# gravity handled in Grounded and Airborne states
 	move_and_slide()
 	
+	# if we are on the floor right now
+	if is_on_floor():
+		velocity.y = 0
+		# if we just touched the floor, notify the state chart
+		if not _was_on_floor:
+			_was_on_floor = true
+			_state_chart.send_event("grounded")
+	else:
+		velocity.y += _gravity * delta
+		# if we just left the floor, notify the state chart
+		if _was_on_floor:
+			_was_on_floor = false
+			_state_chart.send_event("airborne")
+		
+	
 	# let the state machine know if we are moving or not
 	if velocity.length_squared() <= 0.005:
 		_animation_state_machine.travel("Idle")
@@ -40,27 +58,6 @@ func _physics_process(delta):
 
 	# set the velocity to the animation tree, so it can blend between animations
 	_animation_tree["parameters/Move/blend_position"] = signf(velocity.y)
-
-
-func _on_grounded_state_physics_processing(delta):
-	if not is_on_floor():
-		_state_chart.send_event("airborne")
-		return
-		
-	velocity.y = 0
-	
-	if Input.is_action_just_pressed("ui_accept"):
-		velocity.y = JUMP_VELOCITY
-		_state_chart.send_event("jump")
-
-
-func _on_airborne_state_physics_processing(delta):
-	if is_on_floor():
-		_state_chart.send_event("grounded")
-		return
-		
-	# apply gravity	
-	velocity.y += gravity * delta
 
 
 ## Called in states that allow jumping, we process jumps only in these.
