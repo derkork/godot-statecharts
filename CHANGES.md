@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.21.5] - 2025-04-05
+### Improved
+- The addon now ships with UID files for Godot 4.4 ([#178](https://github.com/derkork/godot-statecharts/issues/178)).
+- The platformer example was improved as to not needlessly send events all the time which pollute the history log. A big thanks goes out to [mrezai](https://github.com/mrezai) for submitting a PR with this improvement ([#179](https://github.com/derkork/godot-statecharts/pull/179))
+
 
 ## [0.21.4] - 2025-03-28
 ### Improved
