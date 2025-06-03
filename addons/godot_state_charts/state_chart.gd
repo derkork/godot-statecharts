@@ -308,3 +308,12 @@ func _get_configuration_warnings() -> PackedStringArray:
 		if not child is StateChartState:
 			warnings.append("StateChart's child must be a State")
 	return warnings
+
+func export_to_dict() -> Dictionary:
+	# Iterate over all children and export their current state to a dictionary
+	var states_dict: Dictionary = _state._export_to_dict()
+
+	return {
+		"name": name,
+		"states": states_dict
+	}
