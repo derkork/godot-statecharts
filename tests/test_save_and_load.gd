@@ -1,240 +1,116 @@
 extends StateChartTestBase
 
 
-func test_basic_save():
+func test_export_to_resource():
 	var root := compound_state("root")
-	root.name = "root"
 	var a := atomic_state("a", root)
-	a.name = "a" 
 	var b := atomic_state("b", root)
-	b.name = "b"
 
-	transition(a, b, "to_b")
 	await finish_setup()
 
 	_chart.name = "state_chart"
-	_chart.add_child(root)
+
+	var resource:SerializedStateChart = _chart.export_to_resource()
+
+	# SerializedStateChart
+	assert_eq(resource.name, "state_chart")
+	assert_eq(resource.queued_events, [])
+	assert_eq(resource.property_change_pending, false)
+	assert_eq(resource.state_change_pending, false)
+	assert_eq(resource.locked_down, false)
+	assert_eq(resource.queued_transitions, [])
+	assert_eq(resource.transitions_processing_active, false)
+
+	# SerializedStateChartState children
+	assert_eq(resource.state.name, "root")
+	assert_eq(resource.state.state_class, "CompoundState")
+	assert_eq(resource.state.active, true)
 	
-	# Convert the state chart to a Dictionary
-	var save_dict: Dictionary = _chart.export_to_dict()
-
-	var expected_save_dict := Dictionary({
-		"name": "state_chart",
-		"queued_events": Array([]),
-		"property_change_pending": false,
-		"state_change_pending": false,
-		"locked_down": false,
-		"queued_transitions": Array([]),
-		"transitions_processing_active": false,
-		"states": Dictionary({
-			"name": "root",
-			"state_class": "CompoundState",
-			"active": true,
-			"pending_transition_name": "",
-			"pending_transition_remaining_delay": 0.0,
-			"pending_transition_initial_delay": 0.0,
-			"children": Array([
-				Dictionary({
-					"name": "a",
-					"state_class": "AtomicState",
-					"active": true,
-					"pending_transition_name": "",
-					"pending_transition_remaining_delay": 0.0,
-					"pending_transition_initial_delay": 0.0,
-					"children": Array([])
-				}),
-				Dictionary({
-					"name": "b",
-					"state_class": "AtomicState",
-					"active": false,
-					"pending_transition_name": "",
-					"pending_transition_remaining_delay": 0.0,
-					"pending_transition_initial_delay": 0.0,
-					"children": Array([])
-				})
-			])
-		})
-	})
-	print("Save Dict:")
-	print(JSON.stringify(save_dict, "\t"))
-	print("Expected Save Dict:")
-	print(JSON.stringify(expected_save_dict, "\t"))
-	assert_eq_deep(save_dict, expected_save_dict)
+	assert_eq(resource.state.children.size(), 2)
+	assert_eq(resource.state.children[0].name, "a")
+	assert_eq(resource.state.children[0].state_class, "AtomicState")
+	assert_eq(resource.state.children[0].active, true)
+	assert_eq(resource.state.children[1].name, "b")
+	assert_eq(resource.state.children[1].state_class, "AtomicState")
+	assert_eq(resource.state.children[1].active, false)
 
 
-func test_save_with_history():
+func test_export_to_resource_with_history():
 	var root := compound_state("root")
-	root.name = "root"
 	var a := compound_state("a", root)
 	var a1 := atomic_state("a1", a)
 	var a2 := atomic_state("a2", a)
+	var b := atomic_state("b", root)
 	var h := history_state("h", a, a1)
 	
 	transition(a1, a2, "to_a2")
-
-	var b := atomic_state("b", root)
 	transition(a, b, "exit_a")	
 	transition(b, h, "return_to_a")
+
 	await finish_setup()
 
 	_chart.name = "state_chart"
-	_chart.add_child(root)
 	
-	# Convert the state chart to a Dictionary
-	var save_dict: Dictionary = _chart.export_to_dict()
+	var resource:SerializedStateChart = _chart.export_to_resource()
 
-	var expected_save_dict := Dictionary({
-		"name": "state_chart",
-		"queued_events": Array([]),
-		"property_change_pending": false,
-		"state_change_pending": false,
-		"locked_down": false,
-		"queued_transitions": Array([]),
-		"transitions_processing_active": false,
-		"states": Dictionary({
-			"name": "root",
-			"state_class": "CompoundState",
-			"active": true,
-			"pending_transition_name": "",
-			"pending_transition_remaining_delay": 0.0,
-			"pending_transition_initial_delay": 0.0,
-			"children": Array([
-				Dictionary({
-					"name": "a",
-					"state_class": "CompoundState",
-					"active": true,
-					"pending_transition_name": "",
-					"pending_transition_remaining_delay": 0.0,
-					"pending_transition_initial_delay": 0.0,
-					"children": Array([
-						Dictionary({
-							"name": "a1",
-							"state_class": "AtomicState",
-							"active": true,
-							"pending_transition_name": "",
-							"pending_transition_remaining_delay": 0.0,
-							"pending_transition_initial_delay": 0.0,
-							"children": Array([])
-						}),
-						Dictionary({
-							"name": "a2",
-							"state_class": "AtomicState",
-							"active": false,
-							"pending_transition_name": "",
-							"pending_transition_remaining_delay": 0.0,
-							"pending_transition_initial_delay": 0.0,
-							"children": Array([])
-						}),
-						Dictionary({
-							"name": "h",
-							"state_class": "HistoryState",
-							"active": false,
-							"pending_transition_name": "",
-							"pending_transition_remaining_delay": 0.0,
-							"pending_transition_initial_delay": 0.0,
-							"children": Array([]),
-							"history": Dictionary()
-						}),
-					])
-				}),
-				Dictionary({
-					"name": "b",
-					"state_class": "AtomicState",
-					"active": false,
-					"pending_transition_name": "",
-					"pending_transition_remaining_delay": 0.0,
-					"pending_transition_initial_delay": 0.0,
-					"children": Array([])
-				})
-			])
-		})
-	})
-	# print("Save Dict:")
-	# print(JSON.stringify(save_dict, "\t"))
-	# print("Expected Save Dict:")
-	# print(JSON.stringify(expected_save_dict, "\t"))
-	assert_eq_deep(save_dict, expected_save_dict)
+	# Spot-check to ensure that the resource is set up as expected
+	assert_eq(resource.name, "state_chart")
+	assert_eq(resource.state.name, "root")
+	assert_eq(resource.state.active, true)
+	assert_eq(resource.state.children.size(), 2)
+	assert_eq(resource.state.children[0].children[0].name, "a1")
+	assert_eq(resource.state.children[0].children[0].active, true)
+	assert_eq(resource.state.children[0].children[2].name, "h")
+	assert_eq(resource.state.children[0].children[2].active, false)
 
+	# when i send a transition to exit a, then a should be inactive and b should be active
+	# there should also be a record of a1 as the last active state in the history state
 	send_event("exit_a")
-	# b is now active and the history state should have a record of a1 as the last active state
-	expected_save_dict["states"]["children"][0]["active"] = false # a is now inactive
-	expected_save_dict["states"]["children"][0]["children"][0]["active"] = false # a1 is now inactive
-	expected_save_dict["states"]["children"][1]["active"] = true # b is now active
 
-	expected_save_dict["states"]["children"][0]["children"][2]["history"] = Dictionary({ 
-		# the above refers to the node: states.children.a.children.h.history
-		"child_states": {
-			"a": {
-				"child_states": {
-					"a1": {
-						"child_states": {},
-						"history": {},
-						"pending_transition_initial_delay": 0.0,
-						"pending_transition_name": "",
-						"pending_transition_remaining_delay": 0.0
-					},
-					"h": {
-						"child_states": {},
-						"history": {},
-						"pending_transition_initial_delay": 0.0,
-						"pending_transition_name": "",
-						"pending_transition_remaining_delay": 0.0
-					}		
-				},
-				"history": {},
-				"pending_transition_initial_delay": 0.0,
-				"pending_transition_name": "",
-				"pending_transition_remaining_delay": 0.0
-			}
-		},
-		"history": {},
-		"pending_transition_initial_delay": 0.0,
-		"pending_transition_name": "",
-		"pending_transition_remaining_delay": 0.0
-	})
+	resource = _chart.export_to_resource()
 
-	save_dict = _chart.export_to_dict()
-	print("Save Dict:")
-	print(JSON.stringify(save_dict, "\t"))
-	print("Expected Save Dict:")
-	print(JSON.stringify(expected_save_dict, "\t"))
-	assert_eq_deep(save_dict, expected_save_dict)
+	assert_eq(resource.state.children[0].active, false) # a is now inactive
+	assert_eq(resource.state.children[0].children[0].active, false) # a1 is now inactive
+	assert_eq(resource.state.children[0].children[2].name, "h")
+	assert_eq(resource.state.children[0].children[2].active, false)
+	assert_eq(resource.state.children[1].active, true) # b is now active
+
+	# examining the Resource for the Serialized History State:
+	assert_eq(resource.state.children[0].children[2].history.child_states.size(), 1)
+	assert_eq(resource.state.children[0].children[2].history.child_states["a"].child_states.size(), 2)
+	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "a1")
+	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "h")
 
  	# when i send a transition to return to a, then the history state should
 	# remember that a1 was the last active state, so a1 should be active
 	
 	send_event("return_to_a")
+
+	resource = _chart.export_to_resource()
+
+	assert_eq(resource.state.children[0].active, true) # a is now active
+	assert_eq(resource.state.children[0].children[0].active, true) # a1 is now active
+	assert_eq(resource.state.children[0].children[2].name, "h")
+	assert_eq(resource.state.children[0].children[2].active, false)
+	assert_eq(resource.state.children[1].active, false) # b is now inactive
 	
-	assert_active(a1)
-	assert_inactive(b)
-	
-	# when i send a transition to a2, then a2 should be active
+	# the history state history should now be null again.
+	assert_eq(resource.state.children[0].children[2].history, null)
+
+	# when i send a transition to a2 and then out of a
 	send_event("to_a2")
-	
-	assert_active(a2)
-	assert_inactive(a1)
-	
-	# when i send a transition to exit a
 	send_event("exit_a")
+
+	resource = _chart.export_to_resource()
 	
 	# then b should be active
-	assert_active(b)
-	
-	# when i send a transition to return to a, then a2 should be active
-	send_event("return_to_a")
-	
-	assert_active(a2)
-	assert_inactive(a1)
-	assert_inactive(b)
+	assert_eq(resource.state.children[1].active, true) # b is now active
 
-	save_dict = _chart.export_to_dict()
-	print("Save Dict:")
-	print(JSON.stringify(save_dict, "\t"))
-	print("Expected Save Dict:")
-	print(JSON.stringify(expected_save_dict, "\t"))
-	# assert_eq_deep(save_dict, expected_save_dict)	
-
-
+	# history should now have a2 as the last active state
+	assert_eq(resource.state.children[0].children[2].history.child_states.size(), 1)
+	assert_eq(resource.state.children[0].children[2].history.child_states["a"].child_states.size(), 2)
+	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "a2")
+	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "h")
 
 
 # Load the state chart from the Dictionary

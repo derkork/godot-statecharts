@@ -9,7 +9,7 @@ extends Resource
 @export var child_states: Dictionary = {} 
 
 ## The path to the currently pending transition, if any
-@export var pending_transition_name: NodePath 
+@export var pending_transition_name: NodePath
 
 ## The remaining time of the active transition, if any
 @export var pending_transition_remaining_delay: float = 0
@@ -51,4 +51,17 @@ func _export_to_dict() -> Dictionary:
 		our_export_dict.history = history._export_to_dict()
 	else:
 		our_export_dict.history = Dictionary()
+	return our_export_dict
+
+
+func _export_to_resource() -> SerializedSavedState:
+	var our_export_dict := SerializedSavedState.new()
+	if child_states.size() > 0:
+		our_export_dict.child_states = serialize_child_states(child_states)
+	else:
+		our_export_dict.child_states = {}
+	our_export_dict.pending_transition_name = pending_transition_name
+	our_export_dict.pending_transition_remaining_delay = pending_transition_remaining_delay
+	our_export_dict.pending_transition_initial_delay = pending_transition_initial_delay
+	our_export_dict.history = history._export_to_resource() if history != null else null
 	return our_export_dict

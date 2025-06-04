@@ -64,3 +64,12 @@ func _export_to_dict() -> Dictionary:
 	else:
 		our_export_dict.history = Dictionary()
 	return our_export_dict
+
+
+func _export_to_resource() -> SerializedStateChartState:
+	var our_export_dict := super._export_to_resource()
+	if history != null:
+		our_export_dict.history = history._export_to_resource()
+	else:
+		our_export_dict.history = null
+	return our_export_dict

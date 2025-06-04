@@ -323,3 +323,17 @@ func export_to_dict() -> Dictionary:
 	# Export all children node states
 	result.states = _state._export_to_dict()
 	return result
+
+
+func export_to_resource() -> SerializedStateChart:
+	var resource := SerializedStateChart.new()
+	resource.name = name
+	resource.queued_events = _queued_events
+	resource.property_change_pending = _property_change_pending
+	resource.state_change_pending = _state_change_pending
+	resource.locked_down = _locked_down
+	resource.queued_transitions = _queued_transitions
+	resource.transitions_processing_active = _transitions_processing_active
+	resource.state = _state._export_to_resource()
+	print("Exported to SerializedStateChart: ", resource.to_string())
+	return resource

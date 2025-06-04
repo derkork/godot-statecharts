@@ -341,5 +341,16 @@ func _export_to_dict() -> Dictionary:
 	return our_export_dict
 
 
-
-			
+func _export_to_resource() -> SerializedStateChartState:
+	var resource := SerializedStateChartState.new()
+	resource.name = name
+	resource.state_class = self.get_script().get_global_name()
+	resource.active = active
+	resource.pending_transition_name = _pending_transition.name if _pending_transition != null else ""
+	resource.pending_transition_remaining_delay = _pending_transition_remaining_delay
+	resource.pending_transition_initial_delay = _pending_transition_initial_delay
+	resource.children = []
+	for child in get_children():
+		if child is StateChartState:
+			resource.children.append(child._export_to_resource())
+	return resource
