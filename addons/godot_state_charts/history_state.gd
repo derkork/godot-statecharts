@@ -56,20 +56,13 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	return warnings
 		
+
 # Exports the history of this node as part of exporting the full state chart.
-func _export_to_dict() -> Dictionary:
-	var our_export_dict := super._export_to_dict()
-	if history != null:
-		our_export_dict.history = history._export_to_dict()
-	else:
-		our_export_dict.history = Dictionary()
-	return our_export_dict
-
-
+# See state_chart.gd for more info.
 func _export_to_resource() -> SerializedStateChartState:
-	var our_export_dict := super._export_to_resource()
+	var our_export_resource := super._export_to_resource()
 	if history != null:
-		our_export_dict.history = history._export_to_resource()
+		our_export_resource.history = history
 	else:
-		our_export_dict.history = null
-	return our_export_dict
+		our_export_resource.history = null
+	return our_export_resource

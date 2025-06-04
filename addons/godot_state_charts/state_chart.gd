@@ -309,22 +309,9 @@ func _get_configuration_warnings() -> PackedStringArray:
 			warnings.append("StateChart's child must be a State")
 	return warnings
 
-func export_to_dict() -> Dictionary:
-	var result := Dictionary()
-	# Export the state chart's current state
-	result.name = name
-	result.queued_events = _queued_events
-	result.property_change_pending = _property_change_pending
-	result.state_change_pending = _state_change_pending
-	result.locked_down = _locked_down
-	result.queued_transitions = _queued_transitions
-	result.transitions_processing_active = _transitions_processing_active
-
-	# Export all children node states
-	result.states = _state._export_to_dict()
-	return result
-
-
+# Recursively builds a Resource representation of this state chart and it's children.
+# This function is intended to be used for serializing into the desired format (such as a file or JSON) 
+# as needed for game saves or network transmission.
 func export_to_resource() -> SerializedStateChart:
 	var resource := SerializedStateChart.new()
 	resource.name = name
@@ -335,5 +322,4 @@ func export_to_resource() -> SerializedStateChart:
 	resource.queued_transitions = _queued_transitions
 	resource.transitions_processing_active = _transitions_processing_active
 	resource.state = _state._export_to_resource()
-	print("Exported to SerializedStateChart: ", resource.to_string())
 	return resource

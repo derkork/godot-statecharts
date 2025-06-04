@@ -319,28 +319,9 @@ func _has_connections(sgnl:Signal) -> bool:
 	return sgnl.get_connections().size() > 0
 
 
-# Recursively builds a dictionary represenation of this state chart state and it's children.
-# This performs a similar function to _save_state, but will product output for inactive states
-# as well. This function is intended to be used for serializing into the needed format (such 
-# as JSON) as needed for game saves.
-func _export_to_dict() -> Dictionary:
-	var our_export_dict := {}
-
-	our_export_dict.name = name
-	our_export_dict.state_class = self.get_script().get_global_name()
-	our_export_dict.active = active
-	our_export_dict.pending_transition_name = _pending_transition.name if _pending_transition != null else ""
-	our_export_dict.pending_transition_remaining_delay = _pending_transition_remaining_delay
-	our_export_dict.pending_transition_initial_delay = _pending_transition_initial_delay
-	our_export_dict.children = []
-
-	# save all children
-	for child in get_children():
-		if child is StateChartState:
-			our_export_dict.children.append(child._export_to_dict())
-	return our_export_dict
-
-
+# Recursively builds a Resource representation of this state chart state and it's children.
+# This function is intended to be used for serializing into the needed format (such as a file or JSON) 
+# as needed for game saves or network transmission. See state_chart.gd for more info.
 func _export_to_resource() -> SerializedStateChartState:
 	var resource := SerializedStateChartState.new()
 	resource.name = name

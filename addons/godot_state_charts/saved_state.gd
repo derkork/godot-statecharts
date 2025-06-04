@@ -30,38 +30,24 @@ func get_substate_or_null(state:StateChartState) -> SavedState:
 	return child_states.get(state.name)
 
 
-func serialize_child_states(child_states: Dictionary) -> Dictionary:
-	var serialized_child_states := Dictionary()
+func export_child_states(child_states: Dictionary) -> Dictionary:
+	var exported_child_states := Dictionary()
 	for child_state_name in child_states:
-		serialized_child_states[child_state_name] = child_states[child_state_name]._export_to_dict()
-	return serialized_child_states
+		exported_child_states[child_state_name] = child_states[child_state_name]._export_to_resource()
+	return exported_child_states
 
 
-# Export the saved state of this node as part of exporting the full state chart.
-func _export_to_dict() -> Dictionary:
-	var our_export_dict := {}
-	if child_states.size() > 0:
-		our_export_dict.child_states = serialize_child_states(child_states)
-	else:
-		our_export_dict.child_states = Dictionary()
-	our_export_dict.pending_transition_name = String(pending_transition_name) if pending_transition_name != null else ""
-	our_export_dict.pending_transition_remaining_delay = pending_transition_remaining_delay
-	our_export_dict.pending_transition_initial_delay = pending_transition_initial_delay
-	if history != null:
-		our_export_dict.history = history._export_to_dict()
-	else:
-		our_export_dict.history = Dictionary()
-	return our_export_dict
-
-
-func _export_to_resource() -> SerializedSavedState:
-	var our_export_dict := SerializedSavedState.new()
-	if child_states.size() > 0:
-		our_export_dict.child_states = serialize_child_states(child_states)
-	else:
-		our_export_dict.child_states = {}
-	our_export_dict.pending_transition_name = pending_transition_name
-	our_export_dict.pending_transition_remaining_delay = pending_transition_remaining_delay
-	our_export_dict.pending_transition_initial_delay = pending_transition_initial_delay
-	our_export_dict.history = history._export_to_resource() if history != null else null
-	return our_export_dict
+func debug_string() -> String:
+	return """SavedState(
+		child_states: %s
+		pending_transition_name: %s
+		pending_transition_remaining_delay: %s
+		pending_transition_initial_delay: %s
+		history: %s
+	)""" % [
+		JSON.stringify(child_states, "\t"),
+		pending_transition_name,
+		pending_transition_remaining_delay,
+		pending_transition_initial_delay,
+		history.debug_string() if history != null else "null"
+	]
