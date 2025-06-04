@@ -310,10 +310,16 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 func export_to_dict() -> Dictionary:
-	# Iterate over all children and export their current state to a dictionary
-	var states_dict: Dictionary = _state._export_to_dict()
+	var result := Dictionary()
+	# Export the state chart's current state
+	result.name = name
+	result.queued_events = _queued_events
+	result.property_change_pending = _property_change_pending
+	result.state_change_pending = _state_change_pending
+	result.locked_down = _locked_down
+	result.queued_transitions = _queued_transitions
+	result.transitions_processing_active = _transitions_processing_active
 
-	return {
-		"name": name,
-		"states": states_dict
-	}
+	# Export all children node states
+	result.states = _state._export_to_dict()
+	return result
