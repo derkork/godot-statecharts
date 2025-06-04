@@ -13,7 +13,7 @@ extends Resource
 @export var children: Array[SerializedStateChartState] = []
 
 # Only used for history states
-@export var history: SerializedSavedState = null
+@export var history: SavedState = null
 
 
 # This is a helper function to make it easier to debug the serialized state chart state.
