@@ -20,6 +20,12 @@ func test_basic_save():
 
 	var expected_save_dict := Dictionary({
 		"name": "state_chart",
+		"queued_events": Array([]),
+		"property_change_pending": false,
+		"state_change_pending": false,
+		"locked_down": false,
+		"queued_transitions": Array([]),
+		"transitions_processing_active": false,
 		"states": Dictionary({
 			"name": "root",
 			"state_class": "CompoundState",
@@ -79,6 +85,12 @@ func test_save_with_history():
 
 	var expected_save_dict := Dictionary({
 		"name": "state_chart",
+		"queued_events": Array([]),
+		"property_change_pending": false,
+		"state_change_pending": false,
+		"locked_down": false,
+		"queued_transitions": Array([]),
+		"transitions_processing_active": false,
 		"states": Dictionary({
 			"name": "root",
 			"state_class": "CompoundState",
@@ -149,7 +161,8 @@ func test_save_with_history():
 	expected_save_dict["states"]["children"][0]["children"][0]["active"] = false # a1 is now inactive
 	expected_save_dict["states"]["children"][1]["active"] = true # b is now active
 
-	expected_save_dict["states"]["children"][0]["children"][2]["history"] = Dictionary({ # node h.history.child_states
+	expected_save_dict["states"]["children"][0]["children"][2]["history"] = Dictionary({ 
+		# the above refers to the node: states.children.a.children.h.history
 		"child_states": {
 			"a": {
 				"child_states": {
