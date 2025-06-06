@@ -113,22 +113,121 @@ func test_export_to_resource_with_history():
 	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "h")
 
 
-# Load the state chart from the Dictionary
+func test_export_with_queued_event_and_transition():
+	pass
 
-# Verify that the state chart is in the same state as it was before
+func test_basic_load_from_resource():
+	# Set up the initial state chart
+	var root := compound_state("root")
+	var a := atomic_state("a", root)
+	var b := atomic_state("b", root)
+	transition(a, b, "to_b")	
 
-# Verify that the state chart isn't sending alerts
+	await finish_setup()
 
-# Verify that the state chart is sending events
+	_chart.name = "state_chart"
+	
+	# verify starting state
+	assert_active(b)
+	assert_inactive(a)
 
-# Activate the loaded state chart + modify it
-# Verify that the state chart is sending alerts
-# Verify that the state chart is sending messages
+	# export the state chart to a resource
+	var resource:SerializedStateChart = _chart.export_to_resource()	
 
-# Save the state chart to a file
+	# modify the state chart
+	send_event("to_b")
 
-# Load the state chart from the file
+	# ensure that the state chart is in the expected state
+	assert_active(b)
+	assert_inactive(a)
 
-# Verify that the state chart is in the same state as it was before
+	# load the state chart from the resource
+	_chart.load_from_resource(resource)
 
-# Verify that the state chart isn't sending alerts
+	# Verify that the state chart didn't send any sending alerts
+
+	# ensure that the state chart is in the same state as when it was exported
+	assert_active(a)
+	assert_inactive(b)
+
+
+	# Activate the loaded state chart + modify it
+	# Verify that the state chart is sending alerts
+	# Verify that the state chart is sending messages
+
+
+func test_load_from_resource_with_queued_event_and_transition():
+	pass
+
+
+func test_export_and_import_to_file():
+	# Save the state chart to a file
+	# Load the state chart from the file
+	pass
+
+
+func test_unfrozen_state_chart():
+	var root := compound_state("root")
+	var a := atomic_state("a", root)
+	var b := atomic_state("b", root)
+	transition(a, b, "to_b")	
+	await finish_setup()
+
+	_chart.name = "state_chart"
+	watch_signals(_chart)
+	watch_signals(a)
+	watch_signals(b)
+	
+	# verify starting state
+	assert_active(a)
+	assert_inactive(b)
+
+	# ensure that the chart works as expected when not frozen
+	send_event("to_b")
+	assert_active(b)
+	assert_inactive(a)
+	assert_signal_emitted(_chart, "event_received")
+	assert_signal_emitted(a, "state_exited")
+	assert_signal_emitted(a, "event_received")
+	assert_signal_emitted(b, "state_entered")
+	assert_eq(_chart._queued_events.size(), 0)
+	assert_eq(_chart._queued_transitions.size(), 0)
+
+
+func test_frozen_state_chart():
+	# I would have combined the tests for freeze and unfreeze, but the
+	# signal watchers can't be manually reset, but are reset between tests
+	var root := compound_state("root")
+	var a := atomic_state("a", root)
+	var b := atomic_state("b", root)
+	transition(a, b, "to_b")	
+	await finish_setup()
+
+	_chart.name = "state_chart"
+	watch_signals(_chart)
+	watch_signals(a)
+	watch_signals(b)
+	
+	# verify starting state
+	assert_active(a)
+	assert_inactive(b)
+
+	# when processing a transition while frozen
+	# the state chart should not send any alerts
+	# or modify the state chart
+	_chart._frozen = true
+	send_event("to_b")
+
+	# verify that the state chart has not changed
+	assert_active(a)
+	assert_inactive(b)
+	# it should also not enqueue any new events or transitions
+	assert_eq(_chart._queued_events.size(), 0)
+	assert_eq(_chart._queued_transitions.size(), 0)
+	assert_signal_not_emitted(_chart, "event_received")
+	assert_signal_not_emitted(b, "state_exited")
+	assert_signal_not_emitted(a, "event_received")
+	assert_signal_not_emitted(a, "state_entered")
+
+func test_freeze_state_chart_with_queued_event_and_transition():
+	pass

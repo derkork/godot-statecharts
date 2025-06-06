@@ -99,7 +99,6 @@ func _state_init():
 ## initial child state should be activated. If the state entering was not caused by a transition
 ## this can be null.
 func _state_enter(_transition_target:StateChartState):
-	# print("state_enter: " + name)
 	_state_active = true
 	
 	process_mode = Node.PROCESS_MODE_INHERIT
@@ -115,6 +114,10 @@ func _state_enter(_transition_target:StateChartState):
 
 ## Called when the state is exited.
 func _state_exit():
+	if _chart_is_frozen():
+		push_warning("Ignoring state_exit as the state chart is frozen.")
+		return
+
 	# print("state_exit: " + name)
 	# cancel any pending transitions
 	_pending_transition = null
@@ -208,6 +211,10 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
 
 ## Called while the state is active.
 func _process(delta:float) -> void:
+	if _chart_is_frozen():
+		push_warning("Ignoring _process of state ", name, " as the state chart is frozen.")
+		return
+
 	if Engine.is_editor_hint():
 		return
 
@@ -236,23 +243,43 @@ func _handle_transition(_transition:Transition, _source:StateChartState):
 	
 
 func _physics_process(delta:float) -> void:
+	if _chart_is_frozen():
+		push_warning("Ignoring _physics_process of state ", name, " as the state chart is frozen.")
+		return
+
 	if Engine.is_editor_hint():
 		return
 	state_physics_processing.emit(delta)
 
 ## Called when the state chart step function is called.
 func _state_step():
+	if _chart_is_frozen():
+		push_warning("Ignoring _state_step of state ", name, " as the state chart is frozen.")
+		return
+
 	state_stepped.emit()
 
 func _input(event:InputEvent):
+	if _chart_is_frozen():
+		push_warning("Ignoring _input of state ", name, " as the state chart is frozen.")
+		return
+
 	state_input.emit(event)
 
 
 func _unhandled_input(event:InputEvent):
+	if _chart_is_frozen():
+		push_warning("Ignoring _unhandled_input of state ", name, " as the state chart is frozen.")
+		return
+
 	state_unhandled_input.emit(event)
 
 ## Processes all transitions in this state.
 func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName = "") -> bool:
+	if _chart_is_frozen():
+		push_warning("Ignoring _process_transitions of state ", name, " as the state chart is frozen.")
+		return false
+
 	if not active:
 		return false
 
@@ -335,3 +362,9 @@ func _export_to_resource() -> SerializedStateChartState:
 		if child is StateChartState:
 			resource.children.append(child._export_to_resource())
 	return resource
+
+
+func _chart_is_frozen() -> bool:
+	if _chart == null:
+		_chart = _find_chart(get_parent())
+	return _chart._frozen
