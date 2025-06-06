@@ -8,6 +8,7 @@ class_name SerializedStateChart
 extends Resource
 
 @export var name: String = ""
+@export var expression_properties: Dictionary = {}
 @export var queued_events: Array[StringName] = []
 @export var property_change_pending: bool = false
 @export var state_change_pending: bool = false
@@ -19,6 +20,7 @@ extends Resource
 func debug_string() -> String:
 	return """SerializedStateChart(
 		name: %s
+		expression_properties: %s
 		queued_events: %s
 		property_change_pending: %s
 		state_change_pending: %s
@@ -28,6 +30,7 @@ func debug_string() -> String:
 		state: %s
 	)""" % [
 		name,
+		JSON.stringify(expression_properties, "\t"),
 		JSON.stringify(queued_events, "\t"), 
 		property_change_pending,
 		state_change_pending,

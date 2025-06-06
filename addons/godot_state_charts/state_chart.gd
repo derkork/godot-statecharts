@@ -66,6 +66,10 @@ var _state_change_pending:bool = false
 ## be introduced from the outside.
 var _locked_down:bool = false
 
+## Flag indicating if the state chart is frozen.
+## If the state chart is frozen, new events and transitions will be discarded.
+var _frozen:bool = false
+
 var _queued_transitions:Array[Dictionary] = []
 var _transitions_processing_active:bool = false
 
@@ -157,6 +161,10 @@ func _enter_initial_state():
 ## will process the event as soon as possible but there is no guarantee that the 
 ## event will be fully processed when this method returns.
 func send_event(event:StringName) -> void:
+	if _frozen:
+		push_warning("Ignoring event ", event, " as the state chart is frozen.")
+		return
+
 	if not is_node_ready():
 		push_error("State chart is not yet ready. If you call `send_event` in _ready, please call it deferred, e.g. `state_chart.send_event.call_deferred(\"my_event\").")
 		return
@@ -179,6 +187,10 @@ func send_event(event:StringName) -> void:
 ## with the same name. E.g. if you set the property "foo" to 42, you can use the expression "foo == 42" in
 ## an expression guard.
 func set_expression_property(name:StringName, value) -> void:
+	if _frozen:
+		push_warning("Ignoring property change for ", name, " as the state chart is frozen.")
+		return
+
 	if not is_node_ready():
 		push_error("State chart is not yet ready. If you call `set_expression_property` in `_ready`, please call it deferred, e.g. `state_chart.set_expression_property.call_deferred(\"my_property\", 5).")
 		return
@@ -230,7 +242,6 @@ func _run_changes() -> void:
 ## once all currently running transitions have finished. States should call this method
 ## when they want to transition away from themselves. 
 func _run_transition(transition:Transition, source:StateChartState) -> void:
-	
 	# Queue up the transition for running
 	_queued_transitions.append({transition : source})
 	
@@ -245,6 +256,7 @@ func _run_transition(transition:Transition, source:StateChartState) -> void:
 		
 	_run_queued_transitions()
 	
+
 ## Runs all queued transitions until none are left. This also checks for infinite loops in transitions and 
 ## ensures triggering guards on state changes.
 func _run_queued_transitions() -> void:
@@ -271,6 +283,7 @@ func _run_queued_transitions() -> void:
 	if not _locked_down:
 		_run_changes()
 
+
 ## Runs the transition. Used internally by the state chart, do not call this directly.	
 func _do_run_transition(transition:Transition, source:StateChartState):
 	if source.active:
@@ -290,6 +303,10 @@ func _warn_not_active(transition:Transition, source:StateChartState):
 ## Calls the `step` function in all active states. Used for situations where `state_processing` and 
 ## `state_physics_processing` don't make sense (e.g. turn-based games, or games with a fixed timestep).
 func step() -> void:
+	if _frozen:
+		push_error("The state chart is frozen. Ignoring `step`. The chart must be un-frozen before it can be stepped.")
+		return
+
 	if not is_node_ready():
 		push_error("State chart is not yet ready. If you call `step` in `_ready`, please call it deferred, e.g. `state_chart.step.call_deferred()`.")
 		return
@@ -298,6 +315,7 @@ func step() -> void:
 		push_error("State chart has no root state. Ignoring call to `step`.")
 		return
 	_state._state_step()
+
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings:PackedStringArray = []
@@ -309,12 +327,17 @@ func _get_configuration_warnings() -> PackedStringArray:
 			warnings.append("StateChart's child must be a State")
 	return warnings
 
-# Recursively builds a Resource representation of this state chart and it's children.
-# This function is intended to be used for serializing into the desired format (such as a file or JSON) 
-# as needed for game saves or network transmission.
+
+## Recursively builds a Resource representation of this state chart and it's children.
+## This function is intended to be used for serializing into the desired format (such as a file or JSON) 
+## as needed for game saves or network transmission.
+## This method assumes that the StateChart will be constructed and added to the tree prior
+## to loading the resource. As such, it does not store data, such as Transitions, which will be
+## created in the Node Tree.
 func export_to_resource() -> SerializedStateChart:
 	var resource := SerializedStateChart.new()
 	resource.name = name
+	resource.expression_properties = _expression_properties
 	resource.queued_events = _queued_events
 	resource.property_change_pending = _property_change_pending
 	resource.state_change_pending = _state_change_pending
@@ -323,3 +346,30 @@ func export_to_resource() -> SerializedStateChart:
 	resource.transitions_processing_active = _transitions_processing_active
 	resource.state = _state._export_to_resource()
 	return resource
+
+
+## Loads a state chart from a resource. This will replace the current state chart with the one in the resource.
+## Events and transitions will not be processed or queued during the load process.
+## Loading assumes that the state chart states have already been instantiated into your node tree. This will
+## update existing nodes in the tree, but not create new nodes that do not yet exist. Data for non-existent nodes
+## will be discarded. If you want to create new nodes, you need to do so manually from the resource objects prior
+## to calling this method.
+func load_from_resource(resource:SerializedStateChart) -> void:
+	## This property is used to prevent the state chart from generating any new events or transitions.
+	## Any events or transitions will be discarded (NOT queued) while the chart is frozen.
+	## It is intended to be used when loading or manually modifying the state of the state chart
+	## in cases where one wants to ensure that no side effects are triggered while setting the state.
+	_frozen = true
+
+	# load the state chart data
+	_expression_properties = resource.expression_properties
+	_queued_events = resource.queued_events
+	_property_change_pending = resource.property_change_pending
+	_state_change_pending = resource.state_change_pending
+	_locked_down = resource.locked_down
+	_queued_transitions = resource.queued_transitions
+	_transitions_processing_active = resource.transitions_processing_active
+	# _state = resource.state.load_from_resource()
+
+	# unfreeze the state chart to allow processing to resume for new events and transitions
+	_frozen = false
