@@ -9,7 +9,7 @@ extends Resource
 @export var child_states: Dictionary = {} 
 
 ## The path to the currently pending transition, if any
-@export var pending_transition_name: NodePath 
+@export var pending_transition_name: NodePath
 
 ## The remaining time of the active transition, if any
 @export var pending_transition_remaining_delay: float = 0
@@ -29,3 +29,25 @@ func add_substate(state:StateChartState, saved_state:SavedState):
 func get_substate_or_null(state:StateChartState) -> SavedState:
 	return child_states.get(state.name)
 
+
+func export_child_states(child_states: Dictionary) -> Dictionary:
+	var exported_child_states := Dictionary()
+	for child_state_name in child_states:
+		exported_child_states[child_state_name] = child_states[child_state_name]._export_to_resource()
+	return exported_child_states
+
+
+func debug_string() -> String:
+	return """SavedState(
+		child_states: %s
+		pending_transition_name: %s
+		pending_transition_remaining_delay: %s
+		pending_transition_initial_delay: %s
+		history: %s
+	)""" % [
+		JSON.stringify(child_states, "\t"),
+		pending_transition_name,
+		pending_transition_remaining_delay,
+		pending_transition_initial_delay,
+		history.debug_string() if history != null else "null"
+	]
