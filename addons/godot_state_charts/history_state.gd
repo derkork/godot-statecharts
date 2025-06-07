@@ -66,3 +66,8 @@ func _export_to_resource() -> SerializedStateChartState:
 	else:
 		our_export_resource.history = null
 	return our_export_resource
+
+
+func _load_from_resource(resource:SerializedStateChartState):
+	super._load_from_resource(resource)
+	history = resource.history

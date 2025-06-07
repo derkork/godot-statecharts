@@ -4,7 +4,7 @@
 class_name SerializedStateChartState
 extends Resource
 
-@export var name: String = ""
+@export var name: StringName = ""
 @export var state_class: String = ""
 @export var active: bool = false
 @export var pending_transition_name: String = ""

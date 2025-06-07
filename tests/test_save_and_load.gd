@@ -117,7 +117,6 @@ func test_export_with_queued_event_and_transition():
 	pass
 
 func test_basic_load_from_resource():
-	# Set up the initial state chart
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
@@ -126,10 +125,10 @@ func test_basic_load_from_resource():
 	await finish_setup()
 
 	_chart.name = "state_chart"
-	
+
 	# verify starting state
-	assert_active(b)
-	assert_inactive(a)
+	assert_active(a)
+	assert_inactive(b)
 
 	# export the state chart to a resource
 	var resource:SerializedStateChart = _chart.export_to_resource()	
@@ -137,14 +136,16 @@ func test_basic_load_from_resource():
 	# modify the state chart
 	send_event("to_b")
 
+	await wait_frames(1, "waiting for state chart to process the load")
 	# ensure that the state chart is in the expected state
 	assert_active(b)
 	assert_inactive(a)
 
+	await wait_frames(1, "waiting for state chart to process the load")
 	# load the state chart from the resource
 	_chart.load_from_resource(resource)
 
-	# Verify that the state chart didn't send any sending alerts
+	# Verify that the state chart didn't send any signals
 
 	# ensure that the state chart is in the same state as when it was exported
 	assert_active(a)
@@ -156,7 +157,45 @@ func test_basic_load_from_resource():
 	# Verify that the state chart is sending messages
 
 
-func test_load_from_resource_with_queued_event_and_transition():
+func test_load_from_resource_with_pending_transition():
+	var root := compound_state("root")
+	var a := atomic_state("a", root)
+	var b := atomic_state("b", root)
+	transition(a, b, "to_b", "1")
+	await finish_setup()
+
+	# when i trigger the transition
+	send_event("to_b")
+
+	# then the transition should not be taken immediately
+	assert_active(a)
+
+	# export the state chart to a resource
+	var resource:SerializedStateChart = _chart.export_to_resource()	
+
+	# verify that the state chart is in the expected state
+	await wait_seconds(1.1)
+	assert_active(a)
+
+	# after 1.1 seconds the transition should be taken
+	assert_active(b)
+	assert_inactive(a)
+
+	# load the state chart from the resource
+	_chart.load_from_resource(resource)
+
+	# verify that the state chart has been reset
+	assert_active(a)
+	assert_inactive(b)
+
+	# Verify that the count down still works
+	await wait_seconds(1.1)
+
+	assert_active(b)
+	assert_inactive(a)
+
+
+func test_load_from_resource_with_queued_event():
 	pass
 
 
