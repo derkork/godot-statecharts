@@ -114,10 +114,6 @@ func _state_enter(_transition_target:StateChartState):
 
 ## Called when the state is exited.
 func _state_exit():
-	if _chart_is_frozen():
-		push_warning("Ignoring state_exit as the state chart is frozen.")
-		return
-
 	# print("state_exit: " + name)
 	# cancel any pending transitions
 	_pending_transition = null
@@ -276,10 +272,6 @@ func _unhandled_input(event:InputEvent):
 
 ## Processes all transitions in this state.
 func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName = "") -> bool:
-	if _chart_is_frozen():
-		push_warning("Ignoring _process_transitions of state ", name, " as the state chart is frozen.")
-		return false
-
 	if not active:
 		return false
 
@@ -362,6 +354,69 @@ func _export_to_resource() -> SerializedStateChartState:
 		if child is StateChartState:
 			resource.children.append(child._export_to_resource())
 	return resource
+
+func _load_from_resource(resource:SerializedStateChartState):
+	# print("name: %s" % name)
+	# print("load_from_resource: %s" % resource.debug_string())
+	if resource.name != name:
+		push_error("State name mismatch: " + name + " != " + resource.name)
+		return
+
+	if self.get_script().get_global_name() != resource.state_class:
+		push_error("State class mismatch: " + self.get_script().get_global_name() + " != " + resource.state_class)
+		return
+
+	# set both the internal and external active fields (not sure why they both exist?)
+	_state_active = resource.active
+	active = resource.active
+
+	if resource.pending_transition_name != "":
+		# if we have a pending transition, we need to find and restore it. If one is expected but not found
+		# throw an error.
+		var pending_transition: Transition = get_node_or_null(resource.pending_transition_name)
+		if pending_transition == null:
+			push_error("Pending transition " + resource.pending_transition_name + " not found")
+			return
+		_pending_transition = pending_transition
+	_pending_transition_remaining_delay = 0
+	_pending_transition_initial_delay = 0
+
+	var child_nodes : Dictionary = {}
+	for child in self.get_children():
+		child_nodes[child.name] = child
+
+	_verify_children(resource, child_nodes)
+
+	print("Load data for children:")
+	for child_resource in resource.children:
+		var child_node: StateChartState = child_nodes[child_resource.name]
+		print("child_node: %s" % child_node)
+		if child_node is StateChartState:
+			child_node._load_from_resource(child_resource)
+
+
+## Verifies that the children in the resource matches the children in the state.
+## This can happen if the game has been updated and the state chart has been changed.
+## Warn if this is the case, but don't stop the load process.
+func _verify_children(resource:SerializedStateChartState, child_nodes:Dictionary):
+	var state_chart_child_node_count := 0
+
+	for node_name in child_nodes.keys():
+		if child_nodes[node_name] is StateChartState:
+			state_chart_child_node_count += 1
+
+	if resource.children.size() != state_chart_child_node_count:
+		push_warning("State " + name + " has " + str(state_chart_child_node_count) + " StateChartState children but " + str(resource.children.size()) + " children in the loaded resource")
+
+	for child_resource in resource.children:
+		# verify that the child exists in the state chart child nodes
+		if not child_nodes.has(child_resource.name):
+			push_warning("State " + name + " has no child matching the name " + child_resource.name + " from the loaded resource")
+
+		# This should work, but it doesn't. I can't figure out why. It keeps returning null
+		# var child_node: StateChartState = self.find_child(child_resource.name)
+		# if child_node == null:
+		# 	push_warning("State " + name + " has no child matching the name " + child_resource.name + " from the loaded resource")
 
 
 func _chart_is_frozen() -> bool:
