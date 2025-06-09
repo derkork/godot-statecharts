@@ -69,10 +69,6 @@ func _state_init():
 			child_as_state.state_exited.connect(func(): child_state_exited.emit())
 
 func _state_enter(transition_target:StateChartState):
-	if _chart_is_frozen():
-		push_warning("Ignoring state_enter on compound state '" + name + "' as the state chart is frozen.")
-		return
-
 	super._state_enter(transition_target)
 
 	# activate the initial state _unless_ one of these are true 
@@ -126,10 +122,6 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1):
 				break
 
 func _state_exit():
-	if _chart_is_frozen():
-		push_warning("Ignoring state_exit on compound state '" + name + "' as the state chart is frozen.")
-		return
-
 	# if we have any history states, we need to save the current active state
 	if _history_states.size() > 0:
 		var saved_state = SavedState.new()
@@ -153,10 +145,6 @@ func _state_exit():
 
 
 func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName = "") -> bool:
-	if _chart_is_frozen():
-		push_warning("Ignoring _process_transitions on compound state '" + name + "' as the state chart is frozen.")
-		return false
-
 	if not active:
 		return false
 
@@ -174,10 +162,6 @@ func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName 
 
 
 func _handle_transition(transition:Transition, source:StateChartState):
-	if _chart_is_frozen():
-		push_warning("Ignoring _handle_transition on compound state '" + name + "' as the state chart is frozen.")
-		return
-
 	# print("CompoundState._handle_transition: " + name + " from " + source.name + " to " + str(transition.to))
 	# resolve the target state
 	var target = transition.resolve_target()
@@ -260,7 +244,18 @@ func _restore_history_state(target:HistoryState):
 	else:
 		push_error("The default state '" + str(target.default_state) + "' of the history state '" + target.name + "' cannot be found.")
 		return
-			
+
+
+func _load_from_resource(resource:SerializedStateChartState) -> void:
+	super._load_from_resource(resource)
+
+	# ensure _active_state is set to the currently active child
+	if active:
+		# find the currently active child
+		for child in get_children():
+			if child is StateChartState and child.active:
+				_active_state = child
+				break
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = super._get_configuration_warnings()

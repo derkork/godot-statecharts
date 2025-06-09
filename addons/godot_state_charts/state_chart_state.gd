@@ -219,7 +219,6 @@ func _process(delta:float) -> void:
 	# check if there is a pending transition
 	if _pending_transition != null:
 		_pending_transition_remaining_delay -= delta
-		
 		# Notify interested parties that currently a transition is pending.
 		transition_pending.emit(_pending_transition.delay_seconds, max(0, _pending_transition_remaining_delay))
 		
@@ -355,9 +354,7 @@ func _export_to_resource() -> SerializedStateChartState:
 			resource.children.append(child._export_to_resource())
 	return resource
 
-func _load_from_resource(resource:SerializedStateChartState):
-	# print("name: %s" % name)
-	# print("load_from_resource: %s" % resource.debug_string())
+func _load_from_resource(resource:SerializedStateChartState) -> void:
 	if resource.name != name:
 		push_error("State name mismatch: " + name + " != " + resource.name)
 		return
@@ -366,9 +363,17 @@ func _load_from_resource(resource:SerializedStateChartState):
 		push_error("State class mismatch: " + self.get_script().get_global_name() + " != " + resource.state_class)
 		return
 
-	# set both the internal and external active fields (not sure why they both exist?)
-	_state_active = resource.active
-	active = resource.active
+	if resource.active == true:
+		active = true
+		_state_active = true
+		process_mode = Node.PROCESS_MODE_INHERIT
+		# enable processing if someone listens to our signal
+		_toggle_processing(true)
+	else:
+		active = false
+		_state_active = false
+		process_mode = Node.PROCESS_MODE_DISABLED
+		_toggle_processing(false)
 
 	if resource.pending_transition_name != "":
 		# if we have a pending transition, we need to find and restore it. If one is expected but not found
@@ -378,8 +383,9 @@ func _load_from_resource(resource:SerializedStateChartState):
 			push_error("Pending transition " + resource.pending_transition_name + " not found")
 			return
 		_pending_transition = pending_transition
-	_pending_transition_remaining_delay = 0
-	_pending_transition_initial_delay = 0
+	_pending_transition_remaining_delay = resource.pending_transition_remaining_delay
+	_pending_transition_initial_delay = resource.pending_transition_initial_delay
+	set_process(true)
 
 	var child_nodes : Dictionary = {}
 	for child in self.get_children():
@@ -387,10 +393,8 @@ func _load_from_resource(resource:SerializedStateChartState):
 
 	_verify_children(resource, child_nodes)
 
-	print("Load data for children:")
 	for child_resource in resource.children:
 		var child_node: StateChartState = child_nodes[child_resource.name]
-		print("child_node: %s" % child_node)
 		if child_node is StateChartState:
 			child_node._load_from_resource(child_resource)
 
@@ -398,7 +402,7 @@ func _load_from_resource(resource:SerializedStateChartState):
 ## Verifies that the children in the resource matches the children in the state.
 ## This can happen if the game has been updated and the state chart has been changed.
 ## Warn if this is the case, but don't stop the load process.
-func _verify_children(resource:SerializedStateChartState, child_nodes:Dictionary):
+func _verify_children(resource:SerializedStateChartState, child_nodes:Dictionary) -> void:
 	var state_chart_child_node_count := 0
 
 	for node_name in child_nodes.keys():
