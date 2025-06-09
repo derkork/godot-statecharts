@@ -120,64 +120,135 @@ func test_basic_load_from_resource():
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
-	transition(a, b, "to_b")	
+	var t := transition(a, b, "to_b")	
+
+	watch_signals(a)
+	watch_signals(b)
 
 	await finish_setup()
 
-	_chart.name = "state_chart"
+	assert_true(a.is_processing())
+	assert_true(a.is_physics_processing())
 
-	# verify starting state
+	########################################################################
+	#### Part 1: verify starting state
+	########################################################################
 	assert_active(a)
 	assert_inactive(b)
 
-	# export the state chart to a resource
+	# verify that the state chart is processing as expected
+	await wait_frames(10, "Run for a little while.")
+	
+	assert_signal_emitted(a, "state_processing")
+	assert_signal_emitted(a, "state_physics_processing")
+
+	assert_signal_not_emitted(b, "state_processing")
+	assert_signal_not_emitted(b, "state_physics_processing")
+
+	########################################################################
+	#### Part 2: export the state chart to a resource
+	########################################################################
 	var resource:SerializedStateChart = _chart.export_to_resource()	
+
+	########################################################################
+	#### Part 3: modify the state chart post-save
+	########################################################################
+	clear_signal_watcher()
+	watch_signals(a)
+	watch_signals(b)
 
 	# modify the state chart
 	send_event("to_b")
 
-	await wait_frames(1, "waiting for state chart to process the load")
 	# ensure that the state chart is in the expected state
 	assert_active(b)
 	assert_inactive(a)
 
-	await wait_frames(1, "waiting for state chart to process the load")
-	# load the state chart from the resource
-	_chart.load_from_resource(resource)
+	await wait_frames(10, "Run for a little while.")
+		
+	assert_true(b.is_processing())
+	assert_true(b.is_physics_processing())
+	
+	assert_signal_emitted(b, "state_processing")
+	assert_signal_emitted(b, "state_physics_processing")
 
-	# Verify that the state chart didn't send any signals
+	assert_signal_not_emitted(a, "state_processing")
+	assert_signal_not_emitted(a, "state_physics_processing")
+
+	########################################################################
+	#### Part 4: load the state chart from the resource and verify that it's in
+	#### the same state as when it was exported.
+	########################################################################
+	clear_signal_watcher()
+	watch_signals(a)
+	watch_signals(b)
+
+	_chart.load_from_resource(resource)
 
 	# ensure that the state chart is in the same state as when it was exported
 	assert_active(a)
 	assert_inactive(b)
 
+	# Verify that the state chart didn't send any signals
+	assert_signal_not_emitted(a, "state_processing")
+	assert_signal_not_emitted(a, "state_physics_processing")
+	assert_signal_not_emitted(b, "state_processing")
+	assert_signal_not_emitted(b, "state_physics_processing")
+	assert_signal_not_emitted(a, "state_entered")
+	assert_signal_not_emitted(a, "state_exited")
+	assert_signal_not_emitted(b, "state_entered")
+	assert_signal_not_emitted(b, "state_exited")
 
-	# Activate the loaded state chart + modify it
-	# Verify that the state chart is sending alerts
-	# Verify that the state chart is sending messages
+	# Ensure that the state chart has resumed processing
+	await wait_frames(10, "Run for a little while.")
+		
+	assert_true(a.is_processing())
+	assert_true(a.is_physics_processing())
+	
+	assert_signal_emitted(a, "state_processing")
+	assert_signal_emitted(a, "state_physics_processing")
+
+	assert_signal_not_emitted(b, "state_processing")
+	assert_signal_not_emitted(b, "state_physics_processing")
+
+	########################################################################
+	#### Part 5: Make sure signal processing and state changing work as expected
+	########################################################################
+	clear_signal_watcher()
+	watch_signals(a)
+	watch_signals(b)
+	watch_signals(t)
+	send_event("to_b")
+
+	assert_signal_emitted(t, "taken")
+
+	assert_active(b)
+	assert_inactive(a)
+
+	assert_signal_emitted(a, "state_exited")
+	assert_signal_emitted(b, "state_entered")
 
 
 func test_load_from_resource_with_pending_transition():
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
-	transition(a, b, "to_b", "1")
+	transition(a, b, "to_b", "0.5")
 	await finish_setup()
 
 	# when i trigger the transition
 	send_event("to_b")
 
 	# then the transition should not be taken immediately
+	await wait_seconds(0.2)
 	assert_active(a)
 
 	# export the state chart to a resource
 	var resource:SerializedStateChart = _chart.export_to_resource()	
 
 	# verify that the state chart is in the expected state
-	await wait_seconds(1.1)
-	assert_active(a)
-
-	# after 1.1 seconds the transition should be taken
+	# after an additional 0.5 seconds the transition should be taken
+	await wait_seconds(0.5)
 	assert_active(b)
 	assert_inactive(a)
 
@@ -189,8 +260,11 @@ func test_load_from_resource_with_pending_transition():
 	assert_inactive(b)
 
 	# Verify that the count down still works
-	await wait_seconds(1.1)
+	await wait_seconds(0.2) # 0.2 pre-save + 0.2 post-load = 0.4 total delay
+	assert_active(a)
+	assert_inactive(b)
 
+	await wait_seconds(0.2) # 0.2 post-load + 0.4 post-load = 0.6 total delay
 	assert_active(b)
 	assert_inactive(a)
 
@@ -205,7 +279,7 @@ func test_export_and_import_to_file():
 	pass
 
 
-func test_unfrozen_state_chart():
+func test_frozen_state_chart():
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
@@ -232,41 +306,33 @@ func test_unfrozen_state_chart():
 	assert_eq(_chart._queued_events.size(), 0)
 	assert_eq(_chart._queued_transitions.size(), 0)
 
-
-func test_frozen_state_chart():
-	# I would have combined the tests for freeze and unfreeze, but the
-	# signal watchers can't be manually reset, but are reset between tests
-	var root := compound_state("root")
-	var a := atomic_state("a", root)
-	var b := atomic_state("b", root)
-	transition(a, b, "to_b")	
-	await finish_setup()
-
-	_chart.name = "state_chart"
+	clear_signal_watcher()
 	watch_signals(_chart)
 	watch_signals(a)
 	watch_signals(b)
 	
 	# verify starting state
-	assert_active(a)
-	assert_inactive(b)
+	assert_active(b)
+	assert_inactive(a)
 
 	# when processing a transition while frozen
 	# the state chart should not send any alerts
 	# or modify the state chart
 	_chart._frozen = true
-	send_event("to_b")
 
 	# verify that the state chart has not changed
-	assert_active(a)
-	assert_inactive(b)
 	# it should also not enqueue any new events or transitions
-	assert_eq(_chart._queued_events.size(), 0)
-	assert_eq(_chart._queued_transitions.size(), 0)
+	send_event("to_b")
+	assert_active(b)
+	assert_inactive(a)
 	assert_signal_not_emitted(_chart, "event_received")
 	assert_signal_not_emitted(b, "state_exited")
 	assert_signal_not_emitted(a, "event_received")
 	assert_signal_not_emitted(a, "state_entered")
+	assert_signal_not_emitted(b, "event_received")
+	assert_signal_not_emitted(b, "state_entered")
+	assert_eq(_chart._queued_events.size(), 0)
+	assert_eq(_chart._queued_transitions.size(), 0)
 
 func test_freeze_state_chart_with_queued_event_and_transition():
 	pass

@@ -61,3 +61,23 @@ func _get_configuration_warnings():
 		warnings.append("The animation player path is invalid.")
 
 	return warnings
+
+
+func _load_from_resource(resource:SerializedStateChartState) -> void:
+	# TBD: I'm not sure what the best way to handle this is. We will know if the node is active, but not
+	# how long it has been active for. So if it's intended as a one-shot animation, we may trigger it
+	# unecessarily. Also, if the animation timing is important, we may not want to trigger it again at
+	# the moment of loading.
+	super._load_from_resource(resource)
+
+	if not is_instance_valid(_animation_player):
+		return
+
+	var target_animation = animation_name
+	if target_animation == "":
+		target_animation = get_name()
+		
+	if _animation_player.current_animation == target_animation and _animation_player.is_playing():
+		return
+
+	_animation_player.play(target_animation, custom_blend, custom_speed, from_end)	

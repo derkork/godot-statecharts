@@ -260,6 +260,7 @@ func _run_transition(transition:Transition, source:StateChartState) -> void:
 ## Runs all queued transitions until none are left. This also checks for infinite loops in transitions and 
 ## ensures triggering guards on state changes.
 func _run_queued_transitions() -> void:
+
 	_transitions_processing_active = true
 
 	var execution_count := 1
@@ -355,7 +356,7 @@ func export_to_resource() -> SerializedStateChart:
 ## will be discarded. If you want to create new nodes, you need to do so manually from the resource objects prior
 ## to calling this method.
 func load_from_resource(resource:SerializedStateChart) -> void:
-	print("load_from_resource: %s" % resource.debug_string())
+	# print("load_from_resource: %s" % resource.debug_string())
 	## This property is used to prevent the state chart from generating any new events or transitions.
 	## Any events or transitions will be discarded (NOT queued) while the chart is frozen.
 	## It is intended to be used when loading or manually modifying the state of the state chart
@@ -370,13 +371,14 @@ func load_from_resource(resource:SerializedStateChart) -> void:
 	_locked_down = resource.locked_down
 	_queued_transitions = resource.queued_transitions
 	_transitions_processing_active = resource.transitions_processing_active
-	
-	var state_node: StateChartState = self.get_child(0)
 
-	if state_node.name != resource.state.name:
-		push_warning("State node name mismatch: %s != %s. Proceeding with load, but this may cause issues." % [state_node.name, resource.state.name])
+	if _state.name != resource.state.name:
+		push_warning("State node name mismatch: %s != %s. Proceeding with load, but this may cause issues." % [_state.name, resource.state.name])
 
-	_state = state_node._load_from_resource(resource.state)
+	_state._load_from_resource(resource.state)
 
 	# unfreeze the state chart to allow processing to resume for new events and transitions
 	_frozen = false
+
+	_run_queued_transitions()
+	_run_changes()
