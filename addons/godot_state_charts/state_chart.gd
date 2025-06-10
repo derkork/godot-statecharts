@@ -357,6 +357,11 @@ func export_to_resource() -> SerializedStateChart:
 ## to calling this method.
 func load_from_resource(resource:SerializedStateChart) -> void:
 	# print("load_from_resource: %s" % resource.debug_string())
+
+	if resource == null:
+		push_error("Resource is null. Ignoring call to `load_from_resource`.")
+		return
+
 	## This property is used to prevent the state chart from generating any new events or transitions.
 	## Any events or transitions will be discarded (NOT queued) while the chart is frozen.
 	## It is intended to be used when loading or manually modifying the state of the state chart
