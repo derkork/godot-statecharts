@@ -290,6 +290,7 @@
     <Content Include="docs\_docs\usage\02_nodes.md" />
     <Content Include="docs\_docs\usage\05_stepping_mode.md" />
     <Content Include="docs\_docs\usage\06_tips_and_tricks.md" />
+    <Content Include="docs\_docs\usage\07_saving_and_loading.md" />
     <Content Include="docs\_includes\alert.html" />
     <Content Include="docs\_includes\doc.html" />
     <Content Include="docs\_includes\editable.html" />
