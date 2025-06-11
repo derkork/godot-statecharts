@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## Unreleased
+### Fixed
+- A few compiler warnings were resolved for the C# implementation. A big thanks goes to [Walter Geisler](https://github.com/Soren025) for providing a [pull request](https://github.com/derkork/godot-statecharts/pull/185) for this ([#184](https://github.com/derkork/godot-statecharts/issues/184))!
+
+
 ## [0.21.5] - 2025-04-05
 ### Improved
 - The addon now ships with UID files for Godot 4.4 ([#178](https://github.com/derkork/godot-statecharts/issues/178)).
