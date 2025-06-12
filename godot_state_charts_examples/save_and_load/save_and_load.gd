@@ -8,7 +8,7 @@ extends Node2D
 func save_state() -> void:
 	var path = "user://save_resource.tres"
 	var save_resource: SaveResource = SaveResource.new()
-	save_resource.state_chart = chart.export_to_resource()
+	save_resource.state_chart = StateChartSerializer.serialize(chart)
 	for box in box_nodes:
 		save_resource.boxes.append(box.save_state())
 	ResourceSaver.save(save_resource, path)
@@ -16,7 +16,7 @@ func save_state() -> void:
 func load_state() -> void:
 	var path = "user://save_resource.tres"
 	var save_resource: SaveResource = ResourceLoader.load(path, "SaveResource")
-	chart.load_from_resource(save_resource.state_chart)
+	StateChartSerializer.deserialize(save_resource.state_chart, chart)
 
 	var box_node_hash : Dictionary = {}
 	for node in box_nodes:

@@ -43,7 +43,6 @@ func test_initial_state_bypass_on_deep_transition_parallel_states():
 	var disabled := atomic_state("disabled", operation)
 	var enabled := compound_state("enabled", operation)
 	var mouse := atomic_state("mouse", enabled)
-	var controller := atomic_state("controller", enabled)
 
 	var holder:Array[bool] = [false]
 	

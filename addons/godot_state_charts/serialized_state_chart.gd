@@ -7,6 +7,9 @@
 class_name SerializedStateChart
 extends Resource
 
+## This is just in case we change the way this is serialized down the road,
+## so we have a way of migrating.
+@export var version:int = 1
 @export var name: String = ""
 @export var expression_properties: Dictionary = {}
 @export var queued_events: Array[StringName] = []
