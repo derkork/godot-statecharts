@@ -5,7 +5,7 @@ class_name SerializedStateChartState
 extends Resource
 
 @export var name: StringName = ""
-@export var state_class: String = ""
+@export var state_type: int = -1
 @export var active: bool = false
 @export var pending_transition_name: String = ""
 @export var pending_transition_remaining_delay: float = 0.0
@@ -29,7 +29,7 @@ func debug_string() -> String:
 		history: %s
 	)""" % [
 		name,
-		state_class,
+		state_type,
 		active,
 		pending_transition_name,
 		pending_transition_remaining_delay,

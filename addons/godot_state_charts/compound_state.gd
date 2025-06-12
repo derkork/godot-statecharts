@@ -90,10 +90,6 @@ func _state_enter(transition_target:StateChartState):
 			push_error("No initial state set for state '" + name + "'.")
 
 func _state_step():
-	if _chart_is_frozen():
-		push_warning("Ignoring state_step on compound state '" + name + "' as the state chart is frozen.")
-		return
-
 	super._state_step()
 	if _active_state != null:
 		_active_state._state_step()
@@ -245,17 +241,6 @@ func _restore_history_state(target:HistoryState):
 		push_error("The default state '" + str(target.default_state) + "' of the history state '" + target.name + "' cannot be found.")
 		return
 
-
-func _load_from_resource(resource:SerializedStateChartState) -> void:
-	super._load_from_resource(resource)
-
-	# ensure _active_state is set to the currently active child
-	if active:
-		# find the currently active child
-		for child in get_children():
-			if child is StateChartState and child.active:
-				_active_state = child
-				break
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var warnings = super._get_configuration_warnings()

@@ -162,7 +162,8 @@ func _enter_initial_state():
 ## event will be fully processed when this method returns.
 func send_event(event:StringName) -> void:
 	if _frozen:
-		push_warning("Ignoring event ", event, " as the state chart is frozen.")
+		push_error("The state chart is currently frozen. Cannot set send events.")
+
 		return
 
 	if not is_node_ready():
@@ -188,7 +189,7 @@ func send_event(event:StringName) -> void:
 ## an expression guard.
 func set_expression_property(name:StringName, value) -> void:
 	if _frozen:
-		push_warning("Ignoring property change for ", name, " as the state chart is frozen.")
+		push_error("The state chart is currently frozen. Cannot set expression properties.")
 		return
 
 	if not is_node_ready():
@@ -305,7 +306,7 @@ func _warn_not_active(transition:Transition, source:StateChartState):
 ## `state_physics_processing` don't make sense (e.g. turn-based games, or games with a fixed timestep).
 func step() -> void:
 	if _frozen:
-		push_error("The state chart is frozen. Ignoring `step`. The chart must be un-frozen before it can be stepped.")
+		push_error("The state chart is currently frozen. Cannot step.")
 		return
 
 	if not is_node_ready():
@@ -329,61 +330,25 @@ func _get_configuration_warnings() -> PackedStringArray:
 	return warnings
 
 
-## Recursively builds a Resource representation of this state chart and it's children.
-## This function is intended to be used for serializing into the desired format (such as a file or JSON) 
-## as needed for game saves or network transmission.
-## This method assumes that the StateChart will be constructed and added to the tree prior
-## to loading the resource. As such, it does not store data, such as Transitions, which will be
-## created in the Node Tree.
-func export_to_resource() -> SerializedStateChart:
-	var resource := SerializedStateChart.new()
-	resource.name = name
-	resource.expression_properties = _expression_properties
-	resource.queued_events = _queued_events
-	resource.property_change_pending = _property_change_pending
-	resource.state_change_pending = _state_change_pending
-	resource.locked_down = _locked_down
-	resource.queued_transitions = _queued_transitions
-	resource.transitions_processing_active = _transitions_processing_active
-	resource.state = _state._export_to_resource()
-	return resource
-
-
-## Loads a state chart from a resource. This will replace the current state chart with the one in the resource.
-## Events and transitions will not be processed or queued during the load process.
-## Loading assumes that the state chart states have already been instantiated into your node tree. This will
-## update existing nodes in the tree, but not create new nodes that do not yet exist. Data for non-existent nodes
-## will be discarded. If you want to create new nodes, you need to do so manually from the resource objects prior
-## to calling this method.
-func load_from_resource(resource:SerializedStateChart) -> void:
-	# print("load_from_resource: %s" % resource.debug_string())
-
-	if resource == null:
-		push_error("Resource is null. Ignoring call to `load_from_resource`.")
-		return
-
-	## This property is used to prevent the state chart from generating any new events or transitions.
-	## Any events or transitions will be discarded (NOT queued) while the chart is frozen.
-	## It is intended to be used when loading or manually modifying the state of the state chart
-	## in cases where one wants to ensure that no side effects are triggered while setting the state.
+## Freezes the state chart and all states. While frozen, no changes can be made to a state chart.
+func freeze():
 	_frozen = true
+	var to_freeze:Array[StateChartState] = [_state]
+	while not to_freeze.is_empty():
+		var next := to_freeze.pop_back()
+		next._toggle_processing(true)
+		for child in next.get_children():
+			if child is StateChartState:
+				to_freeze.append(child)
 
-	# load the state chart data
-	_expression_properties = resource.expression_properties
-	_queued_events = resource.queued_events
-	_property_change_pending = resource.property_change_pending
-	_state_change_pending = resource.state_change_pending
-	_locked_down = resource.locked_down
-	_queued_transitions = resource.queued_transitions
-	_transitions_processing_active = resource.transitions_processing_active
+## Thaws the state chart and all states. After being thawed, changes can again be made to the state chart.
+func thaw():
+	var to_thaw:Array[StateChartState] = [_state]
+	while not to_thaw.is_empty():
+		var next := to_thaw.pop_back()
+		next._toggle_processing(false)
+		for child in next.get_children():
+			if child is StateChartState:
+				to_thaw.append(child)
 
-	if _state.name != resource.state.name:
-		push_warning("State node name mismatch: %s != %s. Proceeding with load, but this may cause issues." % [_state.name, resource.state.name])
-
-	_state._load_from_resource(resource.state)
-
-	# unfreeze the state chart to allow processing to resume for new events and transitions
 	_frozen = false
-
-	_run_queued_transitions()
-	_run_changes()

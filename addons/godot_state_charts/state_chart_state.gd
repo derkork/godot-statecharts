@@ -50,7 +50,6 @@ var _pending_transition_initial_delay:float = 0
 ## Transitions in this state that react on events. 
 var _transitions:Array[Transition] = []
 
-
 ## The state chart that owns this state.
 var _chart:StateChart
 
@@ -60,7 +59,7 @@ func _ready() -> void:
 		return
 		
 	_chart = _find_chart(get_parent())
-		
+
 
 ## Finds the owning state chart by moving upwards.
 func _find_chart(parent:Node) -> StateChart:
@@ -68,6 +67,7 @@ func _find_chart(parent:Node) -> StateChart:
 		return parent
 	
 	return _find_chart(parent.get_parent())	
+
 
 ## Runs a transition either immediately or delayed depending on the 
 ## transition settings.
@@ -83,9 +83,8 @@ func _run_transition(transition:Transition, immediately:bool = false):
 ## Called when the state chart is built.
 func _state_init():
 	# disable state by default
-	process_mode = Node.PROCESS_MODE_DISABLED
 	_state_active = false
-	_toggle_processing(false)
+	_toggle_processing()
 	
 	# load transitions 
 	_transitions.clear()
@@ -101,10 +100,8 @@ func _state_init():
 func _state_enter(_transition_target:StateChartState):
 	_state_active = true
 	
-	process_mode = Node.PROCESS_MODE_INHERIT
-
 	# enable processing if someone listens to our signal
-	_toggle_processing(true)
+	_toggle_processing()
 	
 	# emit the signal
 	state_entered.emit()
@@ -121,8 +118,7 @@ func _state_exit():
 	_pending_transition_initial_delay = 0
 	_state_active = false
 	# stop processing
-	process_mode = Node.PROCESS_MODE_DISABLED
-	_toggle_processing(false)
+	_toggle_processing()
 	
 	# emit the signal
 	state_exited.emit()
@@ -207,10 +203,6 @@ func _state_restore(saved_state:SavedState, child_levels:int = -1) -> void:
 
 ## Called while the state is active.
 func _process(delta:float) -> void:
-	if _chart_is_frozen():
-		push_warning("Ignoring _process of state ", name, " as the state chart is frozen.")
-		return
-
 	if Engine.is_editor_hint():
 		return
 
@@ -238,35 +230,19 @@ func _handle_transition(_transition:Transition, _source:StateChartState):
 	
 
 func _physics_process(delta:float) -> void:
-	if _chart_is_frozen():
-		push_warning("Ignoring _physics_process of state ", name, " as the state chart is frozen.")
-		return
-
 	if Engine.is_editor_hint():
 		return
 	state_physics_processing.emit(delta)
 
 ## Called when the state chart step function is called.
 func _state_step():
-	if _chart_is_frozen():
-		push_warning("Ignoring _state_step of state ", name, " as the state chart is frozen.")
-		return
-
 	state_stepped.emit()
 
 func _input(event:InputEvent):
-	if _chart_is_frozen():
-		push_warning("Ignoring _input of state ", name, " as the state chart is frozen.")
-		return
-
 	state_input.emit(event)
 
 
 func _unhandled_input(event:InputEvent):
-	if _chart_is_frozen():
-		push_warning("Ignoring _unhandled_input of state ", name, " as the state chart is frozen.")
-		return
-
 	state_unhandled_input.emit(event)
 
 ## Processes all transitions in this state.
@@ -306,7 +282,7 @@ func _queue_transition(transition:Transition, initial_delay:float):
 	_pending_transition_remaining_delay = initial_delay
 	
 	# enable processing when we have a transition
-	set_process(true)
+	_toggle_processing()
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -325,105 +301,31 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	return result		
 
+## Toggles processing of this node depending on the node's internal state.
+## The function determines if the internal state and existing signal connections
+## warrant running state processing at this time. This is to avoid running
+## scripts that don't necessarily need to run, improving performance.
+func _toggle_processing(freeze:bool = false):
+	# Whether processing should be enabled in general. We only process
+	# for active states in the first place.
+	var enable_processing = not freeze and _state_active
 
-func _toggle_processing(active:bool):
-	set_process(active and _has_connections(state_processing))
-	set_physics_process(active and _has_connections(state_physics_processing))
-	set_process_input(active and _has_connections(state_input))
-	set_process_unhandled_input(active and _has_connections(state_unhandled_input))
+	if enable_processing:
+		process_mode = PROCESS_MODE_INHERIT
+	else:
+		process_mode = PROCESS_MODE_DISABLED
+
+	# Now depending on who is listening for signals, we don't necessarily need all the
+	# processing active, so this is an optimization to avoid having to burn CPU cycles
+	# for no good reason.
+
+	# for processing we also check if a transition is pending, as in this case we need to
+	# keep processing until the delay has elapsed.
+	set_process(enable_processing and (_has_connections(state_processing) or _pending_transition != null))
+	set_physics_process(enable_processing and _has_connections(state_physics_processing))
+	set_process_input(enable_processing and _has_connections(state_input))
+	set_process_unhandled_input(enable_processing and _has_connections(state_unhandled_input))
 
 ## Checks whether the given signal has connections. 
 func _has_connections(sgnl:Signal) -> bool:
 	return sgnl.get_connections().size() > 0
-
-
-# Recursively builds a Resource representation of this state chart state and it's children.
-# This function is intended to be used for serializing into the needed format (such as a file or JSON) 
-# as needed for game saves or network transmission. See state_chart.gd for more info.
-func _export_to_resource() -> SerializedStateChartState:
-	var resource := SerializedStateChartState.new()
-	resource.name = name
-	resource.state_class = self.get_script().get_global_name()
-	resource.active = active
-	resource.pending_transition_name = _pending_transition.name if _pending_transition != null else ""
-	resource.pending_transition_remaining_delay = _pending_transition_remaining_delay
-	resource.pending_transition_initial_delay = _pending_transition_initial_delay
-	resource.children = []
-	for child in get_children():
-		if child is StateChartState:
-			resource.children.append(child._export_to_resource())
-	return resource
-
-func _load_from_resource(resource:SerializedStateChartState) -> void:
-	if resource.name != name:
-		push_error("State name mismatch: " + name + " != " + resource.name)
-		return
-
-	if self.get_script().get_global_name() != resource.state_class:
-		push_error("State class mismatch: " + self.get_script().get_global_name() + " != " + resource.state_class)
-		return
-
-	if resource.active == true:
-		active = true
-		_state_active = true
-		process_mode = Node.PROCESS_MODE_INHERIT
-		# enable processing if someone listens to our signal
-		_toggle_processing(true)
-	else:
-		active = false
-		_state_active = false
-		process_mode = Node.PROCESS_MODE_DISABLED
-		_toggle_processing(false)
-
-	if resource.pending_transition_name != "":
-		# if we have a pending transition, we need to find and restore it. If one is expected but not found
-		# throw an error.
-		var pending_transition: Transition = get_node_or_null(resource.pending_transition_name)
-		if pending_transition == null:
-			push_error("Pending transition " + resource.pending_transition_name + " not found")
-			return
-		_pending_transition = pending_transition
-	_pending_transition_remaining_delay = resource.pending_transition_remaining_delay
-	_pending_transition_initial_delay = resource.pending_transition_initial_delay
-	set_process(true)
-
-	var child_nodes : Dictionary = {}
-	for child in self.get_children():
-		child_nodes[child.name] = child
-
-	_verify_children(resource, child_nodes)
-
-	for child_resource in resource.children:
-		var child_node: StateChartState = child_nodes[child_resource.name]
-		if child_node is StateChartState:
-			child_node._load_from_resource(child_resource)
-
-
-## Verifies that the children in the resource matches the children in the state.
-## This can happen if the game has been updated and the state chart has been changed.
-## Warn if this is the case, but don't stop the load process.
-func _verify_children(resource:SerializedStateChartState, child_nodes:Dictionary) -> void:
-	var state_chart_child_node_count := 0
-
-	for node_name in child_nodes.keys():
-		if child_nodes[node_name] is StateChartState:
-			state_chart_child_node_count += 1
-
-	if resource.children.size() != state_chart_child_node_count:
-		push_warning("State " + name + " has " + str(state_chart_child_node_count) + " StateChartState children but " + str(resource.children.size()) + " children in the loaded resource")
-
-	for child_resource in resource.children:
-		# verify that the child exists in the state chart child nodes
-		if not child_nodes.has(child_resource.name):
-			push_warning("State " + name + " has no child matching the name " + child_resource.name + " from the loaded resource")
-
-		# This should work, but it doesn't. I can't figure out why. It keeps returning null
-		# var child_node: StateChartState = self.find_child(child_resource.name)
-		# if child_node == null:
-		# 	push_warning("State " + name + " has no child matching the name " + child_resource.name + " from the loaded resource")
-
-
-func _chart_is_frozen() -> bool:
-	if _chart == null:
-		_chart = _find_chart(get_parent())
-	return _chart._frozen
