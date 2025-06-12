@@ -90,6 +90,10 @@ func take(immediately:bool = true) -> void:
 	if parent_state == null:
 		push_error("Transitions must be children of states.")
 		return
+
+	if parent_state._chart._frozen:
+		push_error("The state chart is currently frozen, so transition '" + name + "' cannot be taken.")
+		return
 	
 	parent_state._run_transition(self, immediately)
 
