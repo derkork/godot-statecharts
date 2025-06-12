@@ -1,0 +1,205 @@
+[gd_scene load_steps=9 format=3 uid="uid://dlimxl8qug8p7"]
+
+[ext_resource type="Script" uid="uid://c8j6hqkk7j6b6" path="res://godot_state_charts_examples/save_and_load/save_and_load.gd" id="1_5m5no"]
+[ext_resource type="PackedScene" uid="uid://d4c6cle8maaql" path="res://godot_state_charts_examples/save_and_load/color_box/color_box.tscn" id="1_8k0j8"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="2_teb0c"]
+[ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="3_atqsj"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="4_5m5no"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="5_cek25"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="6_151g2"]
+[ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="7_atqsj"]
+
+[node name="SaveAndLoad" type="Node2D" node_paths=PackedStringArray("chart", "box_nodes")]
+script = ExtResource("1_5m5no")
+chart = NodePath("StateChart")
+box_nodes = [NodePath("Boxes/HBoxContainer/VBoxContainer/ColorBox"), NodePath("Boxes/HBoxContainer/VBoxContainer/ColorBox2"), NodePath("Boxes/HBoxContainer/VBoxContainer/ColorBox3")]
+
+[node name="Boxes" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(640, 480)
+offset_right = 480.0
+offset_bottom = 480.0
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Boxes"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Boxes/HBoxContainer"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="ColorBox" parent="Boxes/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("chart", "compound_state", "red_state", "green_state", "blue_state") instance=ExtResource("1_8k0j8")]
+layout_mode = 2
+size_flags_vertical = 3
+chart = NodePath("../../../../StateChart")
+compound_state = NodePath("../../../../StateChart/ParallelState/Box1")
+red_state = NodePath("../../../../StateChart/ParallelState/Box1/Red")
+green_state = NodePath("../../../../StateChart/ParallelState/Box1/Green")
+blue_state = NodePath("../../../../StateChart/ParallelState/Box1/Blue")
+
+[node name="ColorBox2" parent="Boxes/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("chart", "compound_state", "red_state", "green_state", "blue_state") instance=ExtResource("1_8k0j8")]
+layout_mode = 2
+size_flags_vertical = 3
+box_id = "box-2"
+chart = NodePath("../../../../StateChart")
+compound_state = NodePath("../../../../StateChart/ParallelState/Box2")
+red_state = NodePath("../../../../StateChart/ParallelState/Box2/Red")
+green_state = NodePath("../../../../StateChart/ParallelState/Box2/Green")
+blue_state = NodePath("../../../../StateChart/ParallelState/Box2/Blue")
+
+[node name="ColorBox3" parent="Boxes/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("chart", "compound_state", "red_state", "green_state", "blue_state") instance=ExtResource("1_8k0j8")]
+layout_mode = 2
+size_flags_vertical = 3
+box_id = "box-3"
+chart = NodePath("../../../../StateChart")
+compound_state = NodePath("../../../../StateChart/ParallelState/Box3")
+red_state = NodePath("../../../../StateChart/ParallelState/Box3/Red")
+green_state = NodePath("../../../../StateChart/ParallelState/Box3/Green")
+blue_state = NodePath("../../../../StateChart/ParallelState/Box3/Blue")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Boxes/HBoxContainer"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="StateChartDebugger" parent="Boxes/HBoxContainer/VBoxContainer2" instance=ExtResource("7_atqsj")]
+layout_mode = 2
+size_flags_vertical = 3
+initial_node_to_watch = NodePath("../../../../StateChart")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Boxes/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="Save" type="Button" parent="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save"
+
+[node name="Load" type="Button" parent="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Load"
+
+[node name="StateChart" type="Node" parent="."]
+script = ExtResource("2_teb0c")
+metadata/_custom_type_script = "uid://couw105c3bde4"
+
+[node name="ParallelState" type="Node" parent="StateChart"]
+script = ExtResource("3_atqsj")
+metadata/_custom_type_script = "uid://c1vp0ojjvaby1"
+
+[node name="Box1" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("4_5m5no")
+initial_state = NodePath("Red")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Red" type="Node" parent="StateChart/ParallelState/Box1"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToGreen" type="Node" parent="StateChart/ParallelState/Box1/Red"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Green")
+event = &"box-1-click"
+delay_in_seconds = "1"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Green" type="Node" parent="StateChart/ParallelState/Box1"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToBlue" type="Node" parent="StateChart/ParallelState/Box1/Green"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Blue")
+event = &"box-1-click"
+delay_in_seconds = "1"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Blue" type="Node" parent="StateChart/ParallelState/Box1"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToRed" type="Node" parent="StateChart/ParallelState/Box1/Blue"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Red")
+event = &"box-1-click"
+delay_in_seconds = "1"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Box2" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("4_5m5no")
+initial_state = NodePath("Green")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Red" type="Node" parent="StateChart/ParallelState/Box2"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToGreen" type="Node" parent="StateChart/ParallelState/Box2/Red"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Green")
+event = &"box-2-click"
+delay_in_seconds = "2"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Green" type="Node" parent="StateChart/ParallelState/Box2"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToBlue" type="Node" parent="StateChart/ParallelState/Box2/Green"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Blue")
+event = &"box-2-click"
+delay_in_seconds = "2"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Blue" type="Node" parent="StateChart/ParallelState/Box2"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToRed" type="Node" parent="StateChart/ParallelState/Box2/Blue"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Red")
+event = &"box-2-click"
+delay_in_seconds = "2"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Box3" type="Node" parent="StateChart/ParallelState"]
+script = ExtResource("4_5m5no")
+initial_state = NodePath("Blue")
+metadata/_custom_type_script = "uid://jk2jm1g6q853"
+
+[node name="Red" type="Node" parent="StateChart/ParallelState/Box3"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToGreen" type="Node" parent="StateChart/ParallelState/Box3/Red"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Green")
+event = &"box-3-click"
+delay_in_seconds = "3"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Green" type="Node" parent="StateChart/ParallelState/Box3"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToBlue" type="Node" parent="StateChart/ParallelState/Box3/Green"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Blue")
+event = &"box-3-click"
+delay_in_seconds = "3"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[node name="Blue" type="Node" parent="StateChart/ParallelState/Box3"]
+script = ExtResource("5_cek25")
+metadata/_custom_type_script = "uid://cytafq8i1y8qm"
+
+[node name="ToRed" type="Node" parent="StateChart/ParallelState/Box3/Blue"]
+script = ExtResource("6_151g2")
+to = NodePath("../../Red")
+event = &"box-3-click"
+delay_in_seconds = "3"
+metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
+
+[connection signal="pressed" from="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer/Load" to="." method="_on_load_pressed"]
