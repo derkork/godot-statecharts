@@ -10,8 +10,9 @@ description: "Here you can find guidance on how to save and load your state char
 ## Table of Contents
 - [Saving](#saving)
 - [Loading](#loading)
+- [Save game evolution](#save-game-evolution)
 
-There are many ways to save your game in Godot and the right implementation will depend on your game's needs. Godot State Charts provides an interface via Resources that allow you to decide the best way to store the state for your game (for example, writing the Resource to disk or converting it into a JSON representation).
+The state of state charts can be saved and loaded with the built-in `StateChartSerializer` class. When saving, this will produce a `SerializedStateChart` resource, which can be added to your own saved game resource or be converted into a savefile format of your choice (e.g. JSON). The serializer can also be used to load the state chart back into your game, restoring the state of the chart and its states.
 
 > ⚠️ **Note**: saving and loading of `AnimationPlayer` and `AnimationStateTree` states is not supported, as both of these states are deprecated.
 
@@ -69,7 +70,7 @@ func load_state() -> void:
 	...
 ```
 
-### Loading from an older save
+### Save game evolution
 
 When you change the state chart definition in your game (e.g. add states, remove states, rename states, change state types, add/remove transitions) then previously saved instances of `SerializedStateChart` will become incompatible with your current state chart definition. `StateChartSerializer` will ensure that the `StateChart` in the tree exactly matches the structure of the `SerializedStateChart` before trying to restore the internal state. If the both do not exactly match, then the `StateChartSerializer` will refuse to restore the state and return a list of error messages detailing the problems. The running state chart will not be modified if `SerializedStateChart` is not compatible. This is to ensure consistent, predictable behaviour.
 
