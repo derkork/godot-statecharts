@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## Unreleased
+
+## [0.22.0] - 2025-06-22
+### Added
+- It is now possible to save and restore a state chart's state using the new `StateChartSerializer` class. This can be useful for saving and loading games or in networked situations where the current state needs to be transferred  to a joining client. A huge thanks goes out to [Jeff Ammons](https://github.com/jammons) for digging into this rather complex topic and providing a [pull request](https://github.com/derkork/godot-statecharts/pull/183). 
+
 ### Fixed
 - A few compiler warnings were resolved for the C# implementation. A big thanks goes to [Walter Geisler](https://github.com/Soren025) for providing a [pull request](https://github.com/derkork/godot-statecharts/pull/185) for this ([#184](https://github.com/derkork/godot-statecharts/issues/184))!
-
 
 ## [0.21.5] - 2025-04-05
 ### Improved
