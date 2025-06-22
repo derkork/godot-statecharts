@@ -1,18 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://dlimxl8qug8p7"]
+[gd_scene load_steps=9 format=3 uid="uid://chedtn2mgojpo"]
 
-[ext_resource type="Script" uid="uid://c8j6hqkk7j6b6" path="res://godot_state_charts_examples/save_and_load/save_and_load.gd" id="1_5m5no"]
-[ext_resource type="PackedScene" uid="uid://d4c6cle8maaql" path="res://godot_state_charts_examples/save_and_load/color_box/color_box.tscn" id="1_8k0j8"]
-[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="2_teb0c"]
-[ext_resource type="Script" uid="uid://c1vp0ojjvaby1" path="res://addons/godot_state_charts/parallel_state.gd" id="3_atqsj"]
-[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="4_5m5no"]
-[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="5_cek25"]
-[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="6_151g2"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/save_and_load/save_and_load.gd" id="1_5m5no"]
+[ext_resource type="PackedScene" uid="uid://cinfdiwxml318" path="res://godot_state_charts_examples/save_and_load/color_box/color_box.tscn" id="1_8k0j8"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/state_chart.gd" id="2_teb0c"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/parallel_state.gd" id="3_atqsj"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/compound_state.gd" id="4_5m5no"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/atomic_state.gd" id="5_cek25"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/transition.gd" id="6_151g2"]
 [ext_resource type="PackedScene" uid="uid://bcwkugn6v3oy7" path="res://addons/godot_state_charts/utilities/state_chart_debugger.tscn" id="7_atqsj"]
 
-[node name="SaveAndLoad" type="Node2D" node_paths=PackedStringArray("chart", "box_nodes")]
+[node name="SaveAndLoad" type="Node2D"]
 script = ExtResource("1_5m5no")
-chart = NodePath("StateChart")
-box_nodes = [NodePath("Boxes/HBoxContainer/VBoxContainer/ColorBox"), NodePath("Boxes/HBoxContainer/VBoxContainer/ColorBox2"), NodePath("Boxes/HBoxContainer/VBoxContainer/ColorBox3")]
 
 [node name="Boxes" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(640, 480)
@@ -27,34 +25,20 @@ layout_mode = 2
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 
-[node name="ColorBox" parent="Boxes/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("chart", "compound_state", "red_state", "green_state", "blue_state") instance=ExtResource("1_8k0j8")]
+[node name="Box1" parent="Boxes/HBoxContainer/VBoxContainer" groups=["colorbox"] instance=ExtResource("1_8k0j8")]
 layout_mode = 2
 size_flags_vertical = 3
-chart = NodePath("../../../../StateChart")
-compound_state = NodePath("../../../../StateChart/ParallelState/Box1")
-red_state = NodePath("../../../../StateChart/ParallelState/Box1/Red")
-green_state = NodePath("../../../../StateChart/ParallelState/Box1/Green")
-blue_state = NodePath("../../../../StateChart/ParallelState/Box1/Blue")
+box_id = &"box-1"
 
-[node name="ColorBox2" parent="Boxes/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("chart", "compound_state", "red_state", "green_state", "blue_state") instance=ExtResource("1_8k0j8")]
+[node name="Box2" parent="Boxes/HBoxContainer/VBoxContainer" groups=["colorbox"] instance=ExtResource("1_8k0j8")]
 layout_mode = 2
 size_flags_vertical = 3
-box_id = "box-2"
-chart = NodePath("../../../../StateChart")
-compound_state = NodePath("../../../../StateChart/ParallelState/Box2")
-red_state = NodePath("../../../../StateChart/ParallelState/Box2/Red")
-green_state = NodePath("../../../../StateChart/ParallelState/Box2/Green")
-blue_state = NodePath("../../../../StateChart/ParallelState/Box2/Blue")
+box_id = &"box-2"
 
-[node name="ColorBox3" parent="Boxes/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("chart", "compound_state", "red_state", "green_state", "blue_state") instance=ExtResource("1_8k0j8")]
+[node name="Box3" parent="Boxes/HBoxContainer/VBoxContainer" groups=["colorbox"] instance=ExtResource("1_8k0j8")]
 layout_mode = 2
 size_flags_vertical = 3
-box_id = "box-3"
-chart = NodePath("../../../../StateChart")
-compound_state = NodePath("../../../../StateChart/ParallelState/Box3")
-red_state = NodePath("../../../../StateChart/ParallelState/Box3/Red")
-green_state = NodePath("../../../../StateChart/ParallelState/Box3/Green")
-blue_state = NodePath("../../../../StateChart/ParallelState/Box3/Blue")
+box_id = &"box-3"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="Boxes/HBoxContainer"]
 custom_minimum_size = Vector2(320, 0)
@@ -80,6 +64,7 @@ size_flags_horizontal = 3
 text = "Load"
 
 [node name="StateChart" type="Node" parent="."]
+unique_name_in_owner = true
 script = ExtResource("2_teb0c")
 metadata/_custom_type_script = "uid://couw105c3bde4"
 
@@ -201,5 +186,23 @@ event = &"box-3-click"
 delay_in_seconds = "3"
 metadata/_custom_type_script = "uid://cf1nsco3w0mf6"
 
-[connection signal="pressed" from="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer/Save" to="." method="_on_save_pressed"]
-[connection signal="pressed" from="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer/Load" to="." method="_on_load_pressed"]
+[connection signal="pressed" from="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer/Save" to="." method="save_state"]
+[connection signal="pressed" from="Boxes/HBoxContainer/VBoxContainer2/HBoxContainer/Load" to="." method="load_state"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box1/Red" to="Boxes/HBoxContainer/VBoxContainer/Box1" method="switch_to_red"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box1/Red" to="Boxes/HBoxContainer/VBoxContainer/Box1" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box1/Green" to="Boxes/HBoxContainer/VBoxContainer/Box1" method="switch_to_green"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box1/Green" to="Boxes/HBoxContainer/VBoxContainer/Box1" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box1/Blue" to="Boxes/HBoxContainer/VBoxContainer/Box1" method="switch_to_blue"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box1/Blue" to="Boxes/HBoxContainer/VBoxContainer/Box1" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box2/Red" to="Boxes/HBoxContainer/VBoxContainer/Box2" method="switch_to_red"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box2/Red" to="Boxes/HBoxContainer/VBoxContainer/Box2" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box2/Green" to="Boxes/HBoxContainer/VBoxContainer/Box2" method="switch_to_green"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box2/Green" to="Boxes/HBoxContainer/VBoxContainer/Box2" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box2/Blue" to="Boxes/HBoxContainer/VBoxContainer/Box2" method="switch_to_blue"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box2/Blue" to="Boxes/HBoxContainer/VBoxContainer/Box2" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box3/Red" to="Boxes/HBoxContainer/VBoxContainer/Box3" method="switch_to_red"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box3/Red" to="Boxes/HBoxContainer/VBoxContainer/Box3" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box3/Green" to="Boxes/HBoxContainer/VBoxContainer/Box3" method="switch_to_green"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box3/Green" to="Boxes/HBoxContainer/VBoxContainer/Box3" method="show_pending"]
+[connection signal="state_entered" from="StateChart/ParallelState/Box3/Blue" to="Boxes/HBoxContainer/VBoxContainer/Box3" method="switch_to_blue"]
+[connection signal="transition_pending" from="StateChart/ParallelState/Box3/Blue" to="Boxes/HBoxContainer/VBoxContainer/Box3" method="show_pending"]
