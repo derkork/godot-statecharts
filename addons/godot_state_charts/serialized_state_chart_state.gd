@@ -16,8 +16,7 @@ extends Resource
 @export var history: SavedState = null
 
 
-# This is a helper function to make it easier to debug the serialized state chart state.
-func debug_string() -> String:
+func _to_string() -> String:
 	return """SerializedStateChartState(
 		name: %s
 		state_class: %s

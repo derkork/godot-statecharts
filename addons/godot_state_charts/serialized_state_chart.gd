@@ -20,8 +20,9 @@ extends Resource
 @export var transitions_processing_active: bool = false
 @export var state: SerializedStateChartState = null
 
-func debug_string() -> String:
+func _to_string() -> String:
 	return """SerializedStateChart(
+		version: %d
 		name: %s
 		expression_properties: %s
 		queued_events: %s
@@ -32,6 +33,7 @@ func debug_string() -> String:
 		transitions_processing_active: %s
 		state: %s
 	)""" % [
+		version,
 		name,
 		JSON.stringify(expression_properties, "\t"),
 		JSON.stringify(queued_events, "\t"), 
