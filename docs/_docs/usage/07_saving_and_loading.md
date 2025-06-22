@@ -44,6 +44,33 @@ func save_state() -> void:
 
 This will save the active status of all states of the state chart as well as any pending transitions and their timings.
 
+#### C# Example
+Here's how you can save the state chart in C#:
+
+```csharp
+public void SaveState()
+{
+    // Set the save file path
+    var path = "user://save_resource.tres";
+
+    // Instantiate a global save resource (with a reference to SerializedStateChart)
+    var saveResource = new SaveResource();
+
+    // Create the populated SerializedStateChart with the current state
+    var serializedStateChart = StateChartSerializer.Serialize(chart);
+    
+    // Because SerializedStateChart is a wrapper around Resource,
+    // SaveResource contains: [Export] public Resource StateChart;
+    saveResource.StateChart = serializedStateChart.Wrapped;
+
+    // Save other non-state-chart game data
+    ...
+
+    // Save to the path from above
+    ResourceSaver.Save(path, saveResource);
+}
+```
+
 ## Loading
 Loading requires reversing the process to populate a `SerializedStateChart` and it's children, then passing that into the `StateChartSerializer.deserialize(...)` method. How you do this, depends on your game's needs, but a simple way would be to load a `SerializedStateChart` back from a file with Godot's build-in `ResourceLoader` class.
 
@@ -68,6 +95,33 @@ func load_state() -> void:
 	
     # load other non-state-chart data
 	...
+```
+
+#### C# Example
+Here's how you can load the state chart in C#:
+
+```csharp
+// This is the state chart that is currently in the tree and
+// onto which we want to apply the state that we previously saved.
+private StateChart chart;
+
+public void LoadState()
+{
+    // Set the file path to your saved game
+    var path = "user://save_resource.tres";
+
+    // Load the global save resource from the file
+    var saveResource = ResourceLoader.Load<SaveResource>(path);
+
+    // Create a wrapper object around the loaded SerializedStateChart
+    var serializedStateChart = SerializedStateChart.Of(saveResource.StateChart);
+    
+    // Restore state chart internal state
+    StateChartSerializer.Deserialize(serializedStateChart, chart);
+
+    // Load other non-state-chart data
+    ...
+}
 ```
 
 ### Save game evolution
