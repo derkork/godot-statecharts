@@ -1,53 +1,44 @@
-[gd_scene load_steps=2 format=3 uid="uid://d4c6cle8maaql"]
+[gd_scene load_steps=2 format=3 uid="uid://cinfdiwxml318"]
 
-[ext_resource type="Script" uid="uid://75vwcsrd775h" path="res://godot_state_charts_examples/save_and_load/color_box/color_box.gd" id="1_3xrxu"]
+[ext_resource type="Script" path="res://godot_state_charts_examples/save_and_load/color_box/color_box.gd" id="1_3xrxu"]
 
-[node name="ColorBox" type="Container"]
-anchors_preset = -1
-anchor_right = 0.234
-anchor_bottom = 0.312
-offset_right = 0.23999
-offset_bottom = 0.23999
-grow_horizontal = 2
-grow_vertical = 2
+[node name="ColorBox" type="MarginContainer"]
+custom_minimum_size = Vector2(300, 150)
+offset_right = 300.0
+offset_bottom = 150.0
 script = ExtResource("1_3xrxu")
 
 [node name="ColorRect" type="ColorRect" parent="."]
-custom_minimum_size = Vector2(320, 160)
+unique_name_in_owner = true
 layout_mode = 2
 color = Color(1, 0.533702, 0.467874, 1)
 
-[node name="Button" type="Button" parent="ColorRect"]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 19.0
-offset_top = -48.0
-offset_right = 131.0
-offset_bottom = -17.0
-grow_vertical = 0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-text = "Change Color"
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
-layout_mode = 1
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 222.0
-offset_bottom = 97.0
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
 
-[node name="ID" type="Label" parent="ColorRect/VBoxContainer"]
+[node name="IdLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Box-ID"
 
-[node name="Timer" type="Label" parent="ColorRect/VBoxContainer"]
+[node name="TimeInStateLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Time in State: 1.2s"
 
-[node name="TransitionTimer" type="Label" parent="ColorRect/VBoxContainer"]
+[node name="TransitionTimeLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Time Until Transition: 1.2s"
 
-[connection signal="pressed" from="ColorRect/Button" to="." method="_on_button_pressed"]
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Change Color"
