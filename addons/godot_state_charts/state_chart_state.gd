@@ -237,7 +237,7 @@ func _physics_process(delta:float) -> void:
 ## Called when the state chart step function is called.
 func _state_step():
 	if not active:
-		push_warning("The current state " + name + " is not active. ")
+		push_warning("Cannot do step since the state " + name + " is not active. ")
 		return
 	
 	state_stepped.emit()
