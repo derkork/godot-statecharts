@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.1] - 2025-08-21
+## Fixed
+- When using an expression for the transition delay, and listening to the `transition_pending` signal you will now get the proper initial delay from that expression instead of a zero ([#190](https://github.com/derkork/godot-statecharts/issues/190)). 
+
 ## [0.22.0] - 2025-06-22
 ### Added
 - It is now possible to save and restore a state chart's state using the new `StateChartSerializer` class. This can be useful for saving and loading games or in networked situations where the current state needs to be transferred  to a joining client. A huge thanks goes out to [Jeff Ammons](https://github.com/jammons) for digging into this rather complex topic and providing a [pull request](https://github.com/derkork/godot-statecharts/pull/183). 
