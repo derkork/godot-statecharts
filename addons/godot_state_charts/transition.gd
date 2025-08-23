@@ -45,6 +45,10 @@ signal taken()
 		_dirty = true
 		update_configuration_warnings()
 
+## Whether to refresh the delay time when the same transition occurs again
+## during the state transition countdown
+@export var should_refresh_delay_time:bool = false
+
 ## A delay in seconds before the transition is taken. Can be 0 in which case
 ## the transition will be taken immediately. The transition will only be taken
 ## if the state is still active when the delay has passed and has never been left.

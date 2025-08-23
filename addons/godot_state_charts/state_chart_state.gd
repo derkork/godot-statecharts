@@ -265,7 +265,7 @@ func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName 
 				# print(name +  ": consuming event " + event)
 				# first match wins
 				# if the winning transition is the currently pending transition, we do not replace it
-				if transition != _pending_transition:
+				if transition != _pending_transition or transition.should_refresh_delay_time:
 					_run_transition(transition)
 			
 				# but in any case we return true, because we consumed the event
