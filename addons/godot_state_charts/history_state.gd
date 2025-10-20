@@ -20,17 +20,13 @@ var history:SavedState = null
 
 
 func _state_save(saved_state:SavedState, _child_levels:int = -1) -> void:
-	# History states are pseudo states, so they only save remembered history if any
-	var our_state := SavedState.new()
-	our_state.history = history
-	saved_state.add_substate(self, our_state)
+	# History states are pseudo states
+	pass
 
 
 func _state_restore(saved_state:SavedState, _child_levels:int = -1) -> void:
-	# History states are pseudo states, so they only restore remembered history if any
-	var our_state := saved_state.get_substate_or_null(self)
-	if our_state != null:
-		history = our_state.history
+	# History states are pseudo states
+	pass
 
 
 func _get_configuration_warnings() -> PackedStringArray:
