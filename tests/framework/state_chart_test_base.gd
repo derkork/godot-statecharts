@@ -33,9 +33,13 @@ func after_each() -> void:
 	_chart.free()
 
 func assert_active(state: StateChartState) -> void:
+	if not state.active:
+		print_chart_state()
 	assert_true(state.active, "Expected state " + state.name + " to be active")
 
 func assert_inactive(state: StateChartState) -> void:
+	if state.active:
+		print_chart_state()
 	assert_false(state.active, "Expected state " + state.name + " to be inactive")
 
 func finish_setup() -> void:
@@ -144,9 +148,36 @@ func any_of_guard(guard:Array[Guard]) -> AnyOfGuard:
 	any_of_guard.guards = guard
 	return any_of_guard
 
-	
+
 func not_guard(guard:Guard) -> NotGuard:
 	@warning_ignore("shadowed_variable")
 	var not_guard: NotGuard = NotGuard.new()
 	not_guard.guard = guard
 	return not_guard
+
+
+# ---- Debug helpers ----
+func print_chart_state() -> void:
+	# Prints a tree of the current state chart and its states.
+	# For each state prints its name and whether it is active or inactive.
+	# If a state has a pending transition, it is printed as a child line with the remaining time.
+	var lines: Array[String] = []
+	if is_instance_valid(_chart):
+		lines.append("StateChart")
+		_append_state_lines(_chart, "  ", lines)
+	else:
+		lines.append("<no StateChart>")
+	for line in lines:
+		print(line)
+
+
+func _append_state_lines(root: Node, indent: String, lines: Array[String]) -> void:
+	for child in root.get_children():
+		if child is StateChartState:
+			var active_text: String = "active" if (child as StateChartState).active else "inactive"
+			lines.append("%s- %s (%s)" % [indent, (child as StateChartState).name, active_text])
+			# Pending transition info as a child line if present
+			if is_instance_valid((child as StateChartState)._pending_transition):
+				lines.append("%s  -> %s (%.2f)" % [indent, (child as StateChartState)._pending_transition.name, (child as StateChartState)._pending_transition_remaining_delay])
+			# Recurse into child states
+			_append_state_lines(child, indent + "  ", lines)

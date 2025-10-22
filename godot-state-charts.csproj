@@ -1,11 +1,10 @@
-<Project Sdk="Godot.NET.Sdk/4.0.3">
+<Project Sdk="Godot.NET.Sdk/4.0.4">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>godotstatecharts</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-      
     <Content Include="addons\godot_state_charts\all_of_guard.gd" />
     <Content Include="addons\godot_state_charts\all_of_guard.svg" />
     <Content Include="addons\godot_state_charts\all_of_guard.svg.import" />
@@ -405,8 +404,7 @@
     <Content Include="tests\test_property_changes_immediately_visible.gd" />
     <Content Include="tests\test_delayed_transition.gd" />
     <Content Include="tests\test_expression_guard.gd" />
-    <Content Include="tests\test_history_state_as_initial_state.gd" />
-    <Content Include="tests\test_history_state_simple.gd" />
+    <Content Include="tests\test_history_state.gd" />
     <Content Include="tests\test_explicit_event_consumption.gd" />
     <Content Include="tests\test_infinite_loop_detection.gd" />
     <Content Include="tests\test_expression_properties.gd" />
