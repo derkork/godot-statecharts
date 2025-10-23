@@ -19,13 +19,14 @@ extends StateChartState
 var history:SavedState = null
 
 
-func _state_save(saved_state:SavedState, _child_levels:int = -1) -> void:
-	# History states are pseudo states
+func _state_save(_saved_state:SavedState, _child_levels:int = -1) -> void:
+	# nothing to do here, as this is a pseude state. history is managed
+	# by parent compound state.
 	pass
 
-
-func _state_restore(saved_state:SavedState, _child_levels:int = -1) -> void:
-	# History states are pseudo states
+func _state_restore(_saved_state:SavedState, _child_levels:int = -1) -> void:
+	# nothing to do here, as this is a pseude state. history is managed
+	# by parent compound state.
 	pass
 
 

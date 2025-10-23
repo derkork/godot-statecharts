@@ -83,7 +83,7 @@ func test_history_state_deep_restores_nested_states() -> void:
 	var a1: CompoundState = compound_state("a1", a)
 	var a1a: AtomicState = atomic_state("a1a", a1)
 	var a1b: AtomicState = atomic_state("a1b", a1)
-	var a2: AtomicState = atomic_state("a2", a)
+	atomic_state("a2", a)
 	var h: HistoryState = history_state("h", a, a1, true)
 	
 	transition(a1a, a1b, "to_a1b")
@@ -168,7 +168,7 @@ func test_history_state_shallow_restores_only_immediate_child() -> void:
 	var a1: CompoundState = compound_state("a1", a)
 	var a1a: AtomicState = atomic_state("a1a", a1)
 	var a1b: AtomicState = atomic_state("a1b", a1)
-	var a2: AtomicState = atomic_state("a2", a)
+	atomic_state("a2", a)
 	# shallow history
 	var h: HistoryState = history_state("h", a, a1, false)
 	
@@ -204,7 +204,7 @@ func test_history_state_shallow_and_deep_coexist() -> void:
 	var a1: CompoundState = compound_state("a1", a)
 	var a1a: AtomicState = atomic_state("a1a", a1)
 	var a1b: AtomicState = atomic_state("a1b", a1)
-	var a2: AtomicState = atomic_state("a2", a)
+	atomic_state("a2", a)
 	var h_shallow: HistoryState = history_state("h_shallow", a, a1, false)
 	var h_deep: HistoryState = history_state("h_deep", a, a1, true)
 	var b: AtomicState = atomic_state("b", root)
@@ -247,7 +247,7 @@ func test_history_state_uses_default_when_no_history_exists() -> void:
 	var b: AtomicState = atomic_state("b", root)
 	
 	var a: CompoundState = compound_state("a", root)
-	var a1: AtomicState = atomic_state("a1", a)
+	atomic_state("a1", a)
 	var a2: AtomicState = atomic_state("a2", a)
 	var h: HistoryState = history_state("h", a, a2)
 	

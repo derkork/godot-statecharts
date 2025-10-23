@@ -7,14 +7,14 @@ var _state_chart:StateChart
 ## a state chart, it will search the children for a state chart. If no state chart
 ## is found, the debugger will be disabled.
 func track(chart:StateChart):
-	print("BEGIN ----------------------------------")
 	_state_chart = chart
 	_connect_all_signals()
+	print("BEGIN [%s]----------------------------------" % [_state_chart.name])
 
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
-		print("END ------------------------------------")
+		print("END [%s] ------------------------------------" % [_state_chart.name])
 		
 
 ## Connects all signals from the currently processing state chart
@@ -44,17 +44,17 @@ func _connect_signals(state:StateChartState):
 
 
 func _on_before_transition(transition:Transition, source:StateChartState):
-	print("%s [»] Transition: %s from %s to %s" % [Engine.get_process_frames(), transition.name, _state_chart.get_path_to(source), _state_chart.get_path_to(transition.resolve_target())])
+	print("%s [%s] [»] Transition: %s from %s to %s" % [Engine.get_process_frames(), _state_chart.name,transition.name, _state_chart.get_path_to(source), _state_chart.get_path_to(transition.resolve_target())])
 
 
 func _on_event_received(event:StringName):
-	print("%s [!] Event received: %s" % [Engine.get_process_frames(), event])
+	print("%s [%s] [!] Event received: %s" % [Engine.get_process_frames(), _state_chart.name, event])
 
 	
 func _on_state_entered(state:StateChartState):
-	print("%s [>] Enter: %s" % [Engine.get_process_frames(), state.name])
+	print("%s [%s] [>] Enter: %s" % [Engine.get_process_frames(), _state_chart.name, state.name])
 
 
 func _on_state_exited(state:StateChartState):
-	print("%s [<] Exit: %s" % [Engine.get_process_frames(), state.name])
+	print("%s [%s] [<] Exit: %s" % [Engine.get_process_frames(), _state_chart.name, state.name])
 

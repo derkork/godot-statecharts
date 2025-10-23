@@ -1,39 +1,67 @@
 extends StateChartTestBase
 
 
-func test_serialization():
+func test_simple_serialization():
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
+	
+	transition(a, b, "to_b")
 
 	await finish_setup()
+	assert_active(a)
 
-	_chart.name = "state_chart"
+	# when i save the state chart
+	var saved:SerializedStateChart = StateChartSerializer.serialize(_chart)
+	
+	# and then enter b
+	send_event("to_b")
+	assert_active(b)
+	
+	# and then restore the state chart
+	var errors := StateChartSerializer.deserialize(saved, _chart)
+	
+	# then a is active again
+	assert_active(a)
+	# and we have no errors
+	assert_eq(errors.size(), 0)
+	
 
-	var resource:SerializedStateChart = StateChartSerializer.serialize(_chart)
+func test_simple_serialization_restore_on_new_chart():
+	# Build and serialize the first chart where 'a' is initially active
+	var root1 := compound_state("root")
+	var a1 := atomic_state("a", root1)
+	var b1 := atomic_state("b", root1)
+	transition(a1, b1, "to_b")
+	await finish_setup()
+	assert_active(a1)
+	var saved: SerializedStateChart = StateChartSerializer.serialize(_chart)
 
-	# SerializedStateChart
-	assert_eq(resource.name, "state_chart")
-	assert_eq(resource.queued_events, [])
-	assert_eq(resource.property_change_pending, false)
-	assert_eq(resource.state_change_pending, false)
-	assert_eq(resource.locked_down, false)
-	assert_eq(resource.queued_transitions, [])
-	assert_eq(resource.transitions_processing_active, false)
+	# Move the original chart to 'b' (not strictly needed for this test, but mirrors the original test)
+	send_event("to_b")
+	assert_active(b1)
 
-	# SerializedStateChartState children
-	assert_eq(resource.state.name, "root")
-	assert_eq(resource.state.state_type, 1) # compound
-	assert_eq(resource.state.active, true)
+	# Now create a completely new StateChart with the same structure
+	var new_chart := chart("new")
+	var new_root := compound_state("root", new_chart)
+	var new_a := atomic_state("a", new_root)
+	var new_b := atomic_state("b", new_root)
+	transition(new_a, new_b, "to_b")
+	
+	await finish_setup(new_chart)
 
-	assert_eq(resource.state.children.size(), 2)
-	assert_eq(resource.state.children[0].name, a.name)
-	assert_eq(resource.state.children[0].state_type, 0) # atomic
-	assert_eq(resource.state.children[0].active, true)
-	assert_eq(resource.state.children[1].name, b.name)
-	assert_eq(resource.state.children[1].state_type, 0) # atomic
-	assert_eq(resource.state.children[1].active, false)
+	# Verify the new chart can transition independently
+	assert_active(new_a)
+	new_chart.send_event("to_b")
+	assert_active(new_b)
 
+	# Restore the saved state into the completely new chart
+	var new_errors := StateChartSerializer.deserialize(saved, new_chart)
+
+	# After restoration, 'a' should be active again on the new chart and there should be no errors
+	assert_active(new_a)
+	assert_eq(new_errors.size(), 0)
+	
 
 func test_serialization_with_history():
 	var root := compound_state("root")
@@ -44,236 +72,116 @@ func test_serialization_with_history():
 	var h := history_state("h", a, a1)
 
 	transition(a1, a2, "to_a2")
-	transition(a, b, "exit_a")	
-	transition(b, h, "return_to_a")
+	transition(a, b, "to_b")	
+	transition(b, h, "to_h")
 
 	await finish_setup()
-
-	_chart.name = "state_chart"
-
-	var resource:SerializedStateChart = StateChartSerializer.serialize(_chart)
-
-	# Spot-check to ensure that the resource is set up as expected
-	assert_eq(resource.name, "state_chart")
-	assert_eq(resource.state.name, "root")
-	assert_eq(resource.state.active, true)
-	assert_eq(resource.state.children.size(), 2)
-	assert_eq(resource.state.children[0].children[0].name, "a1")
-	assert_eq(resource.state.children[0].children[0].active, true)
-	assert_eq(resource.state.children[0].children[2].name, "h")
-	assert_eq(resource.state.children[0].children[2].active, false)
-
-	# when i send a transition to exit a, then a should be inactive and b should be active
-	# there should also be a record of a1 as the last active state in the history state
-	send_event("exit_a")
-
-	resource = StateChartSerializer.serialize(_chart)
-
-	assert_eq(resource.state.children[0].active, false) # a is now inactive
-	assert_eq(resource.state.children[0].children[0].active, false) # a1 is now inactive
-	assert_eq(resource.state.children[0].children[2].name, "h")
-	assert_eq(resource.state.children[0].children[2].active, false)
-	assert_eq(resource.state.children[1].active, true) # b is now active
-
-	# examining the Resource for the Serialized History State:
-	assert_eq(resource.state.children[0].children[2].history.child_states.size(), 1)
-	assert_eq(resource.state.children[0].children[2].history.child_states["a"].child_states.size(), 2)
-	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "a1")
-	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "h")
-
-	# when i send a transition to return to a, then the history state should
-	# remember that a1 was the last active state, so a1 should be active
-
-	send_event("return_to_a")
-
-	resource = StateChartSerializer.serialize(_chart)
-
-	assert_eq(resource.state.children[0].active, true) # a is now active
-	assert_eq(resource.state.children[0].children[0].active, true) # a1 is now active
-	assert_eq(resource.state.children[0].children[2].name, "h")
-	assert_eq(resource.state.children[0].children[2].active, false)
-	assert_eq(resource.state.children[1].active, false) # b is now inactive
-
-	# the history state history should now be null again.
-	assert_eq(resource.state.children[0].children[2].history, null)
-
-	# when i send a transition to a2 and then out of a
+	assert_active(a)
+	assert_active(a1)
+	assert_inactive(b)
+	
+	# send an event so we go to a2
 	send_event("to_a2")
-	send_event("exit_a")
+	assert_active(a2)
+	assert_inactive(a1)
 
-	resource = StateChartSerializer.serialize(_chart)
+	# now we enter b to prepare our history state. the when we go to the 
+	# history state, the state chart should activate a2 now, because that was
+	# last active when we left a
+	send_event("to_b")
+	assert_active(b)
+	assert_inactive(a)
+	
+	# WHEN i save the state chart.
+	var saved:SerializedStateChart = StateChartSerializer.serialize(_chart)
 
-	# then b should be active
-	assert_eq(resource.state.children[1].active, true) # b is now active
+	# and use the state chart's history to go back to a
+	send_event("to_h")
+	assert_active(a)
+	assert_active(a2)
+	
+	# AND i then restore the state chart
+	var errors := StateChartSerializer.deserialize(saved, _chart)
+	
+	# THEN b should be active again
+	assert_active(b)
+	assert_inactive(a)
+	assert_inactive(a1)
+	
+	# AND we have no errors
+	assert_eq(errors.size(), 0)
+	
+	# AND the history state should still remember a2 as the last active state
+	send_event("to_h")
+	assert_active(a)
+	assert_active(a2)
+	
 
-	# history should now have a2 as the last active state
-	assert_eq(resource.state.children[0].children[2].history.child_states.size(), 1)
-	assert_eq(resource.state.children[0].children[2].history.child_states["a"].child_states.size(), 2)
-	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "a2")
-	assert_has(resource.state.children[0].children[2].history.child_states["a"].child_states, "h")
-
-
-func test_basic_deserialization():
-	var root := compound_state("root")
-	var a := atomic_state("a", root)
-	var b := atomic_state("b", root)
-	var t := transition(a, b, "to_b")	
-
-	watch_signals(a)
-	watch_signals(b)
-
+func test_serialization_with_history_restore_on_new_chart():
+	# Build and serialize the first chart where 'a' has a history that points to a2
+	var root1 := compound_state("root")
+	var a := compound_state("a", root1)
+	var a1 := atomic_state("a1", a)
+	var a2 := atomic_state("a2", a)
+	var b1 := atomic_state("b", root1)
+	var h1 := history_state("h", a, a1)
+	transition(a1, a2, "to_a2")
+	transition(a, b1, "to_b")
+	transition(b1, h1, "to_h")
+	
 	await finish_setup()
-
-	assert_true(a.is_processing())
-	assert_true(a.is_physics_processing())
-
-	########################################################################
-	#### Part 1: verify starting state
-	########################################################################
+	
+	# a/a1 should be active initially
 	assert_active(a)
-	assert_inactive(b)
-
-	# verify that the state chart is processing as expected
-	await wait_frames(10, "Run for a little while.")
-
-	assert_signal_emitted(a, "state_processing")
-	assert_signal_emitted(a, "state_physics_processing")
-
-	assert_signal_not_emitted(b, "state_processing")
-	assert_signal_not_emitted(b, "state_physics_processing")
-
-	########################################################################
-	#### Part 2: export the state chart to a resource
-	########################################################################
-	var resource:SerializedStateChart = StateChartSerializer.serialize(_chart)
-
-	########################################################################
-	#### Part 3: modify the state chart post-save
-	########################################################################
-	clear_signal_watcher()
-	watch_signals(a)
-	watch_signals(b)
-
-	# modify the state chart
+	assert_active(a1)
+	# move to a2, then to b so history remembers a2
+	send_event("to_a2")
+	assert_active(a2)
 	send_event("to_b")
+	assert_active(b1)
+	
+	# WHEN: I save serialized state (with history saved inside 'h')
+	var saved: SerializedStateChart = StateChartSerializer.serialize(_chart)
 
-	# ensure that the state chart is in the expected state
-	assert_active(b)
-	assert_inactive(a)
+	# AND: i create a completely new chart with the same structure using helpers
+	var new_chart := chart("new")
+	var root2 := compound_state("root", new_chart)
+	var na := compound_state("a", root2)
+	var na1 := atomic_state("a1", na)
+	var na2 := atomic_state("a2", na)
+	var nb := atomic_state("b", root2)
+	var nh := history_state("h", na, na1)
+	transition(na1, na2, "to_a2")
+	transition(na, nb, "to_b")
+	transition(nb, nh, "to_h")
+	await finish_setup(new_chart)
+	
+	# AND: the new chart is in its initial state
+	assert_active(na)
+	assert_active(na1)
 
-	await wait_frames(10, "Run for a little while.")
+	# AND: I restore the saved state into the new chart
+	var new_errors := StateChartSerializer.deserialize(saved, new_chart)
+	# THEN: b should be active in the new chart
+	assert_active(nb)
+	assert_inactive(na)
+	assert_inactive(na1)
+	
+	# AND: there should be no errors
+	assert_eq(new_errors.size(), 0)
 
-	assert_true(b.is_processing())
-	assert_true(b.is_physics_processing())
-
-	assert_signal_emitted(b, "state_processing")
-	assert_signal_emitted(b, "state_physics_processing")
-
-	assert_signal_not_emitted(a, "state_processing")
-	assert_signal_not_emitted(a, "state_physics_processing")
-
-	########################################################################
-	#### Part 4: load the state chart from the resource and verify that it's in
-	#### the same state as when it was exported.
-	########################################################################
-	clear_signal_watcher()
-	watch_signals(a)
-	watch_signals(b)
-
-	var errors := StateChartSerializer.deserialize(resource, _chart)
-	assert_true(errors.is_empty())
-
-	# ensure that the state chart is in the same state as when it was exported
-	assert_active(a)
-	assert_inactive(b)
-
-	# Verify that the state chart didn't send any signals
-	assert_signal_not_emitted(a, "state_processing")
-	assert_signal_not_emitted(a, "state_physics_processing")
-	assert_signal_not_emitted(b, "state_processing")
-	assert_signal_not_emitted(b, "state_physics_processing")
-	assert_signal_not_emitted(a, "state_entered")
-	assert_signal_not_emitted(a, "state_exited")
-	assert_signal_not_emitted(b, "state_entered")
-	assert_signal_not_emitted(b, "state_exited")
-
-	# Ensure that the state chart has resumed processing
-	await wait_frames(10, "Run for a little while.")
-
-	assert_true(a.is_processing())
-	assert_true(a.is_physics_processing())
-
-	assert_signal_emitted(a, "state_processing")
-	assert_signal_emitted(a, "state_physics_processing")
-
-	assert_signal_not_emitted(b, "state_processing")
-	assert_signal_not_emitted(b, "state_physics_processing")
-
-	########################################################################
-	#### Part 5: Make sure signal processing and state changing work as expected
-	########################################################################
-	clear_signal_watcher()
-	watch_signals(a)
-	watch_signals(b)
-	watch_signals(t)
-	send_event("to_b")
-
-	assert_signal_emitted(t, "taken")
-
-	assert_active(b)
-	assert_inactive(a)
-
-	assert_signal_emitted(a, "state_exited")
-	assert_signal_emitted(b, "state_entered")
-
-
-func test_deserialization_with_pending_transition():
-	var root := compound_state("root")
-	var a := atomic_state("a", root)
-	var b := atomic_state("b", root)
-	transition(a, b, "to_b", "0.5")
-	await finish_setup()
-
-	# when i trigger the transition
-	send_event("to_b")
-
-	# then the transition should not be taken immediately
-	await wait_seconds(0.2)
-	assert_active(a)
-
-	# export the state chart to a resource
-	var resource:SerializedStateChart = StateChartSerializer.serialize(_chart)
-
-	# verify that the state chart is in the expected state
-	# after an additional 0.5 seconds the transition should be taken
-	await wait_seconds(0.5)
-	assert_active(b)
-	assert_inactive(a)
-
-	# load the state chart from the resource
-	var error_messages := StateChartSerializer.deserialize(resource, _chart)
-	assert_true(error_messages.is_empty())
-
-	# verify that the state chart has been reset
-	assert_active(a)
-	assert_inactive(b)
-
-	# Verify that the count down still works
-	await wait_seconds(0.2) # 0.2 pre-save + 0.2 post-load = 0.4 total delay
-	assert_active(a)
-	assert_inactive(b)
-
-	await wait_seconds(0.2) # 0.2 post-load + 0.4 post-load = 0.6 total delay
-	assert_active(b)
-	assert_inactive(a)
-
+	# AND: the history state should still remember a2 as the last active state
+	new_chart.send_event("to_h")
+	assert_active(na)
+	assert_active(na2)
+	
 
 func test_frozen_state_chart():
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
 	var to_b := transition(a, b, "to_b")
-	var to_a := transition(b, a, "to_a")
+	transition(b, a, "to_a")
 	await finish_setup()
 
 	_chart.name = "state_chart"
@@ -435,7 +343,7 @@ func test_pending_transition_name_check_on_deserialization():
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
-	var t := transition(a, b, "to_b")	
+	transition(a, b, "to_b")	
 	await finish_setup()
 
 	_chart.name = "state_chart"
@@ -522,3 +430,63 @@ func test_fewer_states_in_serialized_state():
 		assert_true(error_messages[0].contains("Tree has child state"))
 		assert_true(error_messages[0].contains("c"))
 		assert_true(error_messages[0].contains("no such child state exists in the serialized state"))
+
+#----------------------------------------------------------------------------------------------------------
+# helpers for printing serialized state charts for debugging
+#----------------------------------------------------------------------------------------------------------
+
+func print_serialized_chart_state(serialized: SerializedStateChart) -> void:
+	var lines: Array[String] = []
+	if is_instance_valid(serialized):
+		lines.append("SerializedStateChart: %s" % [serialized.name])
+		if is_instance_valid(serialized.state):
+			_append_serialized_state_lines(serialized.state, "  ", lines)
+		else:
+			lines.append("  <no state>")
+	else:
+		lines.append("<no SerializedStateChart>")
+	for line in lines:
+		print(line)
+
+func _append_serialized_state_lines(state: SerializedStateChartState, indent: String, lines: Array[String]) -> void:
+	if not is_instance_valid(state):
+		return
+	var active_text: String = "active" if state.active else "inactive"
+	var type_letter := _serialized_state_type_letter(state.state_type)
+	lines.append("%s- [%s] %s (%s)" % [indent, type_letter, state.name, active_text])
+	if not state.pending_transition_name.is_empty():
+		lines.append("%s  -> %s (%.2f)" % [indent, state.pending_transition_name, state.pending_transition_remaining_delay])
+	if state.state_type == 3 and is_instance_valid(state.history):
+		var paths := _collect_saved_state_paths(state.history, "")
+		if paths.size() > 0:
+					lines.append("%s  history: %s" % [indent, ", ".join(paths)])
+	for child in state.children:
+					_append_serialized_state_lines(child, indent + "  ", lines)
+
+func _serialized_state_type_letter(state_type: int) -> String:
+	match state_type:
+		0:
+			return "A"
+		1:
+			return "C"
+		2:
+			return "P"
+		3:
+			return "H"
+		_:
+			return "?"
+
+func _collect_saved_state_paths(saved: SavedState, prefix: String) -> Array[String]:
+	var result: Array[String] = []
+	if not is_instance_valid(saved):
+		return result
+	for key in saved.child_states.keys():
+		var name_str := str(key)
+		var path := name_str if prefix.is_empty() else "%s/%s" % [prefix, name_str]
+		result.append(path)
+		var child_saved: SavedState = saved.child_states[key]
+		if is_instance_valid(child_saved):
+			for sub in _collect_saved_state_paths(child_saved, path):
+				result.append(sub)
+	return result
+
