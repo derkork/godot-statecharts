@@ -1,6 +1,6 @@
 static func evaluate_expression(context:String, state_chart: StateChart, expression: String, default_value:Variant) -> Variant:
 	var the_expression := Expression.new()
-	var input_names = state_chart._expression_properties.keys()
+	var input_names := state_chart._expression_properties.keys()
 
 	var parse_result:int = the_expression.parse(expression, input_names)
 
@@ -21,6 +21,6 @@ static func evaluate_expression(context:String, state_chart: StateChart, express
 		push_error("(" + context + ") Expression execute error. Tried to run expression: '"  \
 			+ expression \
 			+ "' but got error: '" + the_expression.get_error_text() + "'")
-		return default_value	
+		return default_value
 
 	return result

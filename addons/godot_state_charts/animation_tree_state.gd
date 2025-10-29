@@ -18,17 +18,17 @@ extends AtomicState
 
 var _animation_tree_state_machine:AnimationNodeStateMachinePlayback
 
-func _ready():
+func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
-		
+
 	super._ready()
-	
+
 	_animation_tree_state_machine = null
 	var the_tree = get_node_or_null(animation_tree)
 
 	if is_instance_valid(the_tree):
-		var state_machine = the_tree.get("parameters/playback") 
+		var state_machine = the_tree.get("parameters/playback")
 		if state_machine is AnimationNodeStateMachinePlayback:
 			_animation_tree_state_machine = state_machine
 		else:
@@ -37,13 +37,13 @@ func _ready():
 		push_error("The animation tree is invalid. This node will not work.")
 
 
-func _state_enter(transition_target:StateChartState):
+func _state_enter(transition_target:StateChartState) -> void:
 	super._state_enter(transition_target)
 
 	if not is_instance_valid(_animation_tree_state_machine):
 		return
 
-	var target_state = state_name
+	var target_state := state_name
 	if target_state == "":
 		target_state = get_name()
 
@@ -51,8 +51,8 @@ func _state_enter(transition_target:StateChartState):
 	_animation_tree_state_machine.travel(target_state)
 
 
-func _get_configuration_warnings():
-	var warnings = super._get_configuration_warnings()
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := super._get_configuration_warnings()
 	warnings.append("This node is deprecated and will be removed in a future version.")
 
 	if animation_tree.is_empty():

@@ -60,10 +60,10 @@ var delay_seconds:float = 0.0:
 
 ## An expression for the delay in seconds before the transition is taken.
 ## This expression can use all expression properties of the state chart.
-## If the expression does not evaluate to a valid float or a negative value, 
+## If the expression does not evaluate to a valid float or a negative value,
 ## the delay will be 0. When the delay is 0, the transition will be taken immediately.
-## The transition will only be taken if the state is still active when the delay has 
-## passed and has never been left. 
+## The transition will only be taken if the state is still active when the delay has
+## passed and has never been left.
 var delay_in_seconds:String = "0.0":
 	set(value):
 		delay_in_seconds = value
@@ -71,7 +71,7 @@ var delay_in_seconds:String = "0.0":
 
 
 ## Read-only property that returns true if the transition has an event specified.
-## @deprecated: this property is no longer needed. It will be removed in a future version. 
+## @deprecated: this property is no longer needed. It will be removed in a future version.
 var has_event:bool:
 	get:
 		return event != null and event.length() > 0
@@ -94,37 +94,37 @@ func take(immediately:bool = true) -> void:
 	if parent_state._chart._frozen:
 		push_error("The state chart is currently frozen, so transition '" + name + "' cannot be taken.")
 		return
-	
+
 	parent_state._run_transition(self, immediately)
 
 ## Evaluates the guard expression and returns true if the transition should be taken.
 ## If no guard expression is specified, this function will always return true.
 func evaluate_guard() -> bool:
-	if guard == null: 
+	if guard == null:
 		return true
 
 	var parent_state:StateChartState = get_parent() as StateChartState
 	if parent_state == null:
 		push_error("Transitions must be children of states.")
 		return false
-		
+
 	return guard.is_satisfied(self, get_parent())
 
 
 ## Evaluates the delay of this transition.
 func evaluate_delay() -> float:
-	# if the expression just is a single float, skip the evaluation and just 
+	# if the expression just is a single float, skip the evaluation and just
 	# return the float value. This is a performance optimization.
 	if delay_in_seconds.is_valid_float():
 		return float(delay_in_seconds)
-	
+
 	# evaluate the expression
 	var parent_state:StateChartState = get_parent() as StateChartState
 	if parent_state == null:
 		push_error("Transitions must be children of states.")
 		return 0.0
 
-	var result = ExpressionUtil.evaluate_expression("delay of " + DebugUtil.path_of(self), parent_state._chart, delay_in_seconds, 0.0)	
+	var result = ExpressionUtil.evaluate_expression("delay of " + DebugUtil.path_of(self), parent_state._chart, delay_in_seconds, 0.0)
 	if typeof(result) != TYPE_FLOAT:
 		push_error("Expression: ", delay_in_seconds ," result: ", result,  " is not a float. Returning 0.0.")
 		return 0.0
@@ -150,10 +150,10 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	if not (get_parent() is StateChartState):
 		warnings.append("Transitions must be children of states.")
-		
+
 	if delay_in_seconds.strip_edges().is_empty():
 		warnings.append("Delay must be a valid expression. Use 0.0 if you want no delay.")
-	
+
 	return warnings
 
 func _get_property_list() -> Array:
@@ -164,7 +164,7 @@ func _get_property_list() -> Array:
 		"usage": PROPERTY_USAGE_DEFAULT,
 		"hint": PROPERTY_HINT_EXPRESSION
 	})
-	
+
 	# hide the old delay_seconds property
 	properties.append({
 		"name": "delay_seconds",
@@ -174,16 +174,16 @@ func _get_property_list() -> Array:
 
 	return properties
 
-	
-func _refresh_caches():
+
+func _refresh_caches() -> void:
 	_dirty = false
 	var is_automatic:bool = (event == null or event.length() == 0)
-	
+
 	if to != null and not to.is_empty():
 		var result:Node = get_node_or_null(to)
 		if result is StateChartState:
 			_target = result
-			
+
 	_supported_trigger_types = 0
 	if not is_automatic:
 		# non-automatic transitions can only be triggered by events
@@ -195,12 +195,7 @@ func _refresh_caches():
 		# ALL automatic transitions remain "in play" until the state is left. While
 		# "in play" they can be triggered by property changes or state changes.
 		# Which changes exactly are supported is determined by the used guard(s).
-		
+
 		# Check the guard for trigger types
 		if guard != null:
 			_supported_trigger_types |= guard.get_supported_trigger_types()
-
-
-
-	
-	

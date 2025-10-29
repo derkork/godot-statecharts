@@ -21,7 +21,7 @@ enum SidebarLocation {
 var _current_sidebar_location:SidebarLocation = SidebarLocation.LEFT
 
 
-func _enter_tree():
+func _enter_tree() -> void:
 	# prepare a copy of the sidebar for both 2D and 3D.
 	_ui_sidebar_canvas = _sidebar_ui.instantiate()
 	_ui_sidebar_canvas.sidebar_toggle_requested.connect(_toggle_sidebar)
@@ -29,11 +29,11 @@ func _enter_tree():
 	_ui_sidebar_spatial = _sidebar_ui.instantiate()
 	_ui_sidebar_spatial.sidebar_toggle_requested.connect(_toggle_sidebar)
 	_ui_sidebar_spatial.hide()
-	
-	
+
+
 	# and add it to the right place in the editor ui
 	_add_sidebars()
-	# get notified when selection changes so we can 
+	# get notified when selection changes so we can
 	# update the sidebar contents accordingly
 	get_editor_interface().get_selection().selection_changed.connect(_on_selection_changed)
 
@@ -41,63 +41,63 @@ func _enter_tree():
 	_debugger_plugin = preload("utilities/editor_debugger/editor_debugger_plugin.gd").new()
 	_debugger_plugin.initialize(get_editor_interface().get_editor_settings())
 	add_debugger_plugin(_debugger_plugin)
-	
+
 	# add the inspector plugin for events
 	_inspector_plugin = preload("utilities/event_editor/event_inspector_plugin.gd").new()
 	add_inspector_plugin(_inspector_plugin)
 
 
-func _set_window_layout(configuration):
+func _set_window_layout(configuration) -> void:
 	_remove_sidebars()
 	_current_sidebar_location = configuration.get_value("GodotStateCharts", "sidebar_location", SidebarLocation.LEFT)
 	_add_sidebars()
 
-	
-func _get_window_layout(configuration):
+
+func _get_window_layout(configuration) -> void:
 	configuration.set_value("GodotStateCharts", "sidebar_location", _current_sidebar_location)
 
 
-func _toggle_sidebar():
+func _toggle_sidebar() -> void:
 	_remove_sidebars()
 	_current_sidebar_location = SidebarLocation.RIGHT if _current_sidebar_location == SidebarLocation.LEFT else SidebarLocation.LEFT
 	_add_sidebars()
 	queue_save_layout()
 
 
-func _add_sidebars():
+func _add_sidebars() -> void:
 	if _current_sidebar_location == SidebarLocation.LEFT:
 		add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, _ui_sidebar_spatial)
-		add_control_to_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT, _ui_sidebar_canvas)		
+		add_control_to_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT, _ui_sidebar_canvas)
 	else:
 		add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_RIGHT, _ui_sidebar_spatial)
-		add_control_to_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_RIGHT, _ui_sidebar_canvas)		
-	
+		add_control_to_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_RIGHT, _ui_sidebar_canvas)
 
-func _remove_sidebars():
+
+func _remove_sidebars() -> void:
 	if _current_sidebar_location == SidebarLocation.LEFT:
 		remove_control_from_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_LEFT,_ui_sidebar_canvas)
 		remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, _ui_sidebar_spatial)
 	else:
 		remove_control_from_container(EditorPlugin.CONTAINER_CANVAS_EDITOR_SIDE_RIGHT,_ui_sidebar_canvas)
 		remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_RIGHT, _ui_sidebar_spatial)
-		
-	
 
-func _ready():
+
+
+func _ready() -> void:
 	# inititalize the side bars
 	_ui_sidebar_canvas.setup(get_editor_interface(), get_undo_redo())
 	_ui_sidebar_spatial.setup(get_editor_interface(), get_undo_redo())
 	_inspector_plugin.setup(get_undo_redo())
-	
 
 
-func _exit_tree():
+
+func _exit_tree() -> void:
 	# remove the debugger plugin
 	remove_debugger_plugin(_debugger_plugin)
-	
+
 	# remove the inspector plugin
 	remove_inspector_plugin(_inspector_plugin)
-	
+
 	# remove the side bars
 	_remove_sidebars()
 	if is_instance_valid(_ui_sidebar_canvas):
@@ -108,9 +108,9 @@ func _exit_tree():
 
 func _on_selection_changed() -> void:
 	# get the current selection
-	var selection = get_editor_interface().get_selection().get_selected_nodes()
-	
-	# show sidebar if we selected a chart or a state 
+	var selection := get_editor_interface().get_selection().get_selected_nodes()
+
+	# show sidebar if we selected a chart or a state
 	if selection.size() == 1:
 		var selected_node = selection[0]
 		if selected_node is StateChart \
@@ -121,7 +121,7 @@ func _on_selection_changed() -> void:
 			_ui_sidebar_spatial.show()
 			_ui_sidebar_spatial.change_selected_node(selected_node)
 			return
-			
+
 	# otherwise hide it
 	_ui_sidebar_canvas.hide()
 	_ui_sidebar_spatial.hide()

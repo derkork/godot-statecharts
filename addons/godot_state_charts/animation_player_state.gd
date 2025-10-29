@@ -26,35 +26,35 @@ extends AtomicState
 
 var _animation_player: AnimationPlayer
 
-func _ready():
+func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
-		
+
 	super._ready()
 	_animation_player = get_node_or_null(animation_player)
 
 	if not is_instance_valid(_animation_player):
 		push_error("The animation player is invalid. This node will not work.")
 
-func _state_enter(transition_target:StateChartState):
+func _state_enter(transition_target:StateChartState) -> void:
 	super._state_enter(transition_target)
 
 	if not is_instance_valid(_animation_player):
 		return
 
-	var target_animation = animation_name
+	var target_animation := animation_name
 	if target_animation == "":
 		target_animation = get_name()
-		
+
 	if _animation_player.current_animation == target_animation and _animation_player.is_playing():
 		return
 
 	_animation_player.play(target_animation, custom_blend, custom_speed, from_end)
 
-func _get_configuration_warnings():
-	var warnings = super._get_configuration_warnings()
+func _get_configuration_warnings() -> PackedStringArray:
+	var warnings := super._get_configuration_warnings()
 	warnings.append("This node is deprecated and will be removed in a future version.")
-	
+
 	if animation_player.is_empty():
 		warnings.append("No animation player is set.")
 	elif get_node_or_null(animation_player) == null:
