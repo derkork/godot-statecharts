@@ -8,7 +8,7 @@ extends StateChartState
 # all children of the state
 var _sub_states:Array[StateChartState] = []
 
-func _state_init():
+func _state_init() -> void:
 	super._state_init()
 	# find all children of this state which are states
 	for child in get_children():
@@ -20,13 +20,13 @@ func _state_init():
 	# subscribe to events from our children
 
 
-func _handle_transition(transition:Transition, source:StateChartState):
+func _handle_transition(transition:Transition, source:StateChartState) -> void:
 	# resolve the target state
-	var target = transition.resolve_target()
-	if not target is StateChartState:
+	var target := transition.resolve_target()
+	if target == null:
 		push_error("The target state '" + str(transition.to) + "' of the transition from '" + source.name + "' is not a state.")
 		return
-	
+
 	# the target state can be
 	# 0. this state. in this case just activate the state and all its children.
 	#    this can happen when a child state transfers back to its parent state.
@@ -48,7 +48,7 @@ func _handle_transition(transition:Transition, source:StateChartState):
 	if target in get_children():
 		# all good, nothing to do.
 		return
-		
+
 	if self.is_ancestor_of(target):
 		# find the child which is the ancestor of the new target.
 		for child in get_children():
@@ -57,24 +57,24 @@ func _handle_transition(transition:Transition, source:StateChartState):
 				child._handle_transition(transition, source)
 				return
 		return
-	
+
 	# ask the parent
 	get_parent()._handle_transition(transition, source)
 
-func _state_enter(transition_target:StateChartState):
+func _state_enter(transition_target:StateChartState) -> void:
 	super._state_enter(transition_target)
 	# enter all children
 	for child in _sub_states:
 		child._state_enter(transition_target)
-	
-func _state_exit():
+
+func _state_exit() -> void:
 	# exit all children
 	for child in _sub_states:
 		child._state_exit()
-	
+
 	super._state_exit()
 
-func _state_step():
+func _state_step() -> void:
 	super._state_step()
 	for child in _sub_states:
 		child._state_step()
@@ -102,15 +102,14 @@ func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName 
 	return super._process_transitions(trigger_type, event)
 
 func _get_configuration_warnings() -> PackedStringArray:
-	var warnings = super._get_configuration_warnings()
-	
-	var child_count = 0
+	var warnings := super._get_configuration_warnings()
+
+	var child_count := 0
 	for child in get_children():
 		if child is StateChartState:
 			child_count += 1
-	
+
 	if child_count < 2:
 		warnings.append("Parallel states should have at least two child states.")
-	
-	
+
 	return warnings

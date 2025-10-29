@@ -6,7 +6,7 @@ extends Resource
 
 ## The saved states of any active child states
 ## Key is the name of the child state, value is the SavedState of the child state
-@export var child_states: Dictionary = {} 
+@export var child_states: Dictionary = {}
 
 ## The path to the currently pending transition, if any
 @export var pending_transition_name: NodePath
@@ -22,10 +22,9 @@ extends Resource
 
 
 ## Adds the given substate to this saved state
-func add_substate(state:StateChartState, saved_state:SavedState):
+func add_substate(state:StateChartState, saved_state:SavedState) -> void:
 	child_states[state.name] = saved_state
 
 ## Returns the saved state of the given substate, or null if it does not exist
 func get_substate_or_null(state:StateChartState) -> SavedState:
 	return child_states.get(state.name)
-
