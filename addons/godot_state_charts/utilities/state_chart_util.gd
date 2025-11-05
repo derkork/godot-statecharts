@@ -6,7 +6,7 @@ static func find_parent_state_chart(node:Node) -> StateChart:
 	if node is StateChart:
 		return node
 	
-	var parent = node.get_parent()
+	var parent := node.get_parent()
 	while parent != null:
 		if parent is StateChart:
 			return parent
@@ -25,7 +25,7 @@ static func events_of(chart:StateChart) -> Array[StringName]:
 	return result
 
 	
-static func _collect_events(node:Node, events:Array[StringName]):
+static func _collect_events(node:Node, events:Array[StringName]) -> void:
 	if node is Transition:
 		if node.event != "" and not events.has(node.event):
 			events.append(node.event)
@@ -41,7 +41,7 @@ static func transitions_of(chart:StateChart) -> Array[Transition]:
 	return result
 	
 	
-static func _collect_transitions(node:Node, result:Array[Transition]):
+static func _collect_transitions(node:Node, result:Array[Transition]) -> void:
 	if node is Transition:
 		result.append(node)
 		

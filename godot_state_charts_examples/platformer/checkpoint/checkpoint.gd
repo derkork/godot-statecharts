@@ -12,25 +12,25 @@ signal deactivated(checkpoint:Node2D)
 @onready var _state_chart:StateChart = get_node("StateChart")
 
 
-func _on_area_2d_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):
+func _on_area_2d_input_event(_viewport:Node, event:InputEvent, _shape_idx:int) -> void:
 	# if event was left mouse button up, emit clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
 		# print("Checkpoint clicked")
 		clicked.emit(self)
 
 
-func _on_area_2d_body_entered(body:Node2D):
+func _on_area_2d_body_entered(body:Node2D) -> void:
 	if body.is_in_group("player"):
 		_state_chart.send_event("player_entered")
 
 
-func _on_area_2d_body_exited(body:Node2D):
+func _on_area_2d_body_exited(body:Node2D) -> void:
 	if body.is_in_group("player"):
 		_state_chart.send_event("player_exited")
 		
 		
-func emit_activated():
+func emit_activated() -> void:
 	activated.emit(self)
 	
-func emit_deactivated():
+func emit_deactivated() -> void:
 	deactivated.emit(self)

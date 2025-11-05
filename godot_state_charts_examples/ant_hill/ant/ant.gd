@@ -25,15 +25,15 @@ var nest:Node2D = null
 ## The currently carried food
 var carried_food:Node = null
 
-const SEGMENT_LENGTH = 150
+const SEGMENT_LENGTH := 150
 
-func _ready():
+func _ready() -> void:
 	# start the state chart
 	state_chart.send_event.call_deferred("initialized")
 
 
 ## Called when we are seeking for food and need a new target.
-func _on_idle_seeking_food():
+func _on_idle_seeking_food() -> void:
 
 	var current_position := get_global_position()
 
@@ -46,7 +46,7 @@ func _on_idle_seeking_food():
 	# if we have food markers nearby travel into the general direction of the closest one points
 	if food_markers.size() > 0:
 		var closest_food_marker := _find_closest(food_markers.keys(), current_position)
-		var direction = Vector2.RIGHT.rotated(closest_food_marker.get_rotation())
+		var direction := Vector2.RIGHT.rotated(closest_food_marker.get_rotation())
 		target_position = current_position + (direction * SEGMENT_LENGTH)
 
 	# otherwise or if we couldn't reach the last target position, pick a random 
@@ -69,15 +69,15 @@ func _on_idle_seeking_food():
 
 
 ## Called when we have found food nearby and want to go to it
-func _on_food_detected():
+func _on_food_detected() -> void:
 	# set the target position to the closest food
-	var closest_food_position = _find_closest(food.keys(), get_global_position()).global_position
+	var closest_food_position := _find_closest(food.keys(), get_global_position()).global_position
 	navigation_agent.set_target_position(closest_food_position)
 
 
 ## Called when we arrived at the food and want to pick it up
-func _on_food_reached():
-	var closest_food = _find_closest(food.keys(), get_global_position())
+func _on_food_reached() -> void:
+	var closest_food := _find_closest(food.keys(), get_global_position())
 	if not is_instance_valid(closest_food):
 		# some other ant must have picked it up
 		state_chart.send_event("food_vanished")
@@ -95,7 +95,7 @@ func _on_food_reached():
 	closest_food.scale = Vector2(0.5, 0.5)
 	
 	# place a marker pointing to the food (0 means point into the current direction)
-	var marker = _place_marker(Marker.MarkerType.FOOD, global_position, 0)
+	var marker := _place_marker(Marker.MarkerType.FOOD, global_position, 0)
 	food_markers[marker] = true
 
 	# notify the state chart that we picked up food
@@ -104,7 +104,7 @@ func _on_food_reached():
  
 
 ## Called when we are returning home and need a new target.
-func _on_idle_returning_home():
+func _on_idle_returning_home() -> void:
 	var current_position := get_global_position()
 
 	# if the nest is nearby, drop off the food
@@ -120,7 +120,7 @@ func _on_idle_returning_home():
 			marker.refresh()
 			
 		var closest_nest_marker := _find_closest(nest_markers.keys(), current_position)
-		var direction = Vector2.RIGHT.rotated(closest_nest_marker.get_rotation()) 
+		var direction := Vector2.RIGHT.rotated(closest_nest_marker.get_rotation()) 
 		target_position = current_position + (direction * SEGMENT_LENGTH)
 	
 	# if we have no nest markers or the navigation agent couldn't reach
@@ -140,14 +140,14 @@ func _on_idle_returning_home():
 	return
 
 ## Called when we are returning home and detected the nest
-func _on_nest_detected():
+func _on_nest_detected() -> void:
 	# travel to the nest
 	navigation_agent.set_target_position(nest.global_position)
 	state_chart.set_expression_property("target_position", nest.global_position)
 
 
 ## Called when we have arrived at the nest and want to drop off the food
-func _on_nest_reached():
+func _on_nest_reached() -> void:
 	# drop off the food
 	carried_food.get_parent().remove_child(carried_food)
 	carried_food.queue_free()
@@ -157,16 +157,16 @@ func _on_nest_reached():
 
 
 ## Called while travelling to a destination
-func _on_travelling_state_physics_processing(_delta):
+func _on_travelling_state_physics_processing(_delta:float) -> void:
 	# get the next position on the path
-	var path_position = navigation_agent.get_next_path_position()
+	var path_position := navigation_agent.get_next_path_position()
 	# and move towards it
 	velocity = (path_position - get_global_position()).normalized() * navigation_agent.max_speed
 	look_at(path_position)
 	move_and_slide()
 
 
-func _on_input_event(_viewport, event, _shape_idx):
+func _on_input_event(_viewport, event, _shape_idx) -> void:
 	# if the left mouse button is up emit the clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
 		# print("clicked")
@@ -174,8 +174,8 @@ func _on_input_event(_viewport, event, _shape_idx):
 
 
 ## Called when the ant is sensing something nearby.
-func _on_sensor_area_area_entered(area:Area2D):
-	var node = area
+func _on_sensor_area_area_entered(area:Area2D) -> void:
+	var node:Node = area
 	if area.has_meta("owner"):
 		node = area.get_node(area.get_meta("owner"))
 
@@ -198,8 +198,8 @@ func _on_sensor_area_area_entered(area:Area2D):
 
 
 
-func _on_sensor_area_area_exited(area:Area2D):
-	var node = area
+func _on_sensor_area_area_exited(area:Area2D) -> void:
+	var node:Node = area
 	if area.has_meta("owner"):
 		node = area.get_node(area.get_meta("owner"))
 	
@@ -238,7 +238,7 @@ func _find_closest(targets:Array, from:Vector2) -> Node2D:
 
 ## Places a marker of the given type at the given position	
 func _place_marker(type:Marker.MarkerType, target_position:Vector2, offset:float = PI) -> Marker:
-	var marker = marker_scene.instantiate()
+	var marker := marker_scene.instantiate()
 	marker.initialize(type)
 	# add to the tree on our parent
 	get_parent().add_child.call_deferred(marker)
@@ -249,7 +249,7 @@ func _place_marker(type:Marker.MarkerType, target_position:Vector2, offset:float
 	return marker
 	
 
-func _place_nest_marker():
+func _place_nest_marker() -> void:
 	# if there are already nest markers around, just refresh them
 	if nest_markers.size() > 0:
 		for marker in nest_markers:
@@ -259,11 +259,11 @@ func _place_nest_marker():
 		_place_marker(Marker.MarkerType.NEST, global_position)
 
 
-func _place_food_marker():
+func _place_food_marker() -> void:
 	_place_marker(Marker.MarkerType.FOOD, global_position)
 
 
-func _maintenance(_delta):
+func _maintenance(_delta:float) -> void:
 	# remove all markers which are no longer valid
 	for marker in food_markers.keys():
 		if not is_instance_valid(marker):

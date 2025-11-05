@@ -19,7 +19,7 @@ var _time_in_state: float = 0.0
 var _current_color_index: int = 0
 
 
-func _ready():
+func _ready() -> void:
 	# emit the signal when the button is pressed
 	%Button.pressed.connect(func(): color_change_requested.emit())
 	# set the id
@@ -28,31 +28,31 @@ func _ready():
 	_switch_to(0)
 
 ## Called when this box should switch to red.
-func switch_to_red():
+func switch_to_red() -> void:
 	_switch_to(0)
 
 	
 ## Called when this box should switch to green.
-func switch_to_green():
+func switch_to_green() -> void:
 	_switch_to(1)
 
 ## Called when this box should switch to blue.
-func switch_to_blue():
+func switch_to_blue() -> void:
 	_switch_to(2)
 
 
-func _switch_to(index: int):
+func _switch_to(index: int) -> void:
 	_current_color_index = index
 	_color_rect.color = COLORS[index]
 	_transition_time_label.text = ""
 	_time_in_state = 0
 
 ## Called every frame while a color change is pending
-func show_pending(_initial_delay: float, remaining_delay: float):
+func show_pending(_initial_delay: float, remaining_delay: float) -> void:
 	_transition_time_label.text = "Time Remaining: %.1f" % remaining_delay
 
 
-func _physics_process(delta):
+func _physics_process(delta:float) -> void:
 	_time_in_state += delta
 	_time_in_state_label.text = "Time in State: %.1f" % _time_in_state
 

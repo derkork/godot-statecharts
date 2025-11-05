@@ -10,7 +10,7 @@ const SAVE_PATH: StringName = "user://save_resource.tres"
 var _boxes: Array[ColorBox]
 
 
-func _ready():
+func _ready() -> void:
 	# grab all color boxes
 	_boxes.assign(get_tree().get_nodes_in_group("colorbox"))
 	# send an event whenever a box requests a color change

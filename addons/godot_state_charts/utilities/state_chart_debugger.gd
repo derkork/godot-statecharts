@@ -52,17 +52,17 @@ var _connected_transitions:Dictionary = {}
 # the debugger history in text form
 var _history:DebuggerHistory = null
 
-func _ready():
+func _ready() -> void:
 	# always run, even if the game is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS	
 	
 	# initialize the buffer
 	_history = DebuggerHistory.new(maximum_lines)
 
-	%CopyToClipboardButton.pressed.connect(func (): DisplayServer.clipboard_set(_history_edit.text))
+	%CopyToClipboardButton.pressed.connect(func () -> void: DisplayServer.clipboard_set(_history_edit.text))
 	%ClearButton.pressed.connect(_clear_history)
 
-	var to_watch = get_node_or_null(initial_node_to_watch)
+	var to_watch := get_node_or_null(initial_node_to_watch)
 	if is_instance_valid(to_watch):
 		debug_node(to_watch)
 	
@@ -74,7 +74,7 @@ func _ready():
 	
 
 ## Adds an item to the history list.
-func add_history_entry(text:String):
+func add_history_entry(text:String) -> void:
 	_history.add_history_entry(Engine.get_process_frames(), text)
 
 ## Sets up the debugger to track the given state chart. If the given node is not 
@@ -90,7 +90,7 @@ func debug_node(root:Node) -> bool:
 	# disconnect all existing signals
 	_disconnect_all_signals()
 
-	var success = _debug_node(root)
+	var success := _debug_node(root)
 	
 
 	# if we have no success, we disable the debugger
@@ -126,13 +126,13 @@ func _debug_node(root:Node) -> bool:
 	return false
 
 
-func _setup_processing(enabled:bool):
+func _setup_processing(enabled:bool) -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS if enabled else Node.PROCESS_MODE_DISABLED
 	visible = enabled
 
 
 ## Disconnects all signals from the currently connected states.
-func _disconnect_all_signals():
+func _disconnect_all_signals() -> void:
 	if is_instance_valid(_state_chart):
 		if not ignore_events:
 			_state_chart.event_received.disconnect(_on_event_received)
@@ -151,7 +151,7 @@ func _disconnect_all_signals():
 
 
 ## Connects all signals from the currently processing state chart
-func _connect_all_signals():
+func _connect_all_signals() -> void:
 	_connected_states.clear()
 	_connected_transitions.clear()
 
@@ -166,7 +166,7 @@ func _connect_all_signals():
 			_connect_signals(child)
 
 
-func _connect_signals(state:StateChartState):
+func _connect_signals(state:StateChartState) -> void:
 	state.state_entered.connect(_on_state_entered.bind(state))
 	state.state_exited.connect(_on_state_exited.bind(state))
 	_connected_states.append(state)
@@ -176,26 +176,26 @@ func _connect_signals(state:StateChartState):
 		if child is StateChartState:
 			_connect_signals(child)
 		if child is Transition:
-			var callable = _on_before_transition.bind(child, state)
+			var callable := _on_before_transition.bind(child, state)
 			child.taken.connect(callable)
 			_connected_transitions[child] = callable
 
 
-func _process(delta):
+func _process(delta:float) -> void:
 	# Clear contents
 	_tree.clear()
 
 	if not is_instance_valid(_state_chart):
 		return
 
-	var root = _tree.create_item()
+	var root := _tree.create_item()
 	root.set_text(0, _root.name)
 
 	# walk over the state chart and find all active states
 	_collect_active_states(_state_chart, root )
 	
 	# also show the values of all variables
-	var items = _state_chart._expression_properties.keys()
+	var items := _state_chart._expression_properties.keys()
 	
 	if items.size() <= 0:
 		return # nothing to show
@@ -203,17 +203,17 @@ func _process(delta):
 	# sort by name so it doesn't flicker all the time
 	items.sort()
 	
-	var properties_root = root.create_child()
+	var properties_root := root.create_child()
 	properties_root.set_text(0, "< Expression properties >")
 	
 	for item in items:
-		var value = str(_state_chart._expression_properties.get(item))
+		var value := str(_state_chart._expression_properties.get(item))
 		
-		var property_line = properties_root.create_child()
+		var property_line := properties_root.create_child()
 		property_line.set_text(0, "%s = %s" % [item, value])
 	
 
-func _collect_active_states(root:Node, parent:TreeItem):
+func _collect_active_states(root:Node, parent:TreeItem) -> void:
 	for child in root.get_children():
 		if child is StateChartState:
 			if child.active:
@@ -227,39 +227,39 @@ func _collect_active_states(root:Node, parent:TreeItem):
 				_collect_active_states(child, state_item)
 
 
-func _clear_history():
+func _clear_history() -> void:
 	_history_edit.text = ""
 	_history.clear()
 
-func _on_before_transition(transition:Transition, source:StateChartState):
+func _on_before_transition(transition:Transition, source:StateChartState) -> void:
 	if ignore_transitions:
 		return
 
 	_history.add_transition(Engine.get_process_frames(), transition.name, _state_chart.get_path_to(source), _state_chart.get_path_to(transition.resolve_target()))
 
 
-func _on_event_received(event:StringName):
+func _on_event_received(event:StringName) -> void:
 	if ignore_events:
 		return
 
 	_history.add_event(Engine.get_process_frames(), event)	
 
 	
-func _on_state_entered(state:StateChartState):
+func _on_state_entered(state:StateChartState) -> void:
 	if ignore_state_changes:
 		return
 		
 	_history.add_state_entered(Engine.get_process_frames(), state.name)
 
 
-func _on_state_exited(state:StateChartState):
+func _on_state_exited(state:StateChartState) -> void:
 	if ignore_state_changes:
 		return
 		
 	_history.add_state_exited(Engine.get_process_frames(), state.name)
 
 
-func _on_timer_timeout():
+func _on_timer_timeout() -> void:
 	# ignore the timer if the history edit isn't visible
 	if not _history_edit.visible or not _history.dirty:
 		return 
@@ -269,12 +269,12 @@ func _on_timer_timeout():
 	_history_edit.scroll_vertical = _history_edit.get_line_count() - 1
 
 
-func _on_ignore_events_checkbox_toggled(button_pressed):
+func _on_ignore_events_checkbox_toggled(button_pressed) -> void:
 	ignore_events = button_pressed
 
 
-func _on_ignore_state_changes_checkbox_toggled(button_pressed):
+func _on_ignore_state_changes_checkbox_toggled(button_pressed) -> void:
 	ignore_state_changes = button_pressed
 
-func _on_ignore_transitions_checkbox_toggled(button_pressed):
+func _on_ignore_transitions_checkbox_toggled(button_pressed) -> void:
 	ignore_transitions = button_pressed

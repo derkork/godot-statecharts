@@ -4,28 +4,28 @@
 var _content:Array[String] = []
 
 ## The current index in the ring buffer
-var _index = 0
+var _index := 0
 
 ## The size of the ring buffer
-var _size = 0 
+var _size := 0 
 
 ## Whether the buffer is fully populated
-var _filled = false
+var _filled := false
 
 
-func _init(size:int = 300):
+func _init(size:int = 300) -> void:
 	_size = size
 	_content.resize(size)
 	
 	
 ## Sets the maximum number of lines to store. This clears the buffer.	
-func set_maximum_lines(lines:int):
+func set_maximum_lines(lines:int) -> void:
 	_size = lines
 	_content.resize(lines)
 	clear()
 
 ## Adds an item to the ring buffer
-func append(value:String):
+func append(value:String) -> void:
 	_content[_index] = value
 	if _index + 1 < _size:
 		_index += 1
@@ -35,8 +35,8 @@ func append(value:String):
 
 
 ## Joins the items of the ring buffer into a big string
-func join():
-	var result = ""
+func join() -> String:
+	var result := ""
 	if _filled:
 		# start by _index + 1, run to the end and then continue from the start
 		for i in range(_index, _size):
@@ -49,6 +49,6 @@ func join():
 	return result
 
 		
-func clear():
+func clear() -> void:
 	_index = 0
 	_filled = false 	

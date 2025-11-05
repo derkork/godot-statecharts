@@ -20,7 +20,7 @@ var _ignore_events:bool = true
 
 
 ## Sets up the debugger remote to track the given state chart.
-func _init(state_chart:StateChart):
+func _init(state_chart:StateChart) -> void:
 	if not is_instance_valid(state_chart):
 		push_error("Probable bug: State chart is not valid. Please report this bug.")
 		return
@@ -32,7 +32,7 @@ func _init(state_chart:StateChart):
 	_state_chart = state_chart
 
 
-func _ready():
+func _ready() -> void:
 	# subscribe to settings changes coming from the editor debugger
 	# will auto-unsubscribe when the chart goes away. We do this before
 	# sending state_chart_added, so we get the initial settings update delivered
@@ -45,7 +45,7 @@ func _ready():
 	_prepare()
 
 
-func _on_settings_updated(chart:NodePath, ignore_events:bool, ignore_transitions:bool):
+func _on_settings_updated(chart:NodePath, ignore_events:bool, ignore_transitions:bool) -> void:
 	if _state_chart.get_path() != chart:
 		return # doesn't affect this chart
 		
@@ -54,7 +54,7 @@ func _on_settings_updated(chart:NodePath, ignore_events:bool, ignore_transitions
 
 
 ## Connects all signals from the currently processing state chart
-func _prepare():
+func _prepare() -> void:
 	_state_chart.event_received.connect(_on_event_received)
 
 	# find all state nodes below the state chart and connect their signals
@@ -63,7 +63,7 @@ func _prepare():
 			_prepare_state(child)
 
 
-func _prepare_state(state:StateChartState):
+func _prepare_state(state:StateChartState) -> void:
 	state.state_entered.connect(_on_state_entered.bind(state))
 	state.state_exited.connect(_on_state_exited.bind(state))
 	state.transition_pending.connect(_on_transition_pending.bind(state))
@@ -79,24 +79,24 @@ func _prepare_state(state:StateChartState):
 			child.taken.connect(_on_transition_taken.bind(state, child))
 
 
-func _on_transition_taken(source:StateChartState, transition:Transition):
+func _on_transition_taken(source:StateChartState, transition:Transition) -> void:
 	if _ignore_transitions:
 		return
 	DebuggerMessage.transition_taken(_state_chart, source, transition)
 
 
-func _on_event_received(event:StringName):
+func _on_event_received(event:StringName) -> void:
 	if _ignore_events:
 		return
 	DebuggerMessage.event_received(_state_chart, event)
 	
-func _on_state_entered(state:StateChartState):
+func _on_state_entered(state:StateChartState) -> void:
 	DebuggerMessage.state_entered(_state_chart, state)		
 
-func _on_state_exited(state:StateChartState):
+func _on_state_exited(state:StateChartState) -> void:
 	DebuggerMessage.state_exited(_state_chart, state)
 
-func _on_transition_pending(num1, remaining, state:StateChartState):
+func _on_transition_pending(num1, remaining, state:StateChartState) -> void:
 	DebuggerMessage.transition_pending(_state_chart, state, state._pending_transition, remaining)
 		
 

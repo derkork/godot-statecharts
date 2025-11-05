@@ -18,7 +18,7 @@ var _chart:StateChart
 var _undo_redo:EditorUndoRedoManager
 
 
-func _init(transition:Transition, undo_redo:EditorUndoRedoManager):
+func _init(transition:Transition, undo_redo:EditorUndoRedoManager) -> void:
 	
 	# save the variables
 	_chart = StateChartUtil.find_parent_state_chart(transition)
@@ -46,7 +46,7 @@ func _init(transition:Transition, undo_redo:EditorUndoRedoManager):
 	_property_control.text_changed.connect(_on_text_changed)
 
 ## Shows the popup when the user clicks the button.
-func _show_popup():
+func _show_popup() -> void:
 	# always show up-to-date information in selector
 	var known_events = StateChartUtil.events_of(_chart)
 	
@@ -73,7 +73,7 @@ func _on_event_selected(index:int) -> void:
 	# index 1 == "Manage"
 	if index == 1:
 		# open refactor window
-		var window = _refactor_window_scene.instantiate()
+		var window := _refactor_window_scene.instantiate()
 		add_child(window)
 		window.open(_chart, _undo_redo)
 		return
@@ -85,7 +85,7 @@ func _on_event_selected(index:int) -> void:
 	_property_control.grab_focus()
 
 
-func _on_text_changed(new_text:String):
+func _on_text_changed(new_text:String) -> void:
 	emit_changed(get_edited_property(), new_text)
 
 

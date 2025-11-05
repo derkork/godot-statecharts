@@ -17,25 +17,25 @@ var _undo_redo:EditorUndoRedoManager
 @onready var _add_grid_container:Control = %AddGridContainer
 
 
-func setup(editor_interface:EditorInterface, undo_redo:EditorUndoRedoManager):
+func setup(editor_interface:EditorInterface, undo_redo:EditorUndoRedoManager) -> void:
 	_editor_interface = editor_interface
 	_undo_redo = undo_redo
 
 
-func change_selected_node(node):
+func change_selected_node(node) -> void:
 	_selected_node = node
 	_repaint()
 
-func _repaint():
+func _repaint() -> void:
 	# we can add states to all composite states and to the 
 	# root if the root has no child state yet.
-	var can_add_states = \
+	var can_add_states := \
 		( _selected_node is StateChart and _selected_node.get_child_count() == 0 ) \
 		or _selected_node is ParallelState \
 		or _selected_node is CompoundState
 		
 	# we can add transitions to all states
-	var can_add_transitions = \
+	var can_add_transitions := \
 		_selected_node is StateChartState
 		
 	_add_section.visible = can_add_states or can_add_transitions
@@ -49,9 +49,9 @@ func _repaint():
 			btn.visible = can_add_transitions
 
 
-func _create_node(type, name:StringName):
+func _create_node(type, name:StringName) -> void:
 	
-	var final_name = _add_node_name_line_edit.text.strip_edges()
+	var final_name := _add_node_name_line_edit.text.strip_edges()
 	if final_name.length() == 0:
 		final_name = name
 	
@@ -75,25 +75,25 @@ func _create_node(type, name:StringName):
 		
 
 
-func _on_atomic_state_pressed():
+func _on_atomic_state_pressed() -> void:
 	_create_node(AtomicState, "AtomicState")
 
 
-func _on_compound_state_pressed():
+func _on_compound_state_pressed() -> void:
 	_create_node(CompoundState, "CompoundState")
 
 
-func _on_parallel_state_pressed():
+func _on_parallel_state_pressed() -> void:
 	_create_node(ParallelState, "ParallelState")
 
 
-func _on_history_state_pressed():
+func _on_history_state_pressed() -> void:
 	_create_node(HistoryState, "HistoryState")
 
 
-func _on_transition_pressed():
+func _on_transition_pressed() -> void:
 	_create_node(Transition, "Transition")
 
 
-func _on_toggle_sidebar_button_pressed():
+func _on_toggle_sidebar_button_pressed() -> void:
 	sidebar_toggle_requested.emit()

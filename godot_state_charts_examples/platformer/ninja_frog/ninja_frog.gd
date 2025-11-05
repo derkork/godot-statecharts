@@ -3,8 +3,8 @@ extends CharacterBody2D
 ## Emitted when this node is clicked with a mouse 
 signal clicked(node:Node2D)
 
-const SPEED = 300.0
-const JUMP_VELOCITY = -400.0
+const SPEED := 300.0
+const JUMP_VELOCITY := -400.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var _gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
@@ -18,10 +18,10 @@ var _gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _was_on_floor:bool = false
 
 # In all states, move and slide and handle left/right movement and gravity.
-func _physics_process(delta):
+func _physics_process(delta:float) -> void:
 
 	# handle left/right movement
-	var direction = Input.get_axis("ui_left", "ui_right")
+	var direction := Input.get_axis("ui_left", "ui_right")
 	if direction:
 		velocity.x = direction * SPEED
 	else:
@@ -61,7 +61,7 @@ func _physics_process(delta):
 
 
 ## Called in states that allow jumping, we process jumps only in these.
-func _on_jump_enabled_state_physics_processing(_delta):
+func _on_jump_enabled_state_physics_processing(_delta:float) -> void:
 	if Input.is_action_just_pressed("ui_accept"):
 		velocity.y = JUMP_VELOCITY
 		_state_chart.send_event("jump")
@@ -69,11 +69,11 @@ func _on_jump_enabled_state_physics_processing(_delta):
 
 ## Called when the jump transition is taken in the double-jump
 ## state. Only used to play the double jump animation.
-func _on_double_jump_jump():
+func _on_double_jump_jump() -> void:
 	_animation_state_machine.travel("DoubleJump")
 
 
-func _on_input_event(_viewport:Node, event:InputEvent, _shape_idx:int):
+func _on_input_event(_viewport:Node, event:InputEvent, _shape_idx:int) -> void:
 	# if the left mouse button is up emit the clicked signal
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() == false:
 			clicked.emit(self)
