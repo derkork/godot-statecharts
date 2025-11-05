@@ -257,7 +257,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 	elif child_count < 2:
 		warnings.append("Compound states with only one child state are not very useful. Consider adding more child states or removing this compound state.")
 
-	var the_initial_state = get_node_or_null(initial_state)
+	var the_initial_state := get_node_or_null(initial_state)
 
 	if not is_instance_valid(the_initial_state):
 		warnings.append("Initial state could not be resolved, is the path correct?")

@@ -311,7 +311,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 func _toggle_processing(freeze:bool = false) -> void:
 	# Whether processing should be enabled in general. We only process
 	# for active states in the first place.
-	var enable_processing = not freeze and _state_active
+	var enable_processing := not freeze and _state_active
 
 	if enable_processing:
 		process_mode = PROCESS_MODE_INHERIT

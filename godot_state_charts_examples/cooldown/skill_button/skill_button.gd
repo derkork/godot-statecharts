@@ -18,18 +18,18 @@ signal pressed()
 ## The button that can be pressed
 @onready var _button:Button = %Button
 
-func _ready():
+func _ready() -> void:
 	_apply_settings()
 	
 	
-func _apply_settings():
+func _apply_settings() -> void:
 	if _texture_progress_bar != null:
 		_texture_progress_bar.texture_under = texture
 
 ## Called while cooldown transitions run. Will update the state of the 
 ## cooldown in the UI elements and disable the button until clear_cooldown
 ## is called.
-func set_cooldown(total:float, current:float):
+func set_cooldown(total:float, current:float) -> void:
 	_label.visible = true
 	_button.disabled = true
 	_texture_progress_bar.max_value = total
@@ -39,7 +39,7 @@ func set_cooldown(total:float, current:float):
 	
 ## Called to clear the cooldown. Will enable the button and clear all cooldown
 ## indicators.	
-func clear_cooldown():
+func clear_cooldown() -> void:
 	_label.visible = false
 	_button.disabled = false
 	_texture_progress_bar.value = 0	
@@ -47,5 +47,5 @@ func clear_cooldown():
 	_texture_progress_bar.max_value = 100
 
 ## Signal relay for the inner button.
-func _on_button_pressed():
+func _on_button_pressed() -> void:
 	pressed.emit()

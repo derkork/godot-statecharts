@@ -9,7 +9,7 @@ var _dirty:bool = false
 var dirty:bool:
 	get: return _dirty
 
-func _init(maximum_lines:int = 500):
+func _init(maximum_lines:int = 500) -> void:
 	_buffer = RingBuffer.new(maximum_lines)
 	_dirty = false
 

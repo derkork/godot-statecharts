@@ -25,7 +25,7 @@ func _ready() -> void:
 	super._ready()
 
 	_animation_tree_state_machine = null
-	var the_tree = get_node_or_null(animation_tree)
+	var the_tree := get_node_or_null(animation_tree)
 
 	if is_instance_valid(the_tree):
 		var state_machine = the_tree.get("parameters/playback")

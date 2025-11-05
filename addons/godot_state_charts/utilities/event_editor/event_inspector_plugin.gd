@@ -6,16 +6,16 @@ const EventEditor = preload("event_editor.gd")
 var _undo_redo:EditorUndoRedoManager
 
 
-func setup(undo_redo:EditorUndoRedoManager):
+func setup(undo_redo:EditorUndoRedoManager) -> void:
 	_undo_redo = undo_redo
 
 
-func _can_handle(_object):
+func _can_handle(_object) -> bool:
 	# We support all objects in this example.
 	return true
 
 
-func _parse_property(object, type, name, _hint_type, _hint_string, _usage_flags, _wide):
+func _parse_property(object, type, name, _hint_type, _hint_string, _usage_flags, _wide) -> bool:
 	# We handle properties of type integer.
 	if object is Transition and name == "event" and type == TYPE_STRING_NAME:
 		# Create an instance of the custom property editor and register

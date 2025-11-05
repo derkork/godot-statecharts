@@ -74,7 +74,7 @@ static func get_state_type(array:Array) -> StateTypes:
 
 ## Returns an icon for the state type of the given array.
 static func get_state_icon(array:Array) -> Texture2D:
-	var type = get_state_type(array)
+	var type := get_state_type(array)
 	if type == StateTypes.AtomicState:
 		return preload("../../atomic_state.svg")
 	elif type == StateTypes.CompoundState:

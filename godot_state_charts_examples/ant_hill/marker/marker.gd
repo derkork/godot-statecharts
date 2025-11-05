@@ -15,7 +15,7 @@ enum MarkerType {
 	NEST
 }
 
-func initialize(type:MarkerType):
+func initialize(type:MarkerType) -> void:
 	add_to_group("marker")
 	match type:
 		MarkerType.FOOD:
@@ -27,11 +27,11 @@ func initialize(type:MarkerType):
 			lifetime_seconds *= 2
 
 ## Refreshes the marker, so it stays for another lifetime
-func refresh():
+func refresh() -> void:
 	expired_time = 0
 
 ## Updates the marker and destroys it if has evaporated.
-func _process(delta):
+func _process(delta:float) -> void:
 	expired_time += delta
 	# Fade out the marker as it expires.
 	modulate.a = max(0, 1 - (expired_time / lifetime_seconds))
@@ -39,9 +39,9 @@ func _process(delta):
 		queue_free()
 
 ## Some debug drawing currently disabled.
-func __draw():
-	var offset = 0.0 if is_in_group("food") else PI
-	var start_angle = - PI / 2 + offset
-	var end_angle = PI / 2 + offset
+func __draw() -> void:
+	var offset := 0.0 if is_in_group("food") else PI
+	var start_angle := - PI / 2 + offset
+	var end_angle := PI / 2 + offset
 	draw_arc(Vector2.ZERO, 30, start_angle, end_angle, 10, modulate, 1, true )
 	

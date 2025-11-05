@@ -86,7 +86,7 @@ func _process_transitions(trigger_type:StateChart.TriggerType, event:StringName 
 	# forward to all children
 	var handled := false
 	for child in _sub_states:
-		var child_handled_it = child._process_transitions(trigger_type, event)
+		var child_handled_it := child._process_transitions(trigger_type, event)
 		handled = handled or child_handled_it
 
 	# if any child handled this, we don't touch it anymore
