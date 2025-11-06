@@ -4,12 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Added type hints everywhere in the project. This will make the project easier to maintain and use. A big thanks goes out to [Renato Rotenberg](https://github.com/Brawmario) for submitting a PR to get the work started ([#200](https://github.com/derkork/godot-statecharts/pull/200)).
+
 ## [0.22.2] - 2025-10-23
-## Fixed
+### Fixed
 - History states should no longer cause memory leaks ([#196](https://github.com/derkork/godot-statecharts/issues/196)). A big thanks goes to [7hells](https://github.com/7hells) who provided a PR with the fix.
 
 ## [0.22.1] - 2025-08-21
-## Fixed
+### Fixed
 - When using an expression for the transition delay, and listening to the `transition_pending` signal you will now get the proper initial delay from that expression instead of a zero ([#190](https://github.com/derkork/godot-statecharts/issues/190)). 
 
 ## [0.22.0] - 2025-06-22
