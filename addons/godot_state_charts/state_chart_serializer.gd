@@ -191,3 +191,156 @@ static func _get_state_path(state: StateChartState) -> String:
 	if state == null or state._chart == null:
 		return ""
 	return str(state._chart.get_path_to(state))
+
+
+## Serializes the given state chart to a network-safe PackedByteArray.
+## This method converts the state chart to JSON, which is safe for network transmission
+## as it does not serialize arbitrary objects or scripts (avoiding var_to_bytes_with_objects security risks).
+## Returns a PackedByteArray that can be sent over the network via RPC.
+static func serialize_to_bytes(state_chart: StateChart) -> PackedByteArray:
+	var serialized := serialize(state_chart)
+	var dict := _serialized_chart_to_dict(serialized)
+	var json := JSON.stringify(dict)
+	return json.to_utf8_buffer()
+
+
+## Deserializes a state chart from a network-safe PackedByteArray.
+## This method converts JSON bytes back to a SerializedStateChart object,
+## then uses the existing deserialize() method to restore the state chart.
+## Returns a set of error messages. If the serialized state chart was no longer 
+## compatible with the current state chart, nothing will happen. The operation 
+## is successful when the returned array is empty.
+static func deserialize_from_bytes(bytes: PackedByteArray, state_chart: StateChart) -> PackedStringArray:
+	var json_string := bytes.get_string_from_utf8()
+	var json := JSON.new()
+	var parse_error := json.parse(json_string)
+	
+	if parse_error != OK:
+		return PackedStringArray(["Failed to parse JSON: %s" % json.get_error_message()])
+	
+	var dict: Dictionary = json.data
+	var serialized := _dict_to_serialized_chart(dict)
+	return deserialize(serialized, state_chart)
+
+
+## Converts a SerializedStateChart to a plain Dictionary for JSON serialization.
+static func _serialized_chart_to_dict(serialized: SerializedStateChart) -> Dictionary:
+	return {
+		"version": serialized.version,
+		"name": serialized.name,
+		"expression_properties": serialized.expression_properties,
+		"queued_events": Array(serialized.queued_events),
+		"property_change_pending": serialized.property_change_pending,
+		"state_change_pending": serialized.state_change_pending,
+		"locked_down": serialized.locked_down,
+		"queued_transitions": serialized.queued_transitions,
+		"transitions_processing_active": serialized.transitions_processing_active,
+		"state": _serialized_state_to_dict(serialized.state) if serialized.state != null else null
+	}
+
+
+## Converts a Dictionary back to a SerializedStateChart.
+static func _dict_to_serialized_chart(dict: Dictionary) -> SerializedStateChart:
+	var result := SerializedStateChart.new()
+	result.version = dict.get("version", 1)
+	result.name = dict.get("name", "")
+	result.expression_properties = dict.get("expression_properties", {})
+	
+	# Convert queued_events array back to Array[StringName]
+	var queued_events_array: Array[StringName] = []
+	for event in dict.get("queued_events", []):
+		queued_events_array.append(StringName(event))
+	result.queued_events = queued_events_array
+	
+	result.property_change_pending = dict.get("property_change_pending", false)
+	result.state_change_pending = dict.get("state_change_pending", false)
+	result.locked_down = dict.get("locked_down", false)
+	
+	# Convert queued_transitions array back to Array[Dictionary]
+	var queued_transitions_array: Array[Dictionary] = []
+	for transition in dict.get("queued_transitions", []):
+		queued_transitions_array.append(transition)
+	result.queued_transitions = queued_transitions_array
+	
+	result.transitions_processing_active = dict.get("transitions_processing_active", false)
+	
+	var state_dict = dict.get("state")
+	result.state = _dict_to_serialized_state(state_dict) if state_dict != null else null
+	
+	return result
+
+
+## Converts a SerializedStateChartState to a plain Dictionary.
+static func _serialized_state_to_dict(state: SerializedStateChartState) -> Dictionary:
+	var children_array := []
+	for child in state.children:
+		children_array.append(_serialized_state_to_dict(child))
+	
+	return {
+		"name": String(state.name),
+		"state_type": state.state_type,
+		"active": state.active,
+		"pending_transition_name": state.pending_transition_name,
+		"pending_transition_remaining_delay": state.pending_transition_remaining_delay,
+		"pending_transition_initial_delay": state.pending_transition_initial_delay,
+		"children": children_array,
+		"history": _saved_state_to_dict(state.history) if state.history != null else null
+	}
+
+
+## Converts a Dictionary back to a SerializedStateChartState.
+static func _dict_to_serialized_state(dict: Dictionary) -> SerializedStateChartState:
+	var result := SerializedStateChartState.new()
+	result.name = StringName(dict.get("name", ""))
+	result.state_type = dict.get("state_type", -1)
+	result.active = dict.get("active", false)
+	result.pending_transition_name = dict.get("pending_transition_name", "")
+	result.pending_transition_remaining_delay = dict.get("pending_transition_remaining_delay", 0.0)
+	result.pending_transition_initial_delay = dict.get("pending_transition_initial_delay", 0.0)
+	
+	# Convert children array
+	var children: Array[SerializedStateChartState] = []
+	for child_dict in dict.get("children", []):
+		children.append(_dict_to_serialized_state(child_dict))
+	result.children = children
+	
+	# Convert history if present
+	var history_dict = dict.get("history")
+	result.history = _dict_to_saved_state(history_dict) if history_dict != null else null
+	
+	return result
+
+
+## Converts a SavedState to a plain Dictionary.
+static func _saved_state_to_dict(saved_state: SavedState) -> Dictionary:
+	var child_states_dict := {}
+	for key in saved_state.child_states:
+		child_states_dict[String(key)] = _saved_state_to_dict(saved_state.child_states[key])
+	
+	return {
+		"child_states": child_states_dict,
+		"pending_transition_name": String(saved_state.pending_transition_name),
+		"pending_transition_remaining_delay": saved_state.pending_transition_remaining_delay,
+		"pending_transition_initial_delay": saved_state.pending_transition_initial_delay,
+		"history": _saved_state_to_dict(saved_state.history) if saved_state.history != null else null
+	}
+
+
+## Converts a Dictionary back to a SavedState.
+static func _dict_to_saved_state(dict: Dictionary) -> SavedState:
+	var result := SavedState.new()
+	
+	# Convert child_states
+	var child_states_dict: Dictionary = dict.get("child_states", {})
+	for key in child_states_dict:
+		result.child_states[StringName(key)] = _dict_to_saved_state(child_states_dict[key])
+	
+	result.pending_transition_name = NodePath(dict.get("pending_transition_name", ""))
+	result.pending_transition_remaining_delay = dict.get("pending_transition_remaining_delay", 0.0)
+	result.pending_transition_initial_delay = dict.get("pending_transition_initial_delay", 0.0)
+	
+	# Convert history if present
+	var history_dict = dict.get("history")
+	result.history = _dict_to_saved_state(history_dict) if history_dict != null else null
+	
+	return result
