@@ -27,6 +27,23 @@ public class StateChartSerializer
         var variant = Wrapped.Call("deserialize",  serializedStateChart.Wrapped, stateChart.Wrapped);
         return variant.AsStringArray();
     }
+
     
+    /// <summary>
+    /// Serializes the given state chart to a byte array. This is intended for transmission over the network.
+    /// </summary>
+    public static byte[] SerializeToBytes(StateChart stateChart)
+    {
+        return Wrapped.Call("serialize_to_bytes", stateChart.Wrapped).AsByteArray();
+    }
+
+    /// <summary>
+    /// Deserializes the given byte array into the given state chart. Returns a set of error messages. If the byte array
+    /// is not compatible or invalid, nothing will happen. The operation is successful when the returned array is empty.
+    /// </summary>
+    public static string[] DeserializeFromBytes(byte[] bytes, StateChart stateChart)
+    {
+        return Wrapped.Call("deserialize_from_bytes", bytes, stateChart.Wrapped).AsStringArray();
+    }
 }
 
