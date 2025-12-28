@@ -27,6 +27,9 @@ const LAYER_SPACING: float = 50.0
 ## Extra spacing for labels on edges.
 const LABEL_SPACING: float = 20.0
 
+## Vertical offset for self-transition label above the node.
+const SELF_TRANSITION_LABEL_OFFSET: float = 30.0
+
 ## Pixels per character for label width estimation.
 const PIXELS_PER_CHAR: float = 7.0
 
@@ -243,6 +246,9 @@ func _layout_level(parent_visual: VisualState) -> void:
 	var parent_state := parent_visual.state_node
 	var transition_info: Array = []  # Store {key, source_idx, target_idx, label_size} for later
 
+	# Track self-transitions per state
+	var self_transitions_per_state: Dictionary = {}  # StateChartState -> {key, label_size, state_idx}
+
 	for key in _grouped_transitions:
 		var group: TransitionGroup = _grouped_transitions[key]
 		var source: StateChartState = group.source
@@ -254,6 +260,19 @@ func _layout_level(parent_visual: VisualState) -> void:
 
 		# Skip if either endpoint is not inside this compound's subtree
 		if source_ancestor == null or target_ancestor == null:
+			continue
+
+		# Handle self-transitions specially
+		if source == target:
+			# Self-transition: source and target are the same state
+			# Only handle if the state is a direct child of this parent
+			if source_ancestor == source:
+				var label_size := _estimate_label_size(group)
+				self_transitions_per_state[source] = {
+					"key": key,
+					"label_size": label_size,
+					"state_idx": state_index_map[source]
+				}
 			continue
 
 		# Skip if both are in the same subtree (handled at a deeper level)
@@ -400,6 +419,38 @@ func _layout_level(parent_visual: VisualState) -> void:
 
 	# Step 4: Coordinate assignment
 	_assign_coordinates(all_nodes, all_edges, parent_visual)
+
+	# Step 5: Position self-transition labels above their states
+	_position_self_transition_labels(self_transitions_per_state, state_nodes, parent_visual)
+
+
+## Positions labels for self-transitions above their respective state nodes.
+func _position_self_transition_labels(
+	self_transitions_per_state: Dictionary,
+	state_nodes: Array[LayoutNode],
+	parent_visual: VisualState
+) -> void:
+	for state in self_transitions_per_state:
+		var trans_info: Dictionary = self_transitions_per_state[state]
+		var key: String = trans_info["key"]
+
+		# Get the state's layout node to find its position
+		# Use the visual's rect which has already been offset-adjusted by _assign_coordinates
+		var state_idx: int = trans_info["state_idx"]
+		var state_node := state_nodes[state_idx]
+		var state_rect := state_node.visual.rect
+
+		# Label centered horizontally above the state
+		var label_center_x := state_rect.position.x + state_rect.size.x / 2.0
+		var label_center_y := state_rect.position.y - SELF_TRANSITION_LABEL_OFFSET
+
+		# Store label position with "self" type for special path handling
+		_label_positions[key] = {
+			"position": Vector2(label_center_x, label_center_y),
+			"parent": parent_visual,
+			"type": "self",
+			"state_rect": state_rect
+		}
 
 
 ## Step 1: Remove cycles by reversing back edges (DFS-based).
@@ -886,6 +937,17 @@ func _finalize_transitions(
 				)
 				vt.label_position = label_pos
 
+			elif label_type == "self":
+				# Self-transition: loopback arrow above the state
+				var state_rect: Rect2 = label_info["state_rect"]
+				# Convert local rect to absolute by adding parent's position
+				var absolute_state_rect := Rect2(
+					state_rect.position + parent_visual.rect.position,
+					state_rect.size
+				)
+				vt.path = _calculate_self_transition_path(absolute_state_rect, label_pos)
+				vt.label_position = label_pos
+
 			else:
 				# Internal transition: simple path through label
 				vt.path = _calculate_arrow_path_through_point(
@@ -1009,6 +1071,36 @@ func _calculate_cross_subtree_path(
 		# Target is a direct child - enter directly from label
 		var enter_target := _rect_edge_intersection(target_rect, tgt_center, label_pos)
 		path.append(enter_target)
+
+	return path
+
+
+## Calculates an arrow path for self-transitions.
+## Routes: upper-left of node → label position above → upper-right of node.
+## This creates a loopback arc above the state with the label at the apex.
+func _calculate_self_transition_path(
+	state_rect: Rect2,
+	label_pos: Vector2
+) -> PackedVector2Array:
+	var path := PackedVector2Array()
+
+	# Calculate horizontal offset from center for exit/entry points
+	# Use 1/4 of the width so the arrows don't overlap at the corners
+	var horizontal_offset := state_rect.size.x / 4.0
+
+	# Exit point: upper-left area of the node's top edge
+	var exit_x := state_rect.position.x + (state_rect.size.x / 2.0) - horizontal_offset
+	var exit_y := state_rect.position.y
+	var exit_point := Vector2(exit_x, exit_y)
+
+	# Entry point: upper-right area of the node's top edge
+	var entry_x := state_rect.position.x + (state_rect.size.x / 2.0) + horizontal_offset
+	var entry_y := state_rect.position.y
+	var entry_point := Vector2(entry_x, entry_y)
+
+	path.append(exit_point)
+	path.append(label_pos)
+	path.append(entry_point)
 
 	return path
 
