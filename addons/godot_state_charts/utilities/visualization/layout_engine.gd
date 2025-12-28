@@ -1009,8 +1009,8 @@ func _calculate_arrow_path_through_point(
 
 
 ## Calculates an arrow path for cross-subtree transitions.
-## Routes: source → exit source_ancestor (if nested) → label → enter target_ancestor (if nested) → target.
-## This handles transitions where source and target are in different child subtrees.
+## Routes through the side edges of compound states to avoid crossing sibling nodes.
+## For nested endpoints, enters/exits the compound from the left or right side at the node's Y level.
 func _calculate_cross_subtree_path(
 	source_rect: Rect2,
 	target_rect: Rect2,
@@ -1036,17 +1036,19 @@ func _calculate_cross_subtree_path(
 	)
 
 	if source_is_nested:
-		# Source is inside a compound - exit via the compound's boundary toward the label
-		var exit_toward := label_pos
-		var exit_from_ancestor := _rect_edge_intersection(
-			source_ancestor_rect,
-			source_ancestor_rect.get_center(),
-			exit_toward
-		)
-		var exit_from_source := _rect_edge_intersection(source_rect, src_center, exit_from_ancestor)
+		# Source is inside a compound - exit via side edge at source's Y level
+		# Choose side based on label position relative to compound center
+		var exit_side_x: float
+		if label_pos.x < source_ancestor_rect.get_center().x:
+			exit_side_x = source_ancestor_rect.position.x  # Exit from left
+		else:
+			exit_side_x = source_ancestor_rect.position.x + source_ancestor_rect.size.x  # Exit from right
+
+		var exit_on_ancestor := Vector2(exit_side_x, src_center.y)
+		var exit_from_source := _rect_edge_intersection(source_rect, src_center, exit_on_ancestor)
 
 		path.append(exit_from_source)
-		path.append(exit_from_ancestor)
+		path.append(exit_on_ancestor)
 	else:
 		# Source is a direct child - exit directly toward label
 		var exit_from_source := _rect_edge_intersection(source_rect, src_center, label_pos)
@@ -1056,16 +1058,18 @@ func _calculate_cross_subtree_path(
 	path.append(label_pos)
 
 	if target_is_nested:
-		# Target is inside a compound - enter via the compound's boundary
-		var enter_from := label_pos
-		var enter_ancestor := _rect_edge_intersection(
-			target_ancestor_rect,
-			target_ancestor_rect.get_center(),
-			enter_from
-		)
-		var enter_target := _rect_edge_intersection(target_rect, tgt_center, enter_ancestor)
+		# Target is inside a compound - enter via side edge at target's Y level
+		# Choose side based on label position relative to compound center
+		var enter_side_x: float
+		if label_pos.x < target_ancestor_rect.get_center().x:
+			enter_side_x = target_ancestor_rect.position.x  # Enter from left
+		else:
+			enter_side_x = target_ancestor_rect.position.x + target_ancestor_rect.size.x  # Enter from right
 
-		path.append(enter_ancestor)
+		var enter_on_ancestor := Vector2(enter_side_x, tgt_center.y)
+		var enter_target := _rect_edge_intersection(target_rect, tgt_center, enter_on_ancestor)
+
+		path.append(enter_on_ancestor)
 		path.append(enter_target)
 	else:
 		# Target is a direct child - enter directly from label
