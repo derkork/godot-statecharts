@@ -27,21 +27,28 @@ func change_selected_node(node) -> void:
 	_repaint()
 
 func _repaint() -> void:
-	# we can add states to all composite states and to the 
+	# Handle null selection (empty state)
+	if _selected_node == null:
+		_add_section.visible = false
+		_no_options_label.visible = true
+		_no_options_label.text = "Select a state chart node to add states or transitions."
+		return
+
+	# we can add states to all composite states and to the
 	# root if the root has no child state yet.
 	var can_add_states := \
 		( _selected_node is StateChart and _selected_node.get_child_count() == 0 ) \
 		or _selected_node is ParallelState \
 		or _selected_node is CompoundState
-		
+
 	# we can add transitions to all states
 	var can_add_transitions := \
 		_selected_node is StateChartState
-		
+
 	_add_section.visible = can_add_states or can_add_transitions
 	_no_options_label.visible = not (can_add_states or can_add_transitions)
-	
-	
+	_no_options_label.text = "This node cannot have further child nodes."
+
 	for btn in _add_grid_container.get_children():
 		if btn.is_in_group("statebutton"):
 			btn.visible = can_add_states

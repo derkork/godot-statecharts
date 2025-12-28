@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://vga3avpb4gyh" path="res://addons/godot_state_charts/toggle_sidebar.svg" id="9_dqcj0"]
 
 [node name="EditorSidebar" type="MarginContainer"]
+custom_minimum_size = Vector2(120, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -16,6 +17,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 script = ExtResource("1_7kcy8")
 

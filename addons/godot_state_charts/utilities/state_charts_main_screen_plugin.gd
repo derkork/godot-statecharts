@@ -1,28 +1,35 @@
 @tool
-## The main container control for the state chart visualization editor screen.
+## The main screen plugin for the state charts editor tab.
 ##
 ## This control serves as the main screen for the "State Charts" editor tab.
 ## It contains:
 ## - A toolbar with zoom controls
 ## - The canvas where the state chart diagram is rendered
+## - A sidebar for adding states and transitions
 ##
-## The visualizer listens to editor selection changes and automatically
+## The plugin listens to editor selection changes and automatically
 ## displays the state chart that contains the currently selected node.
-## Layout uses a CoSE-inspired force-directed algorithm that runs incrementally
-## to avoid freezing the editor. The simulation automatically stops when stable
-## and pauses when the tab is not visible.
 extends Control
 
-const StateChartCanvas = preload("state_chart_canvas.gd")
+const StateChartCanvas = preload("visualization/state_chart_canvas.gd")
+
+## Scene for the sidebar
+const _sidebar_scene: PackedScene = preload("editor_sidebar.tscn")
 
 ## Reference to the Godot editor interface, used for selection tracking.
 var _editor_interface: EditorInterface = null
+
+## Reference to the undo/redo manager for the sidebar.
+var _undo_redo: EditorUndoRedoManager = null
 
 ## The state chart currently being visualized.
 var _current_state_chart: StateChart = null
 
 ## Whether we should fit to view after the next layout completes.
 var _pending_fit_to_view: bool = false
+
+## Whether the sidebar is on the left side (false = right side, default).
+var _sidebar_on_left: bool = false
 
 
 # ----- Child Nodes -----
@@ -39,17 +46,35 @@ var _pending_fit_to_view: bool = false
 ## Zoom percentage label.
 @onready var _zoom_label: Label = %ZoomLabel
 
+## Container for sidebar when on the left.
+@onready var _left_sidebar_container: Control = %LeftSidebarContainer
+
+## Container for sidebar when on the right.
+@onready var _right_sidebar_container: Control = %RightSidebarContainer
+
+## The sidebar instance.
+var _sidebar: Control = null
+
 
 # ----- Initialization -----
 
-## Called by the main plugin to provide the editor interface.
-## This must be called before the visualizer can function properly.
-func setup(editor_interface: EditorInterface) -> void:
+## Called by the main plugin to provide the editor interface and undo/redo manager.
+## This must be called before the plugin can function properly.
+func setup(editor_interface: EditorInterface, undo_redo: EditorUndoRedoManager) -> void:
 	_editor_interface = editor_interface
+	_undo_redo = undo_redo
 
-	# Connect to selection changes to update the visualization
+	# Connect to selection changes to update the visualization and sidebar
 	var selection := editor_interface.get_selection()
 	selection.selection_changed.connect(_on_selection_changed)
+
+	# Instantiate and setup the sidebar
+	_sidebar = _sidebar_scene.instantiate()
+	_sidebar.setup(editor_interface, undo_redo)
+	_sidebar.sidebar_toggle_requested.connect(_toggle_sidebar_position)
+
+	# Add sidebar to the appropriate container
+	_update_sidebar_container()
 
 
 func _ready() -> void:
@@ -76,6 +101,44 @@ func refresh() -> void:
 	_refresh_visualization()
 
 
+## Sets the sidebar position from saved layout.
+func set_sidebar_on_left(on_left: bool) -> void:
+	if _sidebar_on_left == on_left:
+		return
+	_sidebar_on_left = on_left
+	_update_sidebar_container()
+
+
+## Returns whether the sidebar is on the left side.
+func is_sidebar_on_left() -> bool:
+	return _sidebar_on_left
+
+
+# ----- Sidebar Management -----
+
+## Toggles the sidebar between left and right positions.
+func _toggle_sidebar_position() -> void:
+	_sidebar_on_left = not _sidebar_on_left
+	_update_sidebar_container()
+
+
+## Moves the sidebar to the appropriate container based on _sidebar_on_left.
+func _update_sidebar_container() -> void:
+	if _sidebar == null:
+		return
+
+	# Remove from current parent if any
+	var current_parent := _sidebar.get_parent()
+	if current_parent != null:
+		current_parent.remove_child(_sidebar)
+
+	# Add to the appropriate container
+	if _sidebar_on_left:
+		_left_sidebar_container.add_child(_sidebar)
+	else:
+		_right_sidebar_container.add_child(_sidebar)
+
+
 # ----- Selection Tracking -----
 
 ## Called when the editor selection changes.
@@ -85,20 +148,28 @@ func _on_selection_changed() -> void:
 
 	var selection := _editor_interface.get_selection().get_selected_nodes()
 
-	if selection.size() != 1:
-		return
+	var selected: Node = null
+	if selection.size() == 1:
+		selected = selection[0]
 
-	var selected: Node = selection[0]
+	# Update sidebar with selected node (or null for empty state)
+	if _sidebar != null:
+		if selected is StateChart or selected is StateChartState or selected is Transition:
+			_sidebar.change_selected_node(selected)
+		else:
+			_sidebar.change_selected_node(null)
 
-	# Find the StateChart that contains this node
-	var chart: StateChart = _find_state_chart(selected)
+	# Update visualization if a state chart node is selected
+	if selected != null:
+		# Find the StateChart that contains this node
+		var chart: StateChart = _find_state_chart(selected)
 
-	if chart != null and chart != _current_state_chart:
-		_current_state_chart = chart
-		_refresh_visualization()
+		if chart != null and chart != _current_state_chart:
+			_current_state_chart = chart
+			_refresh_visualization()
 
-	# Update selection highlight in canvas
-	_canvas.set_selected_node(selected)
+		# Update selection highlight in canvas
+		_canvas.set_selected_node(selected)
 
 
 ## Finds the StateChart ancestor of a node, or the node itself if it's a StateChart.
