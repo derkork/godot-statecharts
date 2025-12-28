@@ -9,6 +9,12 @@ var _ui_sidebar_spatial:Control
 ## Scene holding the sidebar
 var _sidebar_ui:PackedScene = preload("utilities/editor_sidebar.tscn")
 
+## Scene holding the main screen visualizer
+var _visualizer_scene:PackedScene = preload("utilities/visualization/state_chart_visualizer.tscn")
+
+## The main screen control for the state chart visualizer
+var _main_screen:Control
+
 var _debugger_plugin:EditorDebuggerPlugin
 var _inspector_plugin:EditorInspectorPlugin
 
@@ -45,6 +51,11 @@ func _enter_tree() -> void:
 	# add the inspector plugin for events
 	_inspector_plugin = preload("utilities/event_editor/event_inspector_plugin.gd").new()
 	add_inspector_plugin(_inspector_plugin)
+
+	# Create the main screen visualizer and add it to the editor
+	_main_screen = _visualizer_scene.instantiate()
+	_main_screen.hide()
+	get_editor_interface().get_editor_main_screen().add_child(_main_screen)
 
 
 func _set_window_layout(configuration) -> void:
@@ -89,6 +100,10 @@ func _ready() -> void:
 	_ui_sidebar_spatial.setup(get_editor_interface(), get_undo_redo())
 	_inspector_plugin.setup(get_undo_redo())
 
+	# initialize the main screen visualizer
+	if _main_screen and _main_screen.has_method("setup"):
+		_main_screen.setup(get_editor_interface())
+
 
 
 func _exit_tree() -> void:
@@ -104,6 +119,10 @@ func _exit_tree() -> void:
 		_ui_sidebar_canvas.queue_free()
 	if is_instance_valid(_ui_sidebar_spatial):
 		_ui_sidebar_spatial.queue_free()
+
+	# remove the main screen visualizer
+	if is_instance_valid(_main_screen):
+		_main_screen.queue_free()
 
 
 func _on_selection_changed() -> void:
@@ -125,3 +144,29 @@ func _on_selection_changed() -> void:
 	# otherwise hide it
 	_ui_sidebar_canvas.hide()
 	_ui_sidebar_spatial.hide()
+
+
+# ----- Main Screen Plugin Interface -----
+# These methods implement the main screen plugin interface, which adds a
+# "State Charts" tab alongside the 2D, 3D, and Script editor tabs.
+
+## Returns true to indicate this plugin provides a main screen tab.
+func _has_main_screen() -> bool:
+	return true
+
+
+## Returns the name shown on the main screen tab.
+func _get_plugin_name() -> String:
+	return "State Charts"
+
+
+## Returns the icon for the main screen tab.
+func _get_plugin_icon() -> Texture2D:
+	return preload("state_chart.svg")
+
+
+## Called when the main screen should be shown or hidden.
+## This happens when the user switches between editor tabs (2D, 3D, Script, State Charts).
+func _make_visible(visible: bool) -> void:
+	if is_instance_valid(_main_screen):
+		_main_screen.visible = visible

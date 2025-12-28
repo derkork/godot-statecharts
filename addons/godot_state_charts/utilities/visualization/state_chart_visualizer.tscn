@@ -1,0 +1,61 @@
+[gd_scene load_steps=3 format=3 uid="uid://bm2mjf50iqqil"]
+
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/visualization/state_chart_visualizer.gd" id="1_visualizer"]
+[ext_resource type="Script" path="res://addons/godot_state_charts/utilities/visualization/state_chart_canvas.gd" id="2_canvas"]
+
+[node name="StateChartVisualizer" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_visualizer")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Toolbar" type="HBoxContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FitButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+tooltip_text = "Fit diagram to view"
+text = "Fit"
+
+[node name="Separator1" type="VSeparator" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+
+[node name="ZoomLabel" type="Label" parent="VBoxContainer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "100%"
+
+[node name="ZoomSlider" type="HSlider" parent="VBoxContainer/Toolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+min_value = 10.0
+max_value = 400.0
+value = 100.0
+
+[node name="Separator2" type="VSeparator" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+
+[node name="RefreshButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+tooltip_text = "Refresh the visualization"
+text = "Refresh"
+
+[node name="Canvas" type="Control" parent="VBoxContainer"]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 2
+script = ExtResource("2_canvas")
+
+[connection signal="pressed" from="VBoxContainer/Toolbar/FitButton" to="." method="_on_fit_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/RefreshButton" to="." method="_on_refresh_button_pressed"]
