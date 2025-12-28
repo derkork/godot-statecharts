@@ -9,8 +9,6 @@
 ##
 ## The algorithm runs once per structure change (not continuously like force-directed).
 ## Each compound/parallel state is laid out independently, bottom-up.
-extends RefCounted
-
 const StateChartUtil = preload("../state_chart_util.gd")
 const VisualLabel = preload("visual_label.gd")
 const VisualState = preload("visual_state.gd")

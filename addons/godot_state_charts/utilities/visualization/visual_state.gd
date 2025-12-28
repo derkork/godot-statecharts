@@ -4,7 +4,6 @@
 ## as a nested rectangle in the visualization canvas. It forms a tree structure mirroring
 ## the state hierarchy, with parent states containing their children visually. This is the 
 ## output of the layout engine and the input for the StateChartCanvas.
-extends RefCounted
 
 ## The bounding rectangle of this state in canvas coordinates.
 ## For composite states, this includes the area needed for all children plus padding.

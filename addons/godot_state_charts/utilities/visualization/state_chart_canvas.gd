@@ -96,11 +96,14 @@ var _font_mono: Font
 
 # ----- Cached State Icons -----
 
-## Path to the addon's icon directory.
-const ICON_PATH := "res://addons/godot_state_charts/"
 
 ## Cached state type icons, keyed by state type string.
-var _state_icons: Dictionary = {}
+const _state_icons: Dictionary = {
+	"atomic": preload("../../atomic_state.svg"),
+	"compound": preload("../../compound_state.svg"),
+	"parallel": preload("../../parallel_state.svg"),
+	"history": preload("../../history_state.svg"),
+}
 
 
 # ----- Public Methods -----
@@ -117,13 +120,17 @@ func redraw():
 	var layout := _layout_engine.layout(_current_state_chart)
 	_visual_states = layout.states
 	_visual_transitions = layout.transitions
-	_cache_fonts()
 	queue_redraw()
 	layout_completed.emit()
 
 # ----- Layout Lifecycle -----
 
 func _ready() -> void:
+	_font_regular = VisualizationTheme.get_font(self)
+	_font_bold = VisualizationTheme.get_bold_font(self)
+	_font_italic = VisualizationTheme.get_italic_font(self)
+	_font_bold_italic = VisualizationTheme.get_bold_italic_font(self)
+	_font_mono = VisualizationTheme.get_mono_font(self)
 	redraw()
 
 
@@ -182,37 +189,9 @@ func set_zoom(new_zoom: float, emit_signal: bool = true) -> void:
 		zoom_changed.emit(_zoom)
 
 
-## Caches fonts from the theme for efficient drawing.
-func _cache_fonts() -> void:
-	_font_regular = VisualizationTheme.get_font(self)
-	_font_bold = VisualizationTheme.get_bold_font(self)
-	_font_italic = VisualizationTheme.get_italic_font(self)
-	_font_bold_italic = VisualizationTheme.get_bold_italic_font(self)
-	_font_mono = VisualizationTheme.get_mono_font(self)
-	_cache_icons()
-
-
-## Caches state type icons for efficient drawing.
-func _cache_icons() -> void:
-	_state_icons.clear()
-	var icon_files := {
-		"atomic": "atomic_state.svg",
-		"compound": "compound_state.svg",
-		"parallel": "parallel_state.svg",
-		"history": "history_state.svg",
-	}
-	for state_type in icon_files:
-		var path: String = ICON_PATH + icon_files[state_type]
-		if ResourceLoader.exists(path):
-			_state_icons[state_type] = load(path)
-
-
 # ----- Drawing -----
 
 func _draw() -> void:
-	if _font_regular == null:
-		_cache_fonts()
-
 	# Draw background
 	var bg_color := VisualizationTheme.get_background_color(self)
 	draw_rect(Rect2(Vector2.ZERO, size), bg_color)

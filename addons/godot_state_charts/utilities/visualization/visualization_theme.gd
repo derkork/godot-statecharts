@@ -3,9 +3,6 @@
 ## All colors are derived from the Godot editor theme to ensure readability in both
 ## light and dark themes. State types are distinguished by tinting the base color
 ## rather than using hardcoded colors.
-extends RefCounted
-
-
 # ----- Size Constants -----
 # These define the visual proportions of the state chart diagram.
 
