@@ -1208,6 +1208,16 @@ func _is_obstacle_for_edge(
 	if _is_descendant_of(target_state, node):
 		return false
 
+	# Only consider nodes whose parent contains both source and target.
+	# This treats "foreign" compound states (where neither source nor target is inside)
+	# as single obstacles rather than routing around their individual children.
+	var parent := node.get_parent()
+	if parent != null and parent != _state_chart:
+		var parent_contains_source := (source_state == parent) or _is_descendant_of(source_state, parent)
+		var parent_contains_target := (target_state == parent) or _is_descendant_of(target_state, parent)
+		if not (parent_contains_source and parent_contains_target):
+			return false
+
 	# Everything else is an obstacle
 	return true
 
