@@ -1004,6 +1004,9 @@ func _finalize_transitions(
 	for v in visuals:
 		visual_map[v.state_node.get_path()] = v
 
+	# Track already-routed paths for crossing detection
+	var routed_paths: Array[PackedVector2Array] = []
+
 	# Create visual transitions with obstacle-aware routing
 	for key in _grouped_transitions:
 		var group: TransitionGroup = _grouped_transitions[key]
@@ -1041,6 +1044,7 @@ func _finalize_transitions(
 			)
 			vt.path = _calculate_self_transition_path(absolute_state_rect, label_pos)
 			vt.label_position = label_pos
+			routed_paths.append(vt.path)
 			result.append(vt)
 			continue
 
@@ -1057,8 +1061,12 @@ func _finalize_transitions(
 			target_visual.rect,
 			obstacles,
 			label_pos,
-			has_label_pos
+			has_label_pos,
+			routed_paths
 		)
+
+		# Add path to collection for crossing detection of subsequent edges
+		routed_paths.append(vt.path)
 
 		# Set label position
 		if has_label_pos:
@@ -1219,14 +1227,15 @@ func _find_clear_path(
 	target_rect: Rect2,
 	obstacles: Array[Rect2],
 	label_pos: Vector2 = Vector2.ZERO,
-	has_label: bool = false
+	has_label: bool = false,
+	existing_paths: Array[PackedVector2Array] = []
 ) -> PackedVector2Array:
 	var path := PackedVector2Array()
 
 	var src_center := source_rect.get_center()
 	var tgt_center := target_rect.get_center()
 
-	# If there's a label, route through it
+	# Determine intermediate point for direction calculation
 	var waypoint := label_pos if has_label else (src_center + tgt_center) / 2.0
 
 	# Exit from source toward waypoint
@@ -1236,22 +1245,31 @@ func _find_clear_path(
 
 	path.append(exit_point)
 
-	# Check if direct path to waypoint is blocked
-	var blocking := _find_blocking_obstacle(exit_point, waypoint, obstacles)
-	if blocking.size.x > 0:
-		# Path is blocked - find waypoints around the obstacle
-		var bypass_points := _compute_bypass_waypoints(exit_point, waypoint, blocking, obstacles)
-		for bp in bypass_points:
-			path.append(bp)
-
 	if has_label:
+		# Two-segment path: exit → label → entry
+
+		# Check first segment: exit_point → label_pos
+		var blocking := _find_blocking_obstacle(exit_point, label_pos, obstacles)
+		if blocking.size.x > 0:
+			var bypass_points := _compute_bypass_waypoints(exit_point, label_pos, blocking, obstacles, existing_paths)
+			for bp in bypass_points:
+				path.append(bp)
+
 		path.append(label_pos)
 
-		# Check if path from label to target is blocked
+		# Check second segment: label_pos → entry_point
 		var blocking2 := _find_blocking_obstacle(label_pos, entry_point, obstacles)
 		if blocking2.size.x > 0:
-			var bypass_points2 := _compute_bypass_waypoints(label_pos, entry_point, blocking2, obstacles)
+			var bypass_points2 := _compute_bypass_waypoints(label_pos, entry_point, blocking2, obstacles, existing_paths)
 			for bp in bypass_points2:
+				path.append(bp)
+	else:
+		# Single-segment path: exit → entry (no intermediate label)
+		# Check blocking from exit directly to entry, not to midpoint!
+		var blocking := _find_blocking_obstacle(exit_point, entry_point, obstacles)
+		if blocking.size.x > 0:
+			var bypass_points := _compute_bypass_waypoints(exit_point, entry_point, blocking, obstacles, existing_paths)
+			for bp in bypass_points:
 				path.append(bp)
 
 	path.append(entry_point)
@@ -1340,49 +1358,216 @@ func _on_segment(p: Vector2, q: Vector2, r: Vector2) -> bool:
 		   q.y <= maxf(p.y, r.y) and q.y >= minf(p.y, r.y)
 
 
+## Computes waypoints to route around left or right side of obstacle.
+## Uses corners based on vertical position of start/end relative to obstacle bounds.
+## Note: top/bottom are PADDED bounds. We derive actual bounds for decision logic.
+func _compute_vertical_corner_route(
+	start: Vector2,
+	end: Vector2,
+	side_x: float,  # x-coordinate of the side we're routing around
+	padded_top: float,     # padded top (y - padding)
+	padded_bottom: float   # padded bottom (y + size.y + padding)
+) -> Array[Vector2]:
+	var waypoints: Array[Vector2] = []
+
+	# The padding used in _compute_bypass_waypoints is 10.0
+	# Derive actual obstacle bounds from padded bounds
+	var padding := 10.0
+	var actual_top := padded_top + padding
+	var actual_bottom := padded_bottom - padding
+
+	# Check positions relative to ACTUAL obstacle bounds (not padded)
+	# This correctly determines if we need to wrap around
+	var start_below := start.y >= actual_bottom  # at or below actual bottom edge
+	var start_above := start.y <= actual_top      # at or above actual top edge
+	var end_below := end.y >= actual_bottom
+	var end_above := end.y <= actual_top
+
+	# Determine first corner based on start position
+	# Use PADDED positions for actual waypoints (for clearance)
+	var first_corner_y: float
+	if start_below:
+		first_corner_y = padded_bottom  # padded bottom corner
+	elif start_above:
+		first_corner_y = padded_top     # padded top corner
+	else:
+		# Start is within obstacle's vertical range - use nearest corner
+		first_corner_y = padded_top if (start.y - actual_top) < (actual_bottom - start.y) else padded_bottom
+
+	waypoints.append(Vector2(side_x, first_corner_y))
+
+	# Determine if we need a second corner to reach end without clipping.
+	# We need the second corner if 'end' is not on the same side we entered from.
+	# This includes cases where 'end' is:
+	#   - On the opposite side of the obstacle
+	#   - WITHIN the obstacle's vertical range (which would cause clipping)
+	if first_corner_y == padded_bottom:
+		# Entered from bottom. Need top corner if end is anywhere above the bottom edge
+		# (i.e., within the obstacle's range or above it)
+		if end.y < actual_bottom:
+			waypoints.append(Vector2(side_x, padded_top))
+	elif first_corner_y == padded_top:
+		# Entered from top. Need bottom corner if end is anywhere below the top edge
+		# (i.e., within the obstacle's range or below it)
+		if end.y > actual_top:
+			waypoints.append(Vector2(side_x, padded_bottom))
+
+	return waypoints
+
+
+## Computes waypoints to route around top or bottom side of obstacle.
+## Uses corners based on horizontal position of start/end relative to obstacle bounds.
+## Note: left/right are PADDED bounds. We derive actual bounds for decision logic.
+func _compute_horizontal_corner_route(
+	start: Vector2,
+	end: Vector2,
+	side_y: float,  # y-coordinate of the side we're routing around
+	padded_left: float,    # padded left (x - padding)
+	padded_right: float    # padded right (x + size.x + padding)
+) -> Array[Vector2]:
+	var waypoints: Array[Vector2] = []
+
+	# The padding used in _compute_bypass_waypoints is 10.0
+	# Derive actual obstacle bounds from padded bounds
+	var padding := 10.0
+	var actual_left := padded_left + padding
+	var actual_right := padded_right - padding
+
+	# Check positions relative to ACTUAL obstacle bounds (not padded)
+	var start_right := start.x >= actual_right  # at or to the right of actual right edge
+	var start_left := start.x <= actual_left    # at or to the left of actual left edge
+	var end_right := end.x >= actual_right
+	var end_left := end.x <= actual_left
+
+	# Determine first corner based on start position
+	# Use PADDED positions for actual waypoints (for clearance)
+	var first_corner_x: float
+	if start_right:
+		first_corner_x = padded_right  # padded right corner
+	elif start_left:
+		first_corner_x = padded_left   # padded left corner
+	else:
+		# Start is within obstacle's horizontal range - use nearest corner
+		first_corner_x = padded_left if (start.x - actual_left) < (actual_right - start.x) else padded_right
+
+	waypoints.append(Vector2(first_corner_x, side_y))
+
+	# Determine if we need a second corner to reach end without clipping.
+	# We need the second corner if 'end' is not on the same side we entered from.
+	# This includes cases where 'end' is:
+	#   - On the opposite side of the obstacle
+	#   - WITHIN the obstacle's horizontal range (which would cause clipping)
+	if first_corner_x == padded_right:
+		# Entered from right. Need left corner if end is anywhere to the left of right edge
+		# (i.e., within the obstacle's range or to its left)
+		if end.x < actual_right:
+			waypoints.append(Vector2(padded_left, side_y))
+	elif first_corner_x == padded_left:
+		# Entered from left. Need right corner if end is anywhere to the right of left edge
+		# (i.e., within the obstacle's range or to its right)
+		if end.x > actual_left:
+			waypoints.append(Vector2(padded_right, side_y))
+
+	return waypoints
+
+
+## Counts how many existing paths this route would cross.
+func _count_path_crossings(
+	start: Vector2,
+	waypoints: Array[Vector2],
+	end: Vector2,
+	existing_paths: Array[PackedVector2Array]
+) -> int:
+	var crossings := 0
+
+	# Build full path including start and end
+	var full_path: Array[Vector2] = [start]
+	full_path.append_array(waypoints)
+	full_path.append(end)
+
+	# Check each segment of our path against each segment of existing paths
+	for i in range(full_path.size() - 1):
+		var seg_start := full_path[i]
+		var seg_end := full_path[i + 1]
+
+		for existing_path in existing_paths:
+			for j in range(existing_path.size() - 1):
+				if _segments_intersect(seg_start, seg_end, existing_path[j], existing_path[j + 1]):
+					crossings += 1
+
+	return crossings
+
+
+## Computes total path length for tie-breaking between candidate routes.
+func _path_length(start: Vector2, waypoints: Array[Vector2], end: Vector2) -> float:
+	var length := 0.0
+	var prev := start
+
+	for wp in waypoints:
+		length += prev.distance_to(wp)
+		prev = wp
+
+	length += prev.distance_to(end)
+	return length
+
+
 ## Computes waypoints to bypass an obstacle.
-## Chooses the shorter path (going left/right or above/below).
+## Evaluates all four directions (left, right, top, bottom) and picks the route
+## with fewest crossings of existing paths, tie-breaking by shortest length.
 func _compute_bypass_waypoints(
 	start: Vector2,
 	end: Vector2,
 	obstacle: Rect2,
-	_all_obstacles: Array[Rect2]
+	_all_obstacles: Array[Rect2],
+	existing_paths: Array[PackedVector2Array]
 ) -> Array[Vector2]:
-	var waypoints: Array[Vector2] = []
 	var padding := 10.0
 
-	# Compute the obstacle corners with padding
-	var left := obstacle.position.x - padding
-	var right := obstacle.position.x + obstacle.size.x + padding
-	var top := obstacle.position.y - padding
-	var bottom := obstacle.position.y + obstacle.size.y + padding
+	# Compute padded bounds
+	var padded_left := obstacle.position.x - padding
+	var padded_right := obstacle.position.x + obstacle.size.x + padding
+	var padded_top := obstacle.position.y - padding
+	var padded_bottom := obstacle.position.y + obstacle.size.y + padding
 
-	# Determine which side to go around based on start/end positions
-	var start_to_end := end - start
-	var obstacle_center := obstacle.get_center()
+	# Generate all four candidate routes
+	var left_route := _compute_vertical_corner_route(start, end, padded_left, padded_top, padded_bottom)
+	var right_route := _compute_vertical_corner_route(start, end, padded_right, padded_top, padded_bottom)
+	var top_route := _compute_horizontal_corner_route(start, end, padded_top, padded_left, padded_right)
+	var bottom_route := _compute_horizontal_corner_route(start, end, padded_bottom, padded_left, padded_right)
 
-	# Try to go around the shorter side
-	var horizontal_dist := absf((left + right) / 2.0 - (start.x + end.x) / 2.0)
-	var vertical_dist := absf((top + bottom) / 2.0 - (start.y + end.y) / 2.0)
+	# Collect candidates with their crossing counts
+	var candidates: Array = [
+		{"route": left_route, "crossings": _count_path_crossings(start, left_route, end, existing_paths)},
+		{"route": right_route, "crossings": _count_path_crossings(start, right_route, end, existing_paths)},
+		{"route": top_route, "crossings": _count_path_crossings(start, top_route, end, existing_paths)},
+		{"route": bottom_route, "crossings": _count_path_crossings(start, bottom_route, end, existing_paths)},
+	]
 
-	if absf(start_to_end.x) > absf(start_to_end.y):
-		# Predominantly horizontal movement - go above or below
-		if start.y < obstacle_center.y:
-			# Go above
-			waypoints.append(Vector2(obstacle_center.x, top))
-		else:
-			# Go below
-			waypoints.append(Vector2(obstacle_center.x, bottom))
-	else:
-		# Predominantly vertical movement - go left or right
-		if start.x < obstacle_center.x:
-			# Go left
-			waypoints.append(Vector2(left, obstacle_center.y))
-		else:
-			# Go right
-			waypoints.append(Vector2(right, obstacle_center.y))
+	# Find minimum crossings
+	var min_crossings := 999999
+	for c in candidates:
+		if c["crossings"] < min_crossings:
+			min_crossings = c["crossings"]
 
-	return waypoints
+	# Filter to candidates with minimum crossings
+	var best_candidates: Array = []
+	for c in candidates:
+		if c["crossings"] == min_crossings:
+			best_candidates.append(c)
+
+	# Among best candidates, pick shortest path
+	var best_route: Array[Vector2] = best_candidates[0]["route"]
+	var best_length := _path_length(start, best_route, end)
+
+	for i in range(1, best_candidates.size()):
+		var c: Dictionary = best_candidates[i]
+		var route: Array[Vector2] = c["route"]
+		var length := _path_length(start, route, end)
+		if length < best_length:
+			best_length = length
+			best_route = route
+
+	return best_route
 
 
 # ----- Utility Functions -----
