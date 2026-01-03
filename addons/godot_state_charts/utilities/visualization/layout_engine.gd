@@ -1368,30 +1368,48 @@ func _on_segment(p: Vector2, q: Vector2, r: Vector2) -> bool:
 		   q.y <= maxf(p.y, r.y) and q.y >= minf(p.y, r.y)
 
 
+## Checks if a line segment clips through a rectangle (without extra padding).
+func _line_clips_rect(start: Vector2, end: Vector2, rect: Rect2) -> bool:
+	# Check if either endpoint is inside
+	if rect.has_point(start) or rect.has_point(end):
+		return true
+
+	# Check line intersection with each edge
+	var corners: Array[Vector2] = [
+		rect.position,
+		Vector2(rect.end.x, rect.position.y),
+		rect.end,
+		Vector2(rect.position.x, rect.end.y)
+	]
+
+	for i in range(4):
+		var c1 := corners[i]
+		var c2 := corners[(i + 1) % 4]
+		if _segments_intersect(start, end, c1, c2):
+			return true
+
+	return false
+
+
 ## Computes waypoints to route around left or right side of obstacle.
 ## Uses corners based on vertical position of start/end relative to obstacle bounds.
-## Note: top/bottom are PADDED bounds. We derive actual bounds for decision logic.
 func _compute_vertical_corner_route(
 	start: Vector2,
 	end: Vector2,
 	side_x: float,  # x-coordinate of the side we're routing around
 	padded_top: float,     # padded top (y - padding)
-	padded_bottom: float   # padded bottom (y + size.y + padding)
+	padded_bottom: float,  # padded bottom (y + size.y + padding)
+	actual_bounds: Rect2   # actual obstacle bounds for intersection check
 ) -> Array[Vector2]:
 	var waypoints: Array[Vector2] = []
 
-	# The padding used in _compute_bypass_waypoints is 10.0
-	# Derive actual obstacle bounds from padded bounds
-	var padding := 10.0
-	var actual_top := padded_top + padding
-	var actual_bottom := padded_bottom - padding
+	var actual_top := actual_bounds.position.y
+	var actual_bottom := actual_bounds.end.y
 
 	# Check positions relative to ACTUAL obstacle bounds (not padded)
 	# This correctly determines if we need to wrap around
 	var start_below := start.y >= actual_bottom  # at or below actual bottom edge
 	var start_above := start.y <= actual_top      # at or above actual top edge
-	var end_below := end.y >= actual_bottom
-	var end_above := end.y <= actual_top
 
 	# Determine first corner based on start position
 	# Use PADDED positions for actual waypoints (for clearance)
@@ -1404,50 +1422,38 @@ func _compute_vertical_corner_route(
 		# Start is within obstacle's vertical range - use nearest corner
 		first_corner_y = padded_top if (start.y - actual_top) < (actual_bottom - start.y) else padded_bottom
 
-	waypoints.append(Vector2(side_x, first_corner_y))
+	var first_corner := Vector2(side_x, first_corner_y)
+	waypoints.append(first_corner)
 
 	# Determine if we need a second corner to reach end without clipping.
-	# We need the second corner if 'end' is not on the same side we entered from.
-	# This includes cases where 'end' is:
-	#   - On the opposite side of the obstacle
-	#   - WITHIN the obstacle's vertical range (which would cause clipping)
-	if first_corner_y == padded_bottom:
-		# Entered from bottom. Need top corner if end is anywhere above the bottom edge
-		# (i.e., within the obstacle's range or above it)
-		if end.y < actual_bottom:
-			waypoints.append(Vector2(side_x, padded_top))
-	elif first_corner_y == padded_top:
-		# Entered from top. Need bottom corner if end is anywhere below the top edge
-		# (i.e., within the obstacle's range or below it)
-		if end.y > actual_top:
-			waypoints.append(Vector2(side_x, padded_bottom))
+	# Need second corner if EITHER segment clips the obstacle:
+	# - (start → first_corner) clips, OR
+	# - (first_corner → end) clips
+	var second_corner_y := padded_top if first_corner_y == padded_bottom else padded_bottom
+	if _line_clips_rect(start, first_corner, actual_bounds) or _line_clips_rect(first_corner, end, actual_bounds):
+		waypoints.append(Vector2(side_x, second_corner_y))
 
 	return waypoints
 
 
 ## Computes waypoints to route around top or bottom side of obstacle.
 ## Uses corners based on horizontal position of start/end relative to obstacle bounds.
-## Note: left/right are PADDED bounds. We derive actual bounds for decision logic.
 func _compute_horizontal_corner_route(
 	start: Vector2,
 	end: Vector2,
 	side_y: float,  # y-coordinate of the side we're routing around
 	padded_left: float,    # padded left (x - padding)
-	padded_right: float    # padded right (x + size.x + padding)
+	padded_right: float,   # padded right (x + size.x + padding)
+	actual_bounds: Rect2   # actual obstacle bounds for intersection check
 ) -> Array[Vector2]:
 	var waypoints: Array[Vector2] = []
 
-	# The padding used in _compute_bypass_waypoints is 10.0
-	# Derive actual obstacle bounds from padded bounds
-	var padding := 10.0
-	var actual_left := padded_left + padding
-	var actual_right := padded_right - padding
+	var actual_left := actual_bounds.position.x
+	var actual_right := actual_bounds.end.x
 
 	# Check positions relative to ACTUAL obstacle bounds (not padded)
 	var start_right := start.x >= actual_right  # at or to the right of actual right edge
 	var start_left := start.x <= actual_left    # at or to the left of actual left edge
-	var end_right := end.x >= actual_right
-	var end_left := end.x <= actual_left
 
 	# Determine first corner based on start position
 	# Use PADDED positions for actual waypoints (for clearance)
@@ -1460,23 +1466,16 @@ func _compute_horizontal_corner_route(
 		# Start is within obstacle's horizontal range - use nearest corner
 		first_corner_x = padded_left if (start.x - actual_left) < (actual_right - start.x) else padded_right
 
-	waypoints.append(Vector2(first_corner_x, side_y))
+	var first_corner := Vector2(first_corner_x, side_y)
+	waypoints.append(first_corner)
 
 	# Determine if we need a second corner to reach end without clipping.
-	# We need the second corner if 'end' is not on the same side we entered from.
-	# This includes cases where 'end' is:
-	#   - On the opposite side of the obstacle
-	#   - WITHIN the obstacle's horizontal range (which would cause clipping)
-	if first_corner_x == padded_right:
-		# Entered from right. Need left corner if end is anywhere to the left of right edge
-		# (i.e., within the obstacle's range or to its left)
-		if end.x < actual_right:
-			waypoints.append(Vector2(padded_left, side_y))
-	elif first_corner_x == padded_left:
-		# Entered from left. Need right corner if end is anywhere to the right of left edge
-		# (i.e., within the obstacle's range or to its right)
-		if end.x > actual_left:
-			waypoints.append(Vector2(padded_right, side_y))
+	# Need second corner if EITHER segment clips the obstacle:
+	# - (start → first_corner) clips, OR
+	# - (first_corner → end) clips
+	var second_corner_x := padded_left if first_corner_x == padded_right else padded_right
+	if _line_clips_rect(start, first_corner, actual_bounds) or _line_clips_rect(first_corner, end, actual_bounds):
+		waypoints.append(Vector2(second_corner_x, side_y))
 
 	return waypoints
 
@@ -1540,10 +1539,10 @@ func _compute_bypass_waypoints(
 	var padded_bottom := obstacle.position.y + obstacle.size.y + padding
 
 	# Generate all four candidate routes
-	var left_route := _compute_vertical_corner_route(start, end, padded_left, padded_top, padded_bottom)
-	var right_route := _compute_vertical_corner_route(start, end, padded_right, padded_top, padded_bottom)
-	var top_route := _compute_horizontal_corner_route(start, end, padded_top, padded_left, padded_right)
-	var bottom_route := _compute_horizontal_corner_route(start, end, padded_bottom, padded_left, padded_right)
+	var left_route := _compute_vertical_corner_route(start, end, padded_left, padded_top, padded_bottom, obstacle)
+	var right_route := _compute_vertical_corner_route(start, end, padded_right, padded_top, padded_bottom, obstacle)
+	var top_route := _compute_horizontal_corner_route(start, end, padded_top, padded_left, padded_right, obstacle)
+	var bottom_route := _compute_horizontal_corner_route(start, end, padded_bottom, padded_left, padded_right, obstacle)
 
 	# Collect candidates with their crossing counts
 	var candidates: Array = [
