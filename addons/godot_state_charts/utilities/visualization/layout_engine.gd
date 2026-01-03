@@ -1,14 +1,59 @@
 @tool
-## Computes the layout for visualizing a state chart as nested rectangles with transition arrows.
+## ============================================================================
+## Layout Engine - State Chart Visualization
+## ============================================================================
 ##
-## Uses the Sugiyama algorithm (layered graph drawing):
-## 1. Cycle removal - temporarily reverse back edges
-## 2. Layer assignment - assign nodes to horizontal layers
-## 3. Crossing minimization - order nodes within layers to reduce edge crossings
-## 4. Coordinate assignment - compute final x,y positions
+## Computes the layout for visualizing a state chart as nested rectangles with
+## transition arrows.
 ##
-## The algorithm runs once per structure change (not continuously like force-directed).
-## Each compound/parallel state is laid out independently, bottom-up.
+## ALGORITHM OVERVIEW
+## ------------------
+## The layout happens in several phases:
+##
+## 1. BUILD VISUAL TREE
+##    Creates a VisualState hierarchy mirroring the state chart structure.
+##    Each state gets an initial size based on its name width.
+##
+## 2. RECURSIVE BOTTOM-UP LAYOUT (Sugiyama Algorithm)
+##    For each compound/parallel state, lays out its children using Sugiyama:
+##    - Cycle removal: temporarily reverse back edges to create a DAG
+##    - Layer assignment: assign nodes to horizontal layers based on transitions
+##    - Crossing minimization: order nodes within layers using barycenter heuristic
+##    - Coordinate assignment: compute x,y positions with proper spacing
+##
+## 3. REGISTER ALL POSITIONS
+##    After layout, all node positions are registered in a global registry.
+##    This provides full visibility of all nodes for edge routing.
+##
+## 4. GLOBAL EDGE ROUTING
+##    Routes all transition edges using obstacle-aware pathfinding.
+##    The global registry allows edges to avoid crossing any node, even those
+##    in different compound states.
+##
+## WHY RECURSIVE LAYOUT?
+## ---------------------
+## State charts have hierarchical structure - compound/parallel states contain
+## child states. Children of different parents must never overlap. Recursive
+## bottom-up layout ensures each compound's children are positioned only within
+## that compound's region, automatically satisfying containment constraints.
+##
+## For example, in a parallel state with two compound children, the recursive
+## approach ensures each compound's children stay within their compound's
+## boundaries and never interleave with siblings in the other compound.
+##
+## WHY GLOBAL EDGE ROUTING?
+## ------------------------
+## Cross-boundary transitions (from a state in one compound to a state in
+## another compound) need to know where ALL nodes are positioned to avoid
+## crossing them. The global position registry provides this visibility.
+##
+## After all positions are finalized, edges are routed using obstacle detection.
+## An obstacle is any node that is NOT:
+## - The source or target of the edge
+## - An ancestor of the source or target (we route THROUGH compound boundaries)
+##
+## This allows edges to cross compound state boundaries while avoiding
+## unrelated states that happen to be in the path.
 const StateChartUtil = preload("../state_chart_util.gd")
 const VisualLabel = preload("visual_label.gd")
 const VisualState = preload("visual_state.gd")
@@ -99,6 +144,22 @@ class LayoutEdge:
 	var group_key: String = ""  # Key for looking up transition group
 
 
+## Entry in the global position registry, storing a node's absolute position
+## and metadata for obstacle detection during edge routing.
+class PositionEntry:
+	## The absolute bounding rectangle of this node in canvas coordinates.
+	var rect: Rect2
+	## Reference to the visual state this entry represents.
+	var visual: VisualState
+	## The state node path, used for ancestor checks during obstacle detection.
+	var state_path: NodePath
+
+	func _init(r: Rect2, v: VisualState, path: NodePath) -> void:
+		rect = r
+		visual = v
+		state_path = path
+
+
 # ----- Instance State -----
 
 ## The root visual state (top of hierarchy).
@@ -109,6 +170,11 @@ var _grouped_transitions: Dictionary = {}
 
 ## The state chart being visualized.
 var _state_chart: StateChart = null
+
+## Global registry of all positioned nodes, keyed by state path.
+## Populated after layout is complete, used for obstacle-aware edge routing.
+## Maps NodePath -> PositionEntry
+var _global_position_registry: Dictionary = {}
 
 ## Computed label positions from layout, keyed by transition group key.
 ## Each entry is a Dictionary with:
@@ -124,8 +190,27 @@ var _label_positions: Dictionary = {}
 
 # ----- Public API -----
 
-## Initializes the layout engine with a state chart computes and returns a layout result.
-## Returns true if the chart changed and layout needs recomputing.
+## Computes the complete layout for a state chart.
+##
+## This is the main entry point for the layout engine. It performs all layout
+## phases and returns a LayoutResult containing positioned states and routed
+## transitions.
+##
+## The layout process:
+## 1. Collects all transitions and groups them by source/target pairs
+## 2. Builds a VisualState tree mirroring the state hierarchy
+## 3. Runs recursive bottom-up Sugiyama layout for each compound/parallel state
+## 4. Assigns absolute positions by propagating parent offsets down the tree
+## 5. Registers all positions in the global registry for edge routing
+## 6. Routes all transition edges with obstacle avoidance
+##
+## Parameters:
+##   state_chart: The StateChart node to visualize
+##
+## Returns:
+##   A LayoutResult containing:
+##   - states: Array of VisualState with computed positions and sizes
+##   - transitions: Array of VisualTransition with routed paths
 func layout(state_chart: StateChart) -> LayoutResult:
 	var result := LayoutResult.new()
 
@@ -138,23 +223,33 @@ func layout(state_chart: StateChart) -> LayoutResult:
 
 	_state_chart = state_chart
 	_label_positions.clear()
+	_global_position_registry.clear()
 
-	# Build the visual structure
+	# Phase 1: Collect and group transitions by source/target pairs
+	# This allows us to show multiple transitions as a single labeled edge
 	_collect_and_group_transitions(state_chart)
 
-	# Build visual tree (sizes computed during layout)
+	# Phase 2: Build visual tree mirroring the state hierarchy
+	# Initial sizes are computed based on state name widths
 	_root_visual = _build_visual_tree(root_state)
 
-	# Run Sugiyama layout bottom-up for each compound/parallel state
+	# Phase 3: Run Sugiyama layout bottom-up for each compound/parallel state
+	# This positions children within their parent's local coordinate space
 	_layout_recursive(_root_visual)
 
-	# Assign absolute positions top-down
+	# Phase 4: Assign absolute positions by propagating parent offsets
+	# After this, all rects are in canvas coordinates
 	_assign_absolute_positions(_root_visual, Vector2.ZERO)
 
-	# Flatten hierarchy into parent-first order
+	# Phase 5: Register all absolute positions in global registry
+	# This enables obstacle-aware edge routing across hierarchy boundaries
+	_register_all_positions(_root_visual)
+
+	# Collect all visual states into a flat array (parent-first order)
 	_collect_visuals(_root_visual, result.states)
 
-	# Finalize transitions with paths
+	# Phase 6: Route all transition edges with obstacle avoidance
+	# Uses the global registry to detect and route around obstacles
 	_finalize_transitions(result.states, result.transitions)
 
 	return result
@@ -206,24 +301,43 @@ func _build_visual_tree(state: StateChartState) -> VisualState:
 
 # ----- Sugiyama Layout -----
 
-## Recursively applies Sugiyama layout bottom-up.
+## Recursively applies Sugiyama layout to the state hierarchy, bottom-up.
+##
+## Bottom-up order is crucial for guaranteeing containment:
+## - Children are laid out first, determining their sizes
+## - Parent compound state then sizes itself to contain its children
+## - This ensures children never extend outside their parent's boundaries
+##
+## Each compound/parallel state is treated as an independent layout problem.
+## This prevents children of different parents from interleaving.
 func _layout_recursive(visual: VisualState) -> void:
-	# First, layout all children (bottom-up)
+	# First, layout all children (bottom-up order)
+	# This ensures child sizes are known before parent layout
 	for child in visual.children:
 		_layout_recursive(child)
 
-	# Now layout this level's children
+	# Now layout this level's children within parent's coordinate space
 	if not visual.children.is_empty():
 		_layout_level(visual)
 
 
 ## Applies Sugiyama layout to the children of a compound/parallel state.
-## Uses a two-phase approach:
-## 1. Layer assignment on state nodes only (ignores labels)
-## 2. Insert label nodes at midpoint layers, then run crossing minimization
-## This ensures bidirectional edges (A->B and B->A) have labels at the same layer.
 ##
-## Also handles cross-hierarchy transitions by including their labels in the layout.
+## This function positions children within the parent's local coordinate space.
+## It uses a two-phase approach to handle transition labels:
+##
+## Phase 1 - Layer Assignment (state nodes only):
+##   - Builds graph of state nodes connected by transitions
+##   - Removes cycles by temporarily reversing back edges
+##   - Assigns layers using longest-path algorithm
+##
+## Phase 2 - Label Insertion and Crossing Minimization:
+##   - Inserts virtual "label nodes" at midpoint layers
+##   - Runs barycenter heuristic to minimize edge crossings
+##   - Assigns final x,y coordinates with proper spacing
+##
+## The result is stored in each child's VisualState.rect and the parent's
+## size is updated to contain all children with padding.
 func _layout_level(parent_visual: VisualState) -> void:
 	var num_states := parent_visual.children.size()
 	if num_states == 0:
@@ -874,16 +988,23 @@ func _collect_visuals(visual: VisualState, result: Array[VisualState]) -> void:
 
 
 ## Creates the final visual transitions with computed paths.
+##
+## Uses the global position registry to detect obstacles and route edges around
+## them. All transitions are handled uniformly - there's no longer a distinction
+## between "internal" and "cross-boundary" transitions since we have full
+## visibility of all node positions.
+##
+## Self-transitions are handled specially with a loopback arc above the state.
 func _finalize_transitions(
 	visuals: Array[VisualState],
 	result: Array[VisualTransition]
 ) -> void:
-	# Build lookup table
+	# Build lookup table for quick visual state access
 	var visual_map := {}
 	for v in visuals:
 		visual_map[v.state_node.get_path()] = v
 
-	# Create visual transitions
+	# Create visual transitions with obstacle-aware routing
 	for key in _grouped_transitions:
 		var group: TransitionGroup = _grouped_transitions[key]
 		var source: StateChartState = group.source
@@ -910,173 +1031,43 @@ func _finalize_transitions(
 			has_label_pos = true
 			label_type = label_info.get("type", "internal")
 
-			if label_type == "cross_subtree":
-				# Cross-subtree transition: route through ancestor boundaries
-				var src_ancestor_rect: Rect2 = Rect2()
-				var tgt_ancestor_rect: Rect2 = Rect2()
-
-				if label_info.has("source_ancestor_rect"):
-					var local_rect: Rect2 = label_info["source_ancestor_rect"]
-					src_ancestor_rect = Rect2(
-						local_rect.position + parent_visual.rect.position,
-						local_rect.size
-					)
-				if label_info.has("target_ancestor_rect"):
-					var local_rect: Rect2 = label_info["target_ancestor_rect"]
-					tgt_ancestor_rect = Rect2(
-						local_rect.position + parent_visual.rect.position,
-						local_rect.size
-					)
-
-				vt.path = _calculate_cross_subtree_path(
-					source_visual.rect,
-					target_visual.rect,
-					label_pos,
-					src_ancestor_rect,
-					tgt_ancestor_rect
-				)
-				vt.label_position = label_pos
-
-			elif label_type == "self":
-				# Self-transition: loopback arrow above the state
-				var state_rect: Rect2 = label_info["state_rect"]
-				# Convert local rect to absolute by adding parent's position
-				var absolute_state_rect := Rect2(
-					state_rect.position + parent_visual.rect.position,
-					state_rect.size
-				)
-				vt.path = _calculate_self_transition_path(absolute_state_rect, label_pos)
-				vt.label_position = label_pos
-
-			else:
-				# Internal transition: simple path through label
-				vt.path = _calculate_arrow_path_through_point(
-					source_visual.rect,
-					target_visual.rect,
-					label_pos
-				)
-				vt.label_position = label_pos
-		else:
-			vt.path = _calculate_direct_arrow_path(
-				source_visual.rect,
-				target_visual.rect
+		# Handle self-transitions specially (loopback arc above state)
+		if label_type == "self":
+			var state_rect: Rect2 = _label_positions[key]["state_rect"]
+			var parent_visual: VisualState = _label_positions[key]["parent"]
+			var absolute_state_rect := Rect2(
+				state_rect.position + parent_visual.rect.position,
+				state_rect.size
 			)
-			# Label position at path midpoint for unlabeled transitions
-			if vt.path.size() >= 2:
-				vt.label_position = (vt.path[0] + vt.path[1]) / 2.0
+			vt.path = _calculate_self_transition_path(absolute_state_rect, label_pos)
+			vt.label_position = label_pos
+			result.append(vt)
+			continue
+
+		# Collect obstacles for this edge using global position registry
+		var obstacles: Array[Rect2] = []
+		for path in _global_position_registry:
+			if _is_obstacle_for_edge(path, source, target):
+				var entry: PositionEntry = _global_position_registry[path]
+				obstacles.append(entry.rect)
+
+		# Route the edge with obstacle avoidance
+		vt.path = _find_clear_path(
+			source_visual.rect,
+			target_visual.rect,
+			obstacles,
+			label_pos,
+			has_label_pos
+		)
+
+		# Set label position
+		if has_label_pos:
+			vt.label_position = label_pos
+		elif vt.path.size() >= 2:
+			# For unlabeled transitions, place label at path midpoint
+			vt.label_position = (vt.path[0] + vt.path[vt.path.size() - 1]) / 2.0
 
 		result.append(vt)
-
-
-## Calculates a direct arrow path from source to target rectangle (no waypoints).
-func _calculate_direct_arrow_path(source_rect: Rect2, target_rect: Rect2) -> PackedVector2Array:
-	var path := PackedVector2Array()
-
-	var src_center := source_rect.get_center()
-	var tgt_center := target_rect.get_center()
-
-	var exit_point := _rect_edge_intersection(source_rect, src_center, tgt_center)
-	var entry_point := _rect_edge_intersection(target_rect, tgt_center, src_center)
-
-	path.append(exit_point)
-	path.append(entry_point)
-
-	return path
-
-
-## Calculates an arrow path that goes through a waypoint (label position).
-## Creates a 3-point path: source edge → waypoint → target edge.
-func _calculate_arrow_path_through_point(
-	source_rect: Rect2,
-	target_rect: Rect2,
-	waypoint: Vector2
-) -> PackedVector2Array:
-	var path := PackedVector2Array()
-
-	var src_center := source_rect.get_center()
-	var tgt_center := target_rect.get_center()
-
-	# Exit from source toward waypoint
-	var exit_point := _rect_edge_intersection(source_rect, src_center, waypoint)
-	# Enter target from waypoint
-	var entry_point := _rect_edge_intersection(target_rect, tgt_center, waypoint)
-
-	path.append(exit_point)
-	path.append(waypoint)
-	path.append(entry_point)
-
-	return path
-
-
-## Calculates an arrow path for cross-subtree transitions.
-## Routes through the side edges of compound states to avoid crossing sibling nodes.
-## For nested endpoints, enters/exits the compound from the left or right side at the node's Y level.
-func _calculate_cross_subtree_path(
-	source_rect: Rect2,
-	target_rect: Rect2,
-	label_pos: Vector2,
-	source_ancestor_rect: Rect2,
-	target_ancestor_rect: Rect2
-) -> PackedVector2Array:
-	var path := PackedVector2Array()
-
-	var src_center := source_rect.get_center()
-	var tgt_center := target_rect.get_center()
-
-	# Check if source is nested inside an ancestor (source_rect is smaller and inside ancestor)
-	var source_is_nested := (
-		source_ancestor_rect.size.x > 0 and
-		source_rect.size.x < source_ancestor_rect.size.x - 10
-	)
-
-	# Check if target is nested inside an ancestor
-	var target_is_nested := (
-		target_ancestor_rect.size.x > 0 and
-		target_rect.size.x < target_ancestor_rect.size.x - 10
-	)
-
-	if source_is_nested:
-		# Source is inside a compound - exit via side edge at source's Y level
-		# Choose side based on label position relative to compound center
-		var exit_side_x: float
-		if label_pos.x < source_ancestor_rect.get_center().x:
-			exit_side_x = source_ancestor_rect.position.x  # Exit from left
-		else:
-			exit_side_x = source_ancestor_rect.position.x + source_ancestor_rect.size.x  # Exit from right
-
-		var exit_on_ancestor := Vector2(exit_side_x, src_center.y)
-		var exit_from_source := _rect_edge_intersection(source_rect, src_center, exit_on_ancestor)
-
-		path.append(exit_from_source)
-		path.append(exit_on_ancestor)
-	else:
-		# Source is a direct child - exit directly toward label
-		var exit_from_source := _rect_edge_intersection(source_rect, src_center, label_pos)
-		path.append(exit_from_source)
-
-	# Add the label position
-	path.append(label_pos)
-
-	if target_is_nested:
-		# Target is inside a compound - enter via side edge at target's Y level
-		# Choose side based on label position relative to compound center
-		var enter_side_x: float
-		if label_pos.x < target_ancestor_rect.get_center().x:
-			enter_side_x = target_ancestor_rect.position.x  # Enter from left
-		else:
-			enter_side_x = target_ancestor_rect.position.x + target_ancestor_rect.size.x  # Enter from right
-
-		var enter_on_ancestor := Vector2(enter_side_x, tgt_center.y)
-		var enter_target := _rect_edge_intersection(target_rect, tgt_center, enter_on_ancestor)
-
-		path.append(enter_on_ancestor)
-		path.append(enter_target)
-	else:
-		# Target is a direct child - enter directly from label
-		var enter_target := _rect_edge_intersection(target_rect, tgt_center, label_pos)
-		path.append(enter_target)
-
-	return path
 
 
 ## Calculates an arrow path for self-transitions.
@@ -1156,6 +1147,242 @@ func _rect_edge_intersection(rect: Rect2, inside: Vector2, outside: Vector2) -> 
 		return center
 
 	return inside + direction * min_t
+
+
+# ----- Global Position Registry -----
+
+## Populates the global position registry by walking the visual tree.
+## Must be called AFTER _assign_absolute_positions() so all rects are in
+## absolute canvas coordinates.
+##
+## This registry is used during edge routing to detect obstacles.
+## Having all positions available allows routing edges around any node,
+## regardless of hierarchy level.
+func _register_all_positions(visual: VisualState) -> void:
+	# Register this node
+	var path := visual.state_node.get_path()
+	var entry := PositionEntry.new(visual.rect, visual, path)
+	_global_position_registry[path] = entry
+
+	# Recursively register children
+	for child in visual.children:
+		_register_all_positions(child)
+
+
+## Determines if a node should be treated as an obstacle when routing an edge.
+##
+## A node is an obstacle if it is NOT:
+## - The source or target of the edge
+## - An ancestor of the source (we route THROUGH compound boundaries that contain the source)
+## - An ancestor of the target (we route THROUGH compound boundaries that contain the target)
+##
+## This allows edges to cross compound state boundaries while still avoiding
+## unrelated states that happen to be in the path.
+func _is_obstacle_for_edge(
+	node_path: NodePath,
+	source_state: StateChartState,
+	target_state: StateChartState
+) -> bool:
+	# Get the actual node from the path
+	var node := _state_chart.get_node_or_null(node_path)
+	if node == null:
+		return false
+
+	# Source and target are never obstacles
+	if node == source_state or node == target_state:
+		return false
+
+	# Ancestors of source are not obstacles (we route THROUGH them)
+	if _is_descendant_of(source_state, node):
+		return false
+
+	# Ancestors of target are not obstacles (we route THROUGH them)
+	if _is_descendant_of(target_state, node):
+		return false
+
+	# Everything else is an obstacle
+	return true
+
+
+## Finds a path from source to target that avoids the given obstacles.
+## Prefers straight lines when possible, only adding waypoints when necessary.
+##
+## Algorithm:
+## 1. Check if direct path is clear - if so, return it
+## 2. Find obstacles that block the direct path
+## 3. Route around blocking obstacles by going to their corners
+## 4. Recursively find paths between waypoints
+##
+## Returns a PackedVector2Array with path points from source edge to target edge.
+func _find_clear_path(
+	source_rect: Rect2,
+	target_rect: Rect2,
+	obstacles: Array[Rect2],
+	label_pos: Vector2 = Vector2.ZERO,
+	has_label: bool = false
+) -> PackedVector2Array:
+	var path := PackedVector2Array()
+
+	var src_center := source_rect.get_center()
+	var tgt_center := target_rect.get_center()
+
+	# If there's a label, route through it
+	var waypoint := label_pos if has_label else (src_center + tgt_center) / 2.0
+
+	# Exit from source toward waypoint
+	var exit_point := _rect_edge_intersection(source_rect, src_center, waypoint)
+	# Enter target from waypoint
+	var entry_point := _rect_edge_intersection(target_rect, tgt_center, waypoint)
+
+	path.append(exit_point)
+
+	# Check if direct path to waypoint is blocked
+	var blocking := _find_blocking_obstacle(exit_point, waypoint, obstacles)
+	if blocking.size.x > 0:
+		# Path is blocked - find waypoints around the obstacle
+		var bypass_points := _compute_bypass_waypoints(exit_point, waypoint, blocking, obstacles)
+		for bp in bypass_points:
+			path.append(bp)
+
+	if has_label:
+		path.append(label_pos)
+
+		# Check if path from label to target is blocked
+		var blocking2 := _find_blocking_obstacle(label_pos, entry_point, obstacles)
+		if blocking2.size.x > 0:
+			var bypass_points2 := _compute_bypass_waypoints(label_pos, entry_point, blocking2, obstacles)
+			for bp in bypass_points2:
+				path.append(bp)
+
+	path.append(entry_point)
+
+	return path
+
+
+## Finds the first obstacle that blocks the line from start to end.
+## Returns an empty Rect2 if no obstacle blocks the path.
+func _find_blocking_obstacle(start: Vector2, end: Vector2, obstacles: Array[Rect2]) -> Rect2:
+	var closest_obstacle := Rect2()
+	var closest_dist := INF
+
+	for obstacle in obstacles:
+		if _line_intersects_rect(start, end, obstacle):
+			var dist := start.distance_to(obstacle.get_center())
+			if dist < closest_dist:
+				closest_dist = dist
+				closest_obstacle = obstacle
+
+	return closest_obstacle
+
+
+## Checks if a line segment from start to end intersects a rectangle.
+func _line_intersects_rect(start: Vector2, end: Vector2, rect: Rect2) -> bool:
+	# Expand rect slightly for padding
+	var padding := 5.0
+	var expanded := Rect2(
+		rect.position - Vector2(padding, padding),
+		rect.size + Vector2(padding * 2, padding * 2)
+	)
+
+	# Check if either endpoint is inside
+	if expanded.has_point(start) or expanded.has_point(end):
+		return true
+
+	# Check line intersection with each edge
+	var corners:Array[Vector2] = [
+		expanded.position,
+		Vector2(expanded.position.x + expanded.size.x, expanded.position.y),
+		expanded.position + expanded.size,
+		Vector2(expanded.position.x, expanded.position.y + expanded.size.y)
+	]
+
+	for i in range(4):
+		var c1 := corners[i]
+		var c2 := corners[(i + 1) % 4]
+		if _segments_intersect(start, end, c1, c2):
+			return true
+
+	return false
+
+
+## Checks if two line segments intersect.
+func _segments_intersect(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2) -> bool:
+	var d1 := _cross_product_2d(p4 - p3, p1 - p3)
+	var d2 := _cross_product_2d(p4 - p3, p2 - p3)
+	var d3 := _cross_product_2d(p2 - p1, p3 - p1)
+	var d4 := _cross_product_2d(p2 - p1, p4 - p1)
+
+	if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and \
+	   ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+		return true
+
+	# Check for collinear cases
+	if abs(d1) < 0.0001 and _on_segment(p3, p1, p4):
+		return true
+	if abs(d2) < 0.0001 and _on_segment(p3, p2, p4):
+		return true
+	if abs(d3) < 0.0001 and _on_segment(p1, p3, p2):
+		return true
+	if abs(d4) < 0.0001 and _on_segment(p1, p4, p2):
+		return true
+
+	return false
+
+
+## 2D cross product (z-component of 3D cross product).
+func _cross_product_2d(a: Vector2, b: Vector2) -> float:
+	return a.x * b.y - a.y * b.x
+
+
+## Checks if point q lies on segment pr.
+func _on_segment(p: Vector2, q: Vector2, r: Vector2) -> bool:
+	return q.x <= maxf(p.x, r.x) and q.x >= minf(p.x, r.x) and \
+		   q.y <= maxf(p.y, r.y) and q.y >= minf(p.y, r.y)
+
+
+## Computes waypoints to bypass an obstacle.
+## Chooses the shorter path (going left/right or above/below).
+func _compute_bypass_waypoints(
+	start: Vector2,
+	end: Vector2,
+	obstacle: Rect2,
+	_all_obstacles: Array[Rect2]
+) -> Array[Vector2]:
+	var waypoints: Array[Vector2] = []
+	var padding := 10.0
+
+	# Compute the obstacle corners with padding
+	var left := obstacle.position.x - padding
+	var right := obstacle.position.x + obstacle.size.x + padding
+	var top := obstacle.position.y - padding
+	var bottom := obstacle.position.y + obstacle.size.y + padding
+
+	# Determine which side to go around based on start/end positions
+	var start_to_end := end - start
+	var obstacle_center := obstacle.get_center()
+
+	# Try to go around the shorter side
+	var horizontal_dist := absf((left + right) / 2.0 - (start.x + end.x) / 2.0)
+	var vertical_dist := absf((top + bottom) / 2.0 - (start.y + end.y) / 2.0)
+
+	if absf(start_to_end.x) > absf(start_to_end.y):
+		# Predominantly horizontal movement - go above or below
+		if start.y < obstacle_center.y:
+			# Go above
+			waypoints.append(Vector2(obstacle_center.x, top))
+		else:
+			# Go below
+			waypoints.append(Vector2(obstacle_center.x, bottom))
+	else:
+		# Predominantly vertical movement - go left or right
+		if start.x < obstacle_center.x:
+			# Go left
+			waypoints.append(Vector2(left, obstacle_center.y))
+		else:
+			# Go right
+			waypoints.append(Vector2(right, obstacle_center.y))
+
+	return waypoints
 
 
 # ----- Utility Functions -----
