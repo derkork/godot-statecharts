@@ -26,16 +26,18 @@ The easiest way to install the plugin is to use the Godot Asset Library. Search 
 
 You can also download a ZIP file of this repository and extract it, then copy the `addons/godot_state_charts` folder into your project's `addons` folder.
 
+## Activating the plugin
 After you installed it, make sure you enable the plugin in the project settings:
 
 ![Enabling the plugin in the project settings]({{ site.baseurl }}/assets/img/manual/enable_plugin.png)
 
+After that, please restart Godot, so the Godot will fully load the plugin.
 
 ## Installation with C#
 
 If you want to use this library with C#, make sure you are using the .NET version of Godot 4. This can be downloaded from the [Godot download page](https://godotengine.org/download). The standard version of Godot 4 does not support C#. **If you got Godot from Steam, you have the standard version and need to download the .NET version separately from the Godot website.** There are additional installation steps for the Godot .NET version, so make sure you follow the instructions on the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
 
-After you installed the plugin as described above, you may need to initialize your C# project if you haven't already done so. You can do this by going to the menu _Project_ -> _Tools_ -> _C#_ -> _Create C# solution_.
+After you installed and activated the plugin as described above, you may need to initialize your C# project if you haven't already done so. You can do this by going to the menu _Project_ -> _Tools_ -> _C#_ -> _Create C# solution_.
 
 ![Create C# solution]({{ site.baseurl }}/assets/img/manual/create_csharp_solution.png)
 
