@@ -31,7 +31,7 @@ After you installed it, make sure you enable the plugin in the project settings:
 
 ![Enabling the plugin in the project settings]({{ site.baseurl }}/assets/img/manual/enable_plugin.png)
 
-After that, please restart Godot, so the Godot will fully load the plugin.
+After that, please **restart Godot**, so Godot will fully load the plugin.
 
 ## Installation with C#
 
