@@ -75,7 +75,7 @@ func _on_event_selected(index:int) -> void:
 		# open refactor window
 		var window := _refactor_window_scene.instantiate()
 		add_child(window)
-		window.open(_chart, _undo_redo)
+		window.open(_chart, _undo_redo, get_edited_object()[get_edited_property()])
 		return
 	
 	# replace content with selection from popup

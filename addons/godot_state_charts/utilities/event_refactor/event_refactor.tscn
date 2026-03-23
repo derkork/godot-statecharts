@@ -49,6 +49,12 @@ size_flags_horizontal = 3
 caret_blink = true
 caret_blink_interval = 0.5
 
+[node name="WarningLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+text = "Warning... "
+
 [connection signal="canceled" from="." to="." method="_close"]
 [connection signal="confirmed" from="." to="." method="_on_confirmed"]
 [connection signal="item_selected" from="MarginContainer/VBoxContainer/EventList" to="." method="_on_event_list_item_selected"]
