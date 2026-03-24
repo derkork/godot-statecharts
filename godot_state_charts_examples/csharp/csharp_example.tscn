@@ -73,6 +73,7 @@ script = ExtResource("4_ovkn7")
 script = ExtResource("5_um7g8")
 to = NodePath("../../Poisoned")
 event = &"poisoned"
+delay_in_seconds = "0.0"
 
 [node name="Poisoned" type="Node" parent="StateChart/Root"]
 unique_name_in_owner = true
@@ -84,12 +85,14 @@ script = ExtResource("5_um7g8")
 to = NodePath("../../Normal")
 event = &"next_round"
 guard = SubResource("Resource_j6fet")
+delay_in_seconds = "0.0"
 
 [node name="To Normal On Cure" type="Node" parent="StateChart/Root/Poisoned"]
 editor_description = "This transition immediately goes back to normal state when the cure is taken."
 script = ExtResource("5_um7g8")
 to = NodePath("../../Normal")
 event = &"cured"
+delay_in_seconds = "0.0"
 
 [node name="StateChartDebugger" parent="." instance=ExtResource("7_yrwaw")]
 offset_left = 309.0

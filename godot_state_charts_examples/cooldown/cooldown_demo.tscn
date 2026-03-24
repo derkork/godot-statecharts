@@ -75,6 +75,7 @@ script = ExtResource("9_h41ei")
 script = ExtResource("10_5fig4")
 to = NodePath("../../Cooldown")
 event = &"attack"
+delay_in_seconds = "0.0"
 
 [node name="Cooldown" type="Node" parent="StateChart/Root/AttackSkill"]
 editor_description = "Cooldown state for the attack skill. While the delayed transition is pending, this state will send status updates on the pending transition to the attack skill button. The attack skill button will then update itself and show the remaining cooldown."
@@ -83,7 +84,7 @@ script = ExtResource("9_h41ei")
 [node name="Back to Available" type="Node" parent="StateChart/Root/AttackSkill/Cooldown"]
 script = ExtResource("10_5fig4")
 to = NodePath("../../Available")
-delay_seconds = 1.0
+delay_in_seconds = "1"
 
 [node name="MagicSkill" type="Node" parent="StateChart/Root"]
 script = ExtResource("8_pvst5")
@@ -97,6 +98,7 @@ script = ExtResource("9_h41ei")
 script = ExtResource("10_5fig4")
 to = NodePath("../../Cooldown")
 event = &"magic"
+delay_in_seconds = "0.0"
 
 [node name="Cooldown" type="Node" parent="StateChart/Root/MagicSkill"]
 editor_description = "Cooldown state for the magic skill. While the delayed transition is pending, this state will send status updates on the pending transition to the magic skill button. The magic  skill button will then update itself and show the remaining cooldown."
@@ -105,7 +107,7 @@ script = ExtResource("9_h41ei")
 [node name="Back to Available" type="Node" parent="StateChart/Root/MagicSkill/Cooldown"]
 script = ExtResource("10_5fig4")
 to = NodePath("../../Available")
-delay_seconds = 3.0
+delay_in_seconds = "3"
 
 [node name="HealSkill" type="Node" parent="StateChart/Root"]
 script = ExtResource("8_pvst5")
@@ -119,6 +121,7 @@ script = ExtResource("9_h41ei")
 script = ExtResource("10_5fig4")
 to = NodePath("../../Cooldown")
 event = &"heal"
+delay_in_seconds = "0.0"
 
 [node name="Cooldown" type="Node" parent="StateChart/Root/HealSkill"]
 editor_description = "Cooldown state for the heal skill. While the delayed transition is pending, this state will send status updates on the pending transition to the heal skill button. The heal skill button will then update itself and show the remaining cooldown."
@@ -127,7 +130,7 @@ script = ExtResource("9_h41ei")
 [node name="Back to Available" type="Node" parent="StateChart/Root/HealSkill/Cooldown"]
 script = ExtResource("10_5fig4")
 to = NodePath("../../Available")
-delay_seconds = 10.0
+delay_in_seconds = "10"
 
 [connection signal="pressed" from="VBoxContainer/AttackSkillButton" to="StateChart" method="send_event" binds= ["attack"]]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MagicSkillButton" to="StateChart" method="send_event" binds= ["magic"]]

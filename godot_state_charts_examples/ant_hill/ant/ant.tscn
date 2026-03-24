@@ -516,6 +516,7 @@ script = ExtResource("5_21sgy")
 script = ExtResource("7_qj278")
 to = NodePath("../../Seeking Food")
 event = &"initialized"
+delay_in_seconds = "0.0"
 
 [node name="Seeking Food" type="Node" parent="StateChart/Root"]
 editor_description = "In this state, the ant will look for food."
@@ -530,11 +531,13 @@ script = ExtResource("5_21sgy")
 script = ExtResource("7_qj278")
 to = NodePath("../../Travelling/Place Marker")
 event = &"destination_set"
+delay_in_seconds = "0.0"
 
 [node name="On Food Detected" type="Node" parent="StateChart/Root/Seeking Food/Idle"]
 script = ExtResource("7_qj278")
 to = NodePath("../../../Picking up Food")
 event = &"food_detected"
+delay_in_seconds = "0.0"
 
 [node name="Travelling" type="Node" parent="StateChart/Root/Seeking Food"]
 script = ExtResource("4_ejp2e")
@@ -545,6 +548,7 @@ editor_description = "When navigation is finished return to idle state."
 script = ExtResource("7_qj278")
 to = NodePath("../../Idle")
 event = &"navigation_finished"
+delay_in_seconds = "0.0"
 
 [node name="Travel" type="Node" parent="StateChart/Root/Seeking Food/Travelling"]
 editor_description = "This state is active while the ant is travelling when searching for food. Periodically the state will be left for placing a marker."
@@ -554,7 +558,7 @@ script = ExtResource("5_21sgy")
 editor_description = "While searching for food, periodically place a marker pointing towards the nest. This transition will move to the \"Place Marker\" state which will trigger the placement of the marker. The \"Place Marker\" state will immediately return back to the \"Travel\" state."
 script = ExtResource("7_qj278")
 to = NodePath("../../Place Marker")
-delay_seconds = 0.75
+delay_in_seconds = "0.75"
 
 [node name="Place Marker" type="Node" parent="StateChart/Root/Seeking Food/Travelling"]
 editor_description = "This state is briefly activated when the ant wants to place a marker. It will immediately exit again to the \"Travel\" state."
@@ -563,6 +567,7 @@ script = ExtResource("5_21sgy")
 [node name="Return travelling" type="Node" parent="StateChart/Root/Seeking Food/Travelling/Place Marker"]
 script = ExtResource("7_qj278")
 to = NodePath("../../Travel")
+delay_in_seconds = "0.0"
 
 [node name="Picking up Food" type="Node" parent="StateChart/Root"]
 editor_description = "This state is active when the ant has detected food and wants to pick it up."
@@ -578,6 +583,7 @@ editor_description = "When navigation is finished we can pick up the food."
 script = ExtResource("7_qj278")
 to = NodePath("../../Picking Up")
 event = &"navigation_finished"
+delay_in_seconds = "0.0"
 
 [node name="Picking Up" type="Node" parent="StateChart/Root/Picking up Food"]
 editor_description = "This state is active when the ant has reached the food and now picks it up."
@@ -588,12 +594,14 @@ editor_description = "When navigation is finished return to idle state."
 script = ExtResource("7_qj278")
 to = NodePath("../../../Returning Home")
 event = &"food_picked_up"
+delay_in_seconds = "0.0"
 
 [node name="On Food Vanished" type="Node" parent="StateChart/Root/Picking up Food/Picking Up"]
 editor_description = "When navigation is finished return to idle state."
 script = ExtResource("7_qj278")
 to = NodePath("../../../Seeking Food")
 event = &"food_vanished"
+delay_in_seconds = "0.0"
 
 [node name="Returning Home" type="Node" parent="StateChart/Root"]
 editor_description = "This state is active when the ant has found food and wants to return home."
@@ -608,11 +616,13 @@ script = ExtResource("5_21sgy")
 script = ExtResource("7_qj278")
 to = NodePath("../../Travelling")
 event = &"destination_set"
+delay_in_seconds = "0.0"
 
 [node name="On Nest Detected" type="Node" parent="StateChart/Root/Returning Home/Idle"]
 script = ExtResource("7_qj278")
 to = NodePath("../../../Delivering Food")
 event = &"nest_detected"
+delay_in_seconds = "0.0"
 
 [node name="Travelling" type="Node" parent="StateChart/Root/Returning Home"]
 editor_description = "This state is active when the ant has a destination and is currently travelling."
@@ -624,6 +634,7 @@ editor_description = "When navigation is finished return to idle state."
 script = ExtResource("7_qj278")
 to = NodePath("../../Idle")
 event = &"navigation_finished"
+delay_in_seconds = "0.0"
 
 [node name="Travel" type="Node" parent="StateChart/Root/Returning Home/Travelling"]
 script = ExtResource("5_21sgy")
@@ -631,7 +642,7 @@ script = ExtResource("5_21sgy")
 [node name="Periodically Place Marker" type="Node" parent="StateChart/Root/Returning Home/Travelling/Travel"]
 script = ExtResource("7_qj278")
 to = NodePath("../../Place Marker")
-delay_seconds = 1.0
+delay_in_seconds = "1"
 
 [node name="Place Marker" type="Node" parent="StateChart/Root/Returning Home/Travelling"]
 editor_description = "This state is active when the ant has a destination and is moving towards it."
@@ -640,6 +651,7 @@ script = ExtResource("5_21sgy")
 [node name="Return travelling" type="Node" parent="StateChart/Root/Returning Home/Travelling/Place Marker"]
 script = ExtResource("7_qj278")
 to = NodePath("../../Travel")
+delay_in_seconds = "0.0"
 
 [node name="Delivering Food" type="Node" parent="StateChart/Root"]
 editor_description = "This state is active when the ant has detected the nest and wants to bring food back."
@@ -655,6 +667,7 @@ editor_description = "When navigation is finished we can pick up the food."
 script = ExtResource("7_qj278")
 to = NodePath("../../Dropping")
 event = &"navigation_finished"
+delay_in_seconds = "0.0"
 
 [node name="Dropping" type="Node" parent="StateChart/Root/Delivering Food"]
 editor_description = "This state is active when the ant is dropping the food off at the nest."
@@ -665,6 +678,7 @@ editor_description = "When navigation is finished return to idle state."
 script = ExtResource("7_qj278")
 to = NodePath("../../../Seeking Food")
 event = &"food_dropped"
+delay_in_seconds = "0.0"
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="ready" from="Sprite2D" to="Sprite2D" method="play" binds= ["walk"]]
