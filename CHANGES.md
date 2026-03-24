@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.4] - 2026-03-24
+### Fixed
+- You can no longer accidentally "rename" an empty event name in the event management dialog ([#218](https://github.com/derkork/godot-statecharts/issues/218))
+- The event refactor dialog now properly pops up in the middle of the editor and is movable instead being stuck at the top left of the window.
+- UIDs have been updated so all relevant files have UIDs now, also a duplicate UID issue has been fixed.
+
 ## [0.22.3] - 2026-02-20
 ### Fixed
 - Added type hints everywhere in the project. This will make the project easier to maintain and use. A big thanks goes out to [Renato Rotenberg](https://github.com/Brawmario) for submitting a PR to get the work started ([#200](https://github.com/derkork/godot-statecharts/pull/200)).
