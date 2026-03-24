@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://addons/godot_state_charts/utilities/event_refactor/event_refactor.gd" id="1_hh1x6"]
 
 [node name="event_refactor" type="ConfirmationDialog"]
-initial_position = 1
+initial_position = 2
 title = "Rename Event"
 size = Vector2i(586, 562)
 visible = true

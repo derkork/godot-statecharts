@@ -18,6 +18,7 @@ func open(chart:StateChart, undo_redo:EditorUndoRedoManager, pre_select_event:St
 	_refresh_events()
 	_select_event(pre_select_event)
 	_update_buttons()
+	popup_centered()
 
 
 func _refresh_events() -> void:
