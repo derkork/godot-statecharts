@@ -24,7 +24,7 @@ The easiest way to install the plugin is to use the Godot Asset Library. Search 
 
 ### Installation with Godot Goodie Grabber (GGG)
 
-If you use [Godot Goodie Grabber](https://godotneers.github.io/ggg) to manage your project's dependencies, you can add G.U.I.D.E directly from the asset library using its asset ID `1778`:
+If you use [Godot Goodie Grabber](https://godotneers.github.io/ggg) to manage your project's dependencies, you can add Godot State Charts directly from the asset library using its asset ID `1778`:
 
 ```bash
 ggg add asset --id 1778 --name "godot_state_charts"
