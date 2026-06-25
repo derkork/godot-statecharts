@@ -156,8 +156,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 	return warnings
 
-func _get_property_list() -> Array:
-	var properties:Array = []
+func _get_property_list() -> Array[Dictionary]:
+	var properties:Array[Dictionary] = []
 	properties.append({
 		"name": "delay_in_seconds",
 		"type": TYPE_STRING,
