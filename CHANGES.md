@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.5] - 2026-06-25
+### Fixed
+- Fixed a type hint to ensure compatibility with Godot 4.7. A big thanks goes out to [Paul Gestwicki](https://github.com/doctor-g) for submitting a PR with this fix ([#224](https://github.com/derkork/godot-statecharts/issues/224)).
+
 ## [0.22.4] - 2026-03-24
 ### Fixed
 - You can no longer accidentally "rename" an empty event name in the event management dialog ([#218](https://github.com/derkork/godot-statecharts/issues/218))
