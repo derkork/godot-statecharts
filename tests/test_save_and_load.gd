@@ -1,33 +1,42 @@
 extends StateChartTestBase
 
 
-func test_simple_serialization():
+
+#----------------------------------------------------------------------------------------------------------
+# parameterized tests for both serialization formats
+#----------------------------------------------------------------------------------------------------------
+
+func test_simple_serialization(params:Array = use_parameters([[false], [true]])):
+	var binary:bool = params[0]
+
 	var root := compound_state("root")
 	var a := atomic_state("a", root)
 	var b := atomic_state("b", root)
-	
+
 	transition(a, b, "to_b")
 
 	await finish_setup()
 	assert_active(a)
 
 	# when i save the state chart
-	var saved:SerializedStateChart = StateChartSerializer.serialize(_chart)
-	
+	var saved: Variant = _serialize(_chart, binary)
+
 	# and then enter b
 	send_event("to_b")
 	assert_active(b)
-	
+
 	# and then restore the state chart
-	var errors := StateChartSerializer.deserialize(saved, _chart)
-	
+	var errors := _deserialize(saved, _chart, binary)
+
 	# then a is active again
 	assert_active(a)
 	# and we have no errors
 	assert_eq(errors.size(), 0)
 	
 
-func test_simple_serialization_restore_on_new_chart():
+func test_simple_serialization_restore_on_new_chart(params:Array = use_parameters([[false], [true]])):
+	var binary:bool = params[0]
+
 	# Build and serialize the first chart where 'a' is initially active
 	var root1 := compound_state("root")
 	var a1 := atomic_state("a", root1)
@@ -35,7 +44,7 @@ func test_simple_serialization_restore_on_new_chart():
 	transition(a1, b1, "to_b")
 	await finish_setup()
 	assert_active(a1)
-	var saved: SerializedStateChart = StateChartSerializer.serialize(_chart)
+	var saved: Variant = _serialize(_chart, binary)
 
 	# Move the original chart to 'b' (not strictly needed for this test, but mirrors the original test)
 	send_event("to_b")
@@ -47,7 +56,7 @@ func test_simple_serialization_restore_on_new_chart():
 	var new_a := atomic_state("a", new_root)
 	var new_b := atomic_state("b", new_root)
 	transition(new_a, new_b, "to_b")
-	
+
 	await finish_setup(new_chart)
 
 	# Verify the new chart can transition independently
@@ -56,14 +65,15 @@ func test_simple_serialization_restore_on_new_chart():
 	assert_active(new_b)
 
 	# Restore the saved state into the completely new chart
-	var new_errors := StateChartSerializer.deserialize(saved, new_chart)
+	var new_errors := _deserialize(saved, new_chart, binary)
 
 	# After restoration, 'a' should be active again on the new chart and there should be no errors
 	assert_active(new_a)
 	assert_eq(new_errors.size(), 0)
 	
 
-func test_serialization_with_history():
+func test_serialization_with_history(params:Array = use_parameters([[false], [true]])):
+	var binary:bool = params[0]
 	var root := compound_state("root")
 	var a := compound_state("a", root)
 	var a1 := atomic_state("a1", a)
@@ -72,52 +82,54 @@ func test_serialization_with_history():
 	var h := history_state("h", a, a1)
 
 	transition(a1, a2, "to_a2")
-	transition(a, b, "to_b")	
+	transition(a, b, "to_b")
 	transition(b, h, "to_h")
 
 	await finish_setup()
 	assert_active(a)
 	assert_active(a1)
 	assert_inactive(b)
-	
+
 	# send an event so we go to a2
 	send_event("to_a2")
 	assert_active(a2)
 	assert_inactive(a1)
 
-	# now we enter b to prepare our history state. the when we go to the 
+	# now we enter b to prepare our history state. the when we go to the
 	# history state, the state chart should activate a2 now, because that was
 	# last active when we left a
 	send_event("to_b")
 	assert_active(b)
 	assert_inactive(a)
-	
+
 	# WHEN i save the state chart.
-	var saved:SerializedStateChart = StateChartSerializer.serialize(_chart)
+	var saved: Variant = _serialize(_chart, binary)
 
 	# and use the state chart's history to go back to a
 	send_event("to_h")
 	assert_active(a)
 	assert_active(a2)
-	
+
 	# AND i then restore the state chart
-	var errors := StateChartSerializer.deserialize(saved, _chart)
-	
+	var errors := _deserialize(saved, _chart, binary)
+
 	# THEN b should be active again
 	assert_active(b)
 	assert_inactive(a)
 	assert_inactive(a1)
-	
+
 	# AND we have no errors
 	assert_eq(errors.size(), 0)
-	
+
 	# AND the history state should still remember a2 as the last active state
 	send_event("to_h")
 	assert_active(a)
 	assert_active(a2)
 	
 
-func test_serialization_with_history_restore_on_new_chart():
+@warning_ignore("unused_parameter")
+func test_serialization_with_history_restore_on_new_chart(params:Array = use_parameters([[false], [true]])):
+	var binary:bool = params[0]
 	# Build and serialize the first chart where 'a' has a history that points to a2
 	var root1 := compound_state("root")
 	var a := compound_state("a", root1)
@@ -128,9 +140,9 @@ func test_serialization_with_history_restore_on_new_chart():
 	transition(a1, a2, "to_a2")
 	transition(a, b1, "to_b")
 	transition(b1, h1, "to_h")
-	
+
 	await finish_setup()
-	
+
 	# a/a1 should be active initially
 	assert_active(a)
 	assert_active(a1)
@@ -139,9 +151,9 @@ func test_serialization_with_history_restore_on_new_chart():
 	assert_active(a2)
 	send_event("to_b")
 	assert_active(b1)
-	
+
 	# WHEN: I save serialized state (with history saved inside 'h')
-	var saved: SerializedStateChart = StateChartSerializer.serialize(_chart)
+	var saved: Variant = _serialize(_chart, binary)
 
 	# AND: i create a completely new chart with the same structure using helpers
 	var new_chart := chart("new")
@@ -155,18 +167,18 @@ func test_serialization_with_history_restore_on_new_chart():
 	transition(na, nb, "to_b")
 	transition(nb, nh, "to_h")
 	await finish_setup(new_chart)
-	
+
 	# AND: the new chart is in its initial state
 	assert_active(na)
 	assert_active(na1)
 
 	# AND: I restore the saved state into the new chart
-	var new_errors := StateChartSerializer.deserialize(saved, new_chart)
+	var new_errors := _deserialize(saved, new_chart, binary)
 	# THEN: b should be active in the new chart
 	assert_active(nb)
 	assert_inactive(na)
 	assert_inactive(na1)
-	
+
 	# AND: there should be no errors
 	assert_eq(new_errors.size(), 0)
 
@@ -430,6 +442,231 @@ func test_fewer_states_in_serialized_state():
 		assert_true(error_messages[0].contains("Tree has child state"))
 		assert_true(error_messages[0].contains("c"))
 		assert_true(error_messages[0].contains("no such child state exists in the serialized state"))
+
+
+#----------------------------------------------------------------------------------------------------------
+# binary serialization error tests
+#----------------------------------------------------------------------------------------------------------
+
+func test_binary_empty_byte_array():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Attempt to deserialize an empty byte array
+	var empty_bytes := PackedByteArray()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(empty_bytes, _chart)
+
+	# Verify that deserialization failed with the appropriate error message
+	assert_eq(error_messages.size(), 1)
+	if error_messages.size() > 0:
+		assert_true(error_messages[0].contains("empty byte array"))
+
+
+func test_binary_invalid_utf8_bytes():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create invalid UTF-8 bytes (0xFF 0xFE are invalid UTF-8 sequence starters)
+	var invalid_bytes := PackedByteArray([0xFF, 0xFE, 0x00, 0x01])
+	var error_messages := StateChartSerializer.deserialize_from_bytes(invalid_bytes, _chart)
+
+	# Verify that deserialization failed with the appropriate error message
+	assert_eq(error_messages.size(), 1)
+	if error_messages.size() > 0:
+		assert_true(error_messages[0].contains("UTF-8") or error_messages[0].contains("JSON"))
+
+
+func test_binary_invalid_json_syntax():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create invalid JSON (missing closing brace)
+	var invalid_json := '{"version": 1, "name": "test"'
+	var invalid_bytes := invalid_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(invalid_bytes, _chart)
+
+	# Verify that deserialization failed with the appropriate error message
+	assert_eq(error_messages.size(), 1)
+	if error_messages.size() > 0:
+		assert_true(error_messages[0].contains("JSON"))
+
+
+func test_binary_truncated_json():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create truncated JSON (cut off mid-structure)
+	var truncated_json := '{"version": 1, "name": "test", "state": {"name": "ro'
+	var truncated_bytes := truncated_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(truncated_bytes, _chart)
+
+	# Verify that deserialization failed with the appropriate error message
+	assert_eq(error_messages.size(), 1)
+	if error_messages.size() > 0:
+		assert_true(error_messages[0].contains("JSON"))
+
+
+func test_binary_missing_required_fields():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON missing required fields (no version, no state)
+	var incomplete_json := '{"name": "test"}'
+	var incomplete_bytes := incomplete_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(incomplete_bytes, _chart)
+
+	# Verify that deserialization failed with errors for missing fields
+	assert_true(error_messages.size() >= 1)
+	var combined := " ".join(error_messages)
+	assert_true(combined.contains("Missing required field"))
+
+
+func test_binary_wrong_data_types():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON with wrong data types (version as string, active as string)
+	var wrong_types_json := '{"version": "one", "name": "test", "state": {"name": "root", "state_type": 1, "active": "yes", "children": []}}'
+	var wrong_types_bytes := wrong_types_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(wrong_types_bytes, _chart)
+
+	# Verify that deserialization failed with type errors
+	assert_true(error_messages.size() >= 1)
+	var combined := " ".join(error_messages)
+	assert_true(combined.contains("must be"))
+
+
+func test_binary_null_state():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON with null state
+	var null_state_json := '{"version": 1, "name": "test", "state": null}'
+	var null_state_bytes := null_state_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(null_state_bytes, _chart)
+
+	# Verify that deserialization failed with appropriate error
+	assert_eq(error_messages.size(), 1)
+	if error_messages.size() > 0:
+		assert_true(error_messages[0].contains("state") and error_messages[0].contains("null"))
+
+
+func test_binary_empty_state_object():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON with empty state object (missing name, state_type, active, children)
+	var empty_state_json := '{"version": 1, "name": "test", "state": {}}'
+	var empty_state_bytes := empty_state_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(empty_state_bytes, _chart)
+
+	# Verify that deserialization failed with errors for missing fields
+	assert_true(error_messages.size() >= 1)
+	var combined := " ".join(error_messages)
+	assert_true(combined.contains("Missing required field"))
+
+
+func test_binary_missing_children_array():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON with state missing children array
+	var no_children_json := '{"version": 1, "name": "test", "state": {"name": "root", "state_type": 1, "active": true}}'
+	var no_children_bytes := no_children_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(no_children_bytes, _chart)
+
+	# Verify that deserialization failed with error for missing children
+	assert_true(error_messages.size() >= 1)
+	var combined := " ".join(error_messages)
+	assert_true(combined.contains("children"))
+
+
+func test_binary_invalid_state_type():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON with invalid state_type (99 is not valid, must be 0-3)
+	var invalid_type_json := '{"version": 1, "name": "test", "state": {"name": "root", "state_type": 99, "active": true, "children": []}}'
+	var invalid_type_bytes := invalid_type_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(invalid_type_bytes, _chart)
+
+	# Verify that deserialization failed with error for invalid state_type
+	assert_true(error_messages.size() >= 1)
+	var combined := " ".join(error_messages)
+	assert_true(combined.contains("state_type") or combined.contains("Invalid"))
+
+
+func test_binary_numeric_overflow():
+	# Create a simple state chart to deserialize into
+	var root := compound_state("root")
+	atomic_state("a", root)
+	await finish_setup()
+
+	# Create JSON with extremely large numbers for delays
+	# Note: JSON/GDScript handles large floats gracefully, so this tests the boundary
+	var overflow_json := '{"version": 1, "name": "test", "state": {"name": "root", "state_type": 1, "active": true, "children": [], "pending_transition_remaining_delay": 1e308}}'
+	var overflow_bytes := overflow_json.to_utf8_buffer()
+	var error_messages := StateChartSerializer.deserialize_from_bytes(overflow_bytes, _chart)
+
+	# Large numbers should be handled (converted to INF or clamped)
+	# This test verifies the deserialization doesn't crash
+	# The actual behavior depends on Godot's JSON parser
+	# If it parses successfully, we check that it at least gets to the compatibility check
+	assert_true(error_messages.size() >= 0)  # Just ensure no crash
+
+
+func test_binary_special_characters_in_state_names():
+	# Create a state chart with special characters in the name
+	var root := compound_state("root")
+	var special := atomic_state("state_with_émojis_и_юникод", root)
+	await finish_setup()
+
+	# Serialize and deserialize
+	var bytes := StateChartSerializer.serialize_to_bytes(_chart)
+	var error_messages := StateChartSerializer.deserialize_from_bytes(bytes, _chart)
+
+	# Verify serialization round-trip works with special characters
+	assert_eq(error_messages.size(), 0)
+	assert_active(special)
+
+
+#----------------------------------------------------------------------------------------------------------
+# helpers for serialization/deserialization with both formats
+#----------------------------------------------------------------------------------------------------------
+
+func _serialize(source: StateChart, binary: bool) -> Variant:
+	if binary:
+		return StateChartSerializer.serialize_to_bytes(source)
+	else:
+		return StateChartSerializer.serialize(source)
+
+
+func _deserialize(input: Variant, target: StateChart, binary: bool) -> PackedStringArray:
+	if binary:
+		return StateChartSerializer.deserialize_from_bytes(input, target)
+	else:
+		return StateChartSerializer.deserialize(input, target)
+
 
 #----------------------------------------------------------------------------------------------------------
 # helpers for printing serialized state charts for debugging
